@@ -35,3 +35,4 @@ class JobCategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 def home(request):
+    return render(request,'home.html')
