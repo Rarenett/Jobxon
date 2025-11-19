@@ -33,3 +33,14 @@ class JobCategoryViewSet(viewsets.ModelViewSet):
         categories = self.get_queryset()[:10]  # Top 10 categories
         serializer = self.get_serializer(categories, many=True)
         return Response(serializer.data)
+
+def home(request):
+    return render(request,'home.html')
+
+
+def index(request):
+    return render(request,'home.html')
+
+def register(request):
+    return render(request,'register.html')
+
