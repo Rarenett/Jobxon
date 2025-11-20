@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
+<<<<<<< Updated upstream
 from rest_framework import generics, permissions
 from .models import CompanyProfile, CompanyPhoto
 from .serializers import CompanyProfileSerializer, CompanyPhotoSerializer
@@ -40,3 +41,5 @@ class CompanyPhotoDeleteView(generics.DestroyAPIView):
         company = CompanyProfile.objects.get(user=self.request.user)
         return CompanyPhoto.objects.filter(company=company)
 
+=======
+>>>>>>> Stashed changes
