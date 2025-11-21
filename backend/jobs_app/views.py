@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 # Create your views here.
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -36,7 +35,6 @@ class JobCategoryViewSet(viewsets.ModelViewSet):
 
 def home(request):
     return render(request,'home.html')
-
 
 def index(request):
     return render(request,'home.html')
