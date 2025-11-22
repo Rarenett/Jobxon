@@ -163,4 +163,3 @@ def profile_view(request):
         return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
-def new
