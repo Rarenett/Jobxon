@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import JobCategory
+from .models import JobCategory,JobType
 
 
 class JobCategorySerializer(serializers.ModelSerializer):
@@ -13,3 +13,10 @@ class JobCategorySerializer(serializers.ModelSerializer):
     def get_job_count(self, obj):
         # You can update this later to count actual jobs
         return 0
+    
+
+class JobTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobType
+        fields = ['id', 'name', 'slug', 'created_at']
+        read_only_fields = ['slug', 'created_at']

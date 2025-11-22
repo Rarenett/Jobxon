@@ -3,8 +3,10 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import JobCategory
-from .serializers import JobCategorySerializer
+from .models import JobCategory,JobType
+from .serializers import JobCategorySerializer,JobTypeSerializer
+from django.http import HttpResponse
+from django.utils.text import slugify
 
 
 class JobCategoryViewSet(viewsets.ModelViewSet):
@@ -41,3 +43,24 @@ def index(request):
 
 def register(request):
     return render(request,'register.html')
+
+class JobTypeViewSet(viewsets.ModelViewSet):
+    queryset = JobType.objects.all().order_by("id")
+    serializer_class = JobTypeSerializer
+
+
+def add_jobtype(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+
+        if not name:
+            return HttpResponse("Name required", status=400)
+
+        JobType.objects.create(
+            name=name,
+            slug=slugify(name)
+        )
+
+        return HttpResponse("Job Type Added", status=201)
+
+    return HttpResponse("Only POST allowed", status=405)
