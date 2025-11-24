@@ -107,6 +107,7 @@ export const admin = {
     MANAGE_JOBS:    "/manage-jobs",
     CANDIDATES:     "/candidates-list",
     AllCANDIDATES:"/can-list",
+    ALLCOMPANIES:"",
     VIEW_APPLIED_CANDIDATES:"/view-candidate",
     CAND_BOOKMARKS:"/bookmarked-candidates",
 
@@ -115,6 +116,7 @@ export const admin = {
     MESSAGES1:      "/messages-style-1",
     MESSAGES2:      "/messages-style-2",
     RESUME_ALERTS:  "/resume-alerts",
+    COMPANY_LIST:"/company-list",
     JOB_CATEGORY:"/job-category"
 }
 
