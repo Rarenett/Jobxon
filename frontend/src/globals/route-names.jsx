@@ -107,6 +107,7 @@ export const admin = {
     MANAGE_JOBS:    "/manage-jobs",
     CANDIDATES:     "/candidates-list",
     AllCANDIDATES:"/can-list",
+    ALLCOMPANIES:"",
     VIEW_APPLIED_CANDIDATES:"/view-candidate",
     CAND_BOOKMARKS:"/bookmarked-candidates",
 
@@ -114,7 +115,8 @@ export const admin = {
     PACKAGES:       "/packages",
     MESSAGES1:      "/messages-style-1",
     MESSAGES2:      "/messages-style-2",
-    RESUME_ALERTS:  "/resume-alerts"
+    RESUME_ALERTS:  "/resume-alerts",
+    COMPANY_LIST:"/company-list"
 }
 
 export function pubRoute(_route) {

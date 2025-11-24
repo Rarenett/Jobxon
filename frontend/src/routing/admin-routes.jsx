@@ -17,6 +17,7 @@ import Error404Page from "../app/pannels/public-user/components/pages/error404";
 import AdminALLCANDIDATES from "../app/pannels/public-user/components/candidates/can-list";
 import AdminAPPLIEDCANDIDATES from "../app/pannels/public-user/components/candidates/can-detail2";
 
+import AdminCompaniesPage from "../app/pannels/admin/components/AdminCompaniesPage";
 
 function AdminRoutes() {
     return (
@@ -37,6 +38,8 @@ function AdminRoutes() {
             <Route path={admin.MESSAGES1} element={<AdminMessages1Page />} />
             <Route path={admin.MESSAGES2} element={<AdminMessages2Page />} />
             <Route path={admin.RESUME_ALERTS} element={<AdminResumeAlertsPage />} />
+            <Route path={admin.COMPANY_LIST} element={<AdminCompaniesPage />} />
+
             <Route path="*" element={<Error404Page />} />
         </Routes>
     )

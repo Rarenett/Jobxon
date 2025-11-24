@@ -46,6 +46,23 @@ function AdminSidebarSection(props) {
                             </ul>
                         </li>
 
+
+                                       <li
+                            className={
+                                setMenuActive(currentpath, adRoute(admin.COMPANY_LIST)) 
+
+
+                            }>
+                            <a href="#">
+                                <i className="fa fa-user-friends" />
+                                <span className="admin-nav-text">Companies</span>
+                            </a>
+                            <ul className="sub-menu">
+                                <li> <NavLink to={adRoute(admin.COMPANY_LIST)} id="canMenuId1"><span className="admin-nav-text">Companies List</span></NavLink></li>
+
+                            </ul>
+                        </li>
+
                         <li
                             className={
                                 setMenuActive(currentpath, adRoute(admin.AllCANDIDATES)) +
