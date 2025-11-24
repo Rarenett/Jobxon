@@ -16,7 +16,6 @@ import Error404Page from "../app/pannels/public-user/components/pages/error404";
 
 import AdminALLCANDIDATES from "../app/pannels/public-user/components/candidates/can-list";
 import AdminAPPLIEDCANDIDATES from "../app/pannels/public-user/components/candidates/can-detail2";
-import AdminJobCategory from "../app/pannels/admin/components/admin-JobCategory";
 
 import AdminCompaniesPage from "../app/pannels/admin/components/AdminCompaniesPage";
 
@@ -31,10 +30,8 @@ function AdminRoutes() {
             <Route path={admin.AllCANDIDATES} element={<AdminALLCANDIDATES />} />
             <Route path={admin.VIEW_APPLIED_CANDIDATES} element={<AdminAPPLIEDCANDIDATES />} />
 
-
             <Route path={admin.BOOKMARKS} element={<JobBookmarksPage />} />
                         <Route path={admin.CAND_BOOKMARKS} element={<AdminBookmarksPage />} />
-                        <Route path={admin.JOB_CATEGORY} element={<AdminJobCategory />} />
 
             <Route path={admin.PACKAGES} element={<AdminPackagesPage />} />
             <Route path={admin.MESSAGES1} element={<AdminMessages1Page />} />
