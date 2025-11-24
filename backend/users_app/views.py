@@ -162,6 +162,7 @@ def profile_view(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+<<<<<<< HEAD
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -229,3 +230,7 @@ class CandidateProfileViewSet(viewsets.ModelViewSet):
                 'message': 'Validation failed',
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+=======
+
+
+>>>>>>> main

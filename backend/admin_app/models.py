@@ -1,5 +1,6 @@
 from django.db import models
 
+<<<<<<< HEAD
 #
 from django.db import models
 from django.conf import settings
@@ -40,3 +41,6 @@ class CandidateAdditionalDetail(models.Model):
 
     def __str__(self):
         return f"{self.candidate} - {self.detail_type}"
+=======
+# Create your models here.
+>>>>>>> main
