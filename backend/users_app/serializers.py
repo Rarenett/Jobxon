@@ -107,3 +107,48 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
             'is_active', 'created_at', 'updated_at'
         ]
         read_only_fields = ['user', 'id', 'email', 'created_at', 'updated_at']
+
+
+
+from rest_framework import serializers
+from .models import CandidateProfile
+
+
+
+class CandidateBasicInfoSerializer(serializers.ModelSerializer):
+    """Serializer for candidate basic information update"""
+    
+    class Meta:
+        model = CandidateProfile
+        fields = [
+            "full_name",
+            "phone",
+            "email",
+            "website",
+            "qualification",
+            "languages",
+            "job_category",
+            "experience",
+            "current_salary",
+            "expected_salary",
+            "age",
+            "country",
+            "city",
+            "postcode",
+            "full_address",
+            "description",
+        ]
+        extra_kwargs = {
+            'email': {'required': False},
+            'full_name': {'required': False},
+        }
+
+
+class CandidateProfileSerializer(serializers.ModelSerializer):
+    """Full candidate profile serializer"""
+    email = serializers.EmailField(source='user.email', read_only=True)
+    
+    class Meta:
+        model = CandidateProfile
+        fields = '_all_'
+        read_only_fields = ['user', 'id', 'created_at', 'updated_at']
