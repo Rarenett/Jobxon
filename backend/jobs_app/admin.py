@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import JobCategory
+from .models import JobCategory,JobType
 
 
 @admin.register(JobCategory)
@@ -20,3 +20,8 @@ class JobCategoryAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = ['created_at']
+
+@admin.register(JobType)
+class JobTypeAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "slug", "created_at")
+    search_fields = ("name",)

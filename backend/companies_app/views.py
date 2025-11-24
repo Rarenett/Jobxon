@@ -110,7 +110,6 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
         except CompanyProfile.DoesNotExist:
             return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
 class CompanyPhotoViewSet(viewsets.ModelViewSet):
     queryset = CompanyPhoto.objects.all()
     serializer_class = CompanyPhotoSerializer
