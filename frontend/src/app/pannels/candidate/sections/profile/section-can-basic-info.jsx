@@ -25,7 +25,7 @@ function SectionCandicateBasicInfo() {
 
     // Verify token on component mount
     useEffect(() => {
-        const token = localStorage.getItem("access");
+        const token = localStorage.getItem("refresh_token");
         console.log("Token on mount:", token); // Debug log
         if (!token) {
             console.warn("No access token found in localStorage");
@@ -43,7 +43,7 @@ function SectionCandicateBasicInfo() {
         e.preventDefault();
 
         // Get token inside the function to ensure latest value
-        const token = localStorage.getItem("access");
+        const token = localStorage.getItem("access_token");
         
         // Debug: Check what's actually in localStorage
         console.log("Token retrieved:", token);
