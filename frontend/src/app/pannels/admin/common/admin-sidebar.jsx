@@ -32,16 +32,36 @@ function AdminSidebarSection(props) {
                             className={
                                 setMenuActive(currentpath, adRoute(admin.POST_A_JOB)) +
                                 setMenuActive(currentpath, adRoute(admin.MANAGE_JOBS)) +
-                                setMenuActive(currentpath, adRoute(admin.CANDIDATES))
+                                setMenuActive(currentpath, adRoute(admin.CANDIDATES))+
+                                setMenuActive(currentpath, adRoute(admin.JOB_CATEGORY))
+
                             }>
                             <a href="#">
                                 <i className="fa fa-suitcase" />
                                 <span className="admin-nav-text">Jobs</span>
                             </a>
                             <ul className="sub-menu">
-                                <li> <NavLink to={adRoute(admin.POST_A_JOB)} id="jobMenuId1"><span className="admin-nav-text">Post a New Job</span></NavLink></li>
-                                <li> <NavLink to={adRoute(admin.MANAGE_JOBS)} id="jobMenuId2"><span className="admin-nav-text">Manage Jobs</span></NavLink></li>
-                                <li><NavLink to={adRoute(admin.CANDIDATES)} id="jobMenuId3"><span className="admin-nav-text">Applied Candidates</span></NavLink></li>
+                                <li> <NavLink to={adRoute(admin.JOB_CATEGORY)} id="jobMenuId1"><span className="admin-nav-text">Job Category</span></NavLink></li>
+                                <li> <NavLink to={adRoute(admin.POST_A_JOB)} id="jobMenuId2"><span className="admin-nav-text">Post a New Job</span></NavLink></li>
+                                <li> <NavLink to={adRoute(admin.MANAGE_JOBS)} id="jobMenuId3"><span className="admin-nav-text">Manage Jobs</span></NavLink></li>
+                                <li><NavLink to={adRoute(admin.CANDIDATES)} id="jobMenuId4"><span className="admin-nav-text">Applied Candidates</span></NavLink></li>
+
+                            </ul>
+                        </li>
+
+
+                                       <li
+                            className={
+                                setMenuActive(currentpath, adRoute(admin.COMPANY_LIST)) 
+
+
+                            }>
+                            <a href="#">
+                                <i className="fa fa-user-friends" />
+                                <span className="admin-nav-text">Companies</span>
+                            </a>
+                            <ul className="sub-menu">
+                                <li> <NavLink to={adRoute(admin.COMPANY_LIST)} id="canMenuId1"><span className="admin-nav-text">Companies List</span></NavLink></li>
 
                             </ul>
                         </li>

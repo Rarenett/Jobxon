@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-# Create your views here.
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,7 +13,7 @@ class JobCategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = JobCategory.objects.all()
     serializer_class = JobCategorySerializer
-    lookup_field = 'slug'
+    lookup_field = 'pk'  # Changed from 'slug' to 'pk' (primary key/id)
     
     def get_queryset(self):
         """
@@ -34,13 +32,14 @@ class JobCategoryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(categories, many=True)
         return Response(serializer.data)
 
+
 def home(request):
-    return render(request,'home.html')
+    return render(request, 'home.html')
 
 
 def index(request):
-    return render(request,'home.html')
+    return render(request, 'home.html')
+
 
 def register(request):
-    return render(request,'register.html')
-
+    return render(request, 'register.html')
