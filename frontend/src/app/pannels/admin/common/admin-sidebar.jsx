@@ -33,8 +33,8 @@ function AdminSidebarSection(props) {
                                 setMenuActive(currentpath, adRoute(admin.POST_A_JOB)) +
                                 setMenuActive(currentpath, adRoute(admin.MANAGE_JOBS)) +
                                 setMenuActive(currentpath, adRoute(admin.CANDIDATES)) +
-                                setMenuActive(currentpath, adRoute(admin.JOB_TYPE)) +
-                                setMenuActive(currentpath, adRoute(admin.JOB_TYPE_LIST)) 
+                                setMenuActive(currentpath, adRoute(admin.JOB_TYPE)) 
+                                
                             }>
                             <a href="#">
                                 <i className="fa fa-suitcase" />
@@ -45,7 +45,7 @@ function AdminSidebarSection(props) {
                                 <li> <NavLink to={adRoute(admin.MANAGE_JOBS)} id="jobMenuId2"><span className="admin-nav-text">Manage Jobs</span></NavLink></li>
                                 <li><NavLink to={adRoute(admin.CANDIDATES)} id="jobMenuId3"><span className="admin-nav-text">Applied Candidates</span></NavLink></li>
                                 <li> <NavLink to={adRoute(admin.JOB_TYPE)} id="jobMenuId4"><span className="admin-nav-text">Job Type</span></NavLink></li>
-                                <li> <NavLink to={adRoute(admin.JOB_TYPE_LIST)} id="jobMenuId5"><span className="admin-nav-text">Job Type List</span></NavLink></li>
+                                
                             </ul>
                         </li>
 

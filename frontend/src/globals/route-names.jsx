@@ -105,7 +105,7 @@ export const admin = {
     PROFILE:        "/profile",
     POST_A_JOB:     "/post-a-job",
     JOB_TYPE:       "/job_type",
-    JOB_TYPE_LIST:       "/job_type_list",
+    
     MANAGE_JOBS:    "/manage-jobs",
     CANDIDATES:     "/candidates-list",
     AllCANDIDATES:"/can-list",
