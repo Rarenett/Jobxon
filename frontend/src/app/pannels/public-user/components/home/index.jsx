@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from "react";
 import { loadScript, publicUrlFor } from "../../../../../globals/constants";
 import JobZImage from "../../../../common/jobz-img";
@@ -13,7 +11,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 
 function Home1Page() {
- const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -68,10 +66,172 @@ function Home1Page() {
             }
         ]
     };
-    
 
     return (
         <>
+            {/* Custom CSS for job categories section */}
+            <style>{`
+                /* Slick slider overrides for categories */
+                .job-categories-style1 .slick-slider {
+                    position: relative;
+                }
+                
+                .job-categories-style1 .slick-list {
+                    overflow: hidden;
+                    margin: 0;
+                    padding: 0;
+                }
+                
+                .job-categories-style1 .slick-track {
+                    display: flex !important;
+                }
+                
+                .job-categories-style1 .slick-slide {
+                    height: auto;
+                    padding: 0 15px;
+                }
+                
+                .job-categories-style1 .slick-slide > div {
+                    height: 100%;
+                }
+                
+                /* Category block styling */
+                .job-categories-style1 .item {
+                    height: 100%;
+                }
+                
+                .job-categories-style1 .job-categories-block {
+                    background: #fff;
+                    border-radius: 10px;
+                    padding: 30px 20px;
+                    text-align: center;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                .job-categories-style1 .job-categories-block:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+                }
+                
+                .job-categories-style1 .job-categories-block .twm-media {
+                    width: 80px;
+                    height: 80px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 20px;
+                    background: rgba(25, 103, 210, 0.05);
+                    border-radius: 50%;
+                }
+                
+                .job-categories-style1 .job-categories-block .twm-media i {
+                    font-size: 40px;
+                    color: #1967d2;
+                    transition: all 0.3s ease;
+                }
+                
+                .job-categories-style1 .job-categories-block:hover .twm-media i {
+                    transform: scale(1.1);
+                    color: #0d47a1;
+                }
+                
+                .job-categories-style1 .job-categories-block .twm-content {
+                    text-align: center;
+                }
+                
+                .job-categories-style1 .job-categories-block .twm-jobs-available {
+                    font-size: 14px;
+                    color: #fff;
+                    margin-bottom: 10px;
+                    font-weight: 500;
+                }
+                
+                .job-categories-style1 .job-categories-block .twm-content a {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #333;
+                    text-decoration: none;
+                    transition: color 0.3s ease;
+                }
+                
+                .job-categories-style1 .job-categories-block .twm-content a:hover {
+                    color: #1967d2;
+                }
+                
+                /* Arrow styling */
+                .job-categories-style1 .slick-prev,
+                .job-categories-style1 .slick-next {
+                    width: 45px;
+                    height: 45px;
+                    background: #fff;
+                    border-radius: 50%;
+                    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+                    z-index: 1;
+                }
+                
+                .job-categories-style1 .slick-prev:hover,
+                .job-categories-style1 .slick-next:hover {
+                    background: #1967d2;
+                }
+                
+                .job-categories-style1 .slick-prev:hover:before,
+                .job-categories-style1 .slick-next:hover:before {
+                    color: #fff;
+                }
+                
+                .job-categories-style1 .slick-prev {
+                    left: -55px;
+                }
+                
+                .job-categories-style1 .slick-next {
+                    right: -55px;
+                }
+                
+                .job-categories-style1 .slick-prev:before,
+                .job-categories-style1 .slick-next:before {
+                    font-size: 24px;
+                    opacity: 1;
+                    color: #fff;
+                }
+                
+                @media (max-width: 1199px) {
+                    .job-categories-style1 .slick-prev {
+                        left: -35px;
+                    }
+                    
+                    .job-categories-style1 .slick-next {
+                        right: -35px;
+                    }
+                }
+                
+                @media (max-width: 767px) {
+                    .job-categories-style1 .slick-prev {
+                        left: 0;
+                    }
+                    
+                    .job-categories-style1 .slick-next {
+                        right: 0;
+                    }
+                    
+                    .job-categories-style1 .slick-prev,
+                    .job-categories-style1 .slick-next {
+                        width: 35px;
+                        height: 35px;
+                    }
+                    
+                    .job-categories-style1 .slick-prev:before,
+                    .job-categories-style1 .slick-next:before {
+                        font-size: 18px;
+                    }
+                }
+            `}</style>
+
             {/*Banner Start*/}
             <div className="twm-home1-banner-section site-bg-gray bg-cover" style={{ backgroundImage: `url(${publicUrlFor("images/main-slider/slider1/bg1.jpg")})` }}>
                 <div className="row">
@@ -214,17 +374,18 @@ function Home1Page() {
                 </div>
             </div>
             {/*Banner End*/}
+
             {/* HOW IT WORK SECTION START */}
             <div className="section-full p-t120 p-b90 site-bg-white twm-how-it-work-area">
                 <div className="container">
-                    {/* title="" START*/}
+                    {/* title START*/}
                     <div className="section-head center wt-small-separator-outer">
                         <div className="wt-small-separator site-text-primary">
                             <div>Working Process</div>
                         </div>
                         <h2 className="wt-title">How It Works</h2>
                     </div>
-                    {/* title="" END*/}
+                    {/* title END*/}
                     <div className="twm-how-it-work-section">
                         <div className="row">
                             <div className="col-xl-4 col-lg-6 col-md-6">
@@ -269,6 +430,8 @@ function Home1Page() {
                 </div>
             </div>
             {/* HOW IT WORK SECTION END */}
+
+            {/* JOBS CATEGORIES SECTION START */}
             <div className="section-full p-t120 p-b90 site-bg-gray twm-job-categories-area">
                 <div className="container">
                     <div className="wt-separator-two-part">
@@ -293,7 +456,7 @@ function Home1Page() {
                                     <p>Loading categories...</p>
                                 </div>
                             ) : categories.length > 0 ? (
-                                <Slider {...categorySliderSettings} className="job-categories-carousel">
+                                <Slider {...categorySliderSettings}>
                                     {categories.map((category) => (
                                         <div key={category.id} className="item">
                                             <div className="job-categories-block">
@@ -325,6 +488,7 @@ function Home1Page() {
                 </div>
             </div>
             {/* JOBS CATEGORIES SECTION END */}
+
             {/* EXPLORE NEW LIFE START */}
             <div className="section-full p-t120 p-b120 twm-explore-area bg-cover " style={{ backgroundImage: `url(${publicUrlFor("images/background/bg-1.jpg")})` }}>
                 <div className="container">
@@ -346,7 +510,7 @@ function Home1Page() {
                                         <div className="twm-r-circle-2" />
                                         <div className="twm-title-small">Explore New Life</div>
                                         <div className="twm-title-large">
-                                            <h2>Don’t just find. be found
+                                            <h2>Don't just find. be found
                                                 put your CV in front of
                                                 great employers </h2>
                                             <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry the standard dummy text ever since the  when an printer took.</p>
@@ -364,16 +528,17 @@ function Home1Page() {
                 </div>
             </div>
             {/* EXPLORE NEW LIFE END */}
+
             {/* TOP COMPANIES START */}
             <div className="section-full p-t120  site-bg-white twm-companies-wrap">
-                {/* title="" START*/}
+                {/* title START*/}
                 <div className="section-head center wt-small-separator-outer">
                     <div className="wt-small-separator site-text-primary">
                         <div>Top Companies</div>
                     </div>
                     <h2 className="wt-title">Get hired in top companies</h2>
                 </div>
-                {/* title="" END*/}
+                {/* title END*/}
                 <div className="container">
                     <div className="section-content">
                         <div className="owl-carousel home-client-carousel2 owl-btn-vertical-center">
@@ -484,19 +649,20 @@ function Home1Page() {
                 </div>
             </div>
             {/* TOP COMPANIES END */}
+
             {/* JOB POST START */}
             <div className="section-full p-t120 p-b90 site-bg-light-purple twm-bg-ring-wrap">
                 <div className="twm-bg-ring-right" />
                 <div className="twm-bg-ring-left" />
                 <div className="container">
-                    {/* title="" START*/}
+                    {/* title START*/}
                     <div className="section-head center wt-small-separator-outer">
                         <div className="wt-small-separator site-text-primary">
                             <div>All Jobs Post</div>
                         </div>
                         <h2 className="wt-title">Find Your Career You Deserve it</h2>
                     </div>
-                    {/* title="" END*/}
+                    {/* title END*/}
                     <div className="section-content">
                         <div className="twm-jobs-list-wrap">
                             <ul>
@@ -604,20 +770,21 @@ function Home1Page() {
                 </div>
             </div>
             {/* JOB POST END */}
+
             {/* TESTIMONIAL SECTION START */}
             <div className="section-full p-t120 p-b90 site-bg-white twm-testimonial-1-area">
                 <div className="container">
                     <div className="wt-separator-two-part">
                         <div className="row wt-separator-two-part-row">
                             <div className="col-xl-5 col-lg-6 col-md-12 wt-separator-two-part-left">
-                                {/* title="" START*/}
+                                {/* title START*/}
                                 <div className="section-head left wt-small-separator-outer">
                                     <div className="wt-small-separator site-text-primary">
                                         <div>Clients Testimonials</div>
                                     </div>
                                     <h2 className="wt-title">What Our Customers Say About Us</h2>
                                 </div>
-                                {/* title="" END*/}
+                                {/* title END*/}
                             </div>
                         </div>
                     </div>
@@ -728,17 +895,18 @@ function Home1Page() {
                 </div>
             </div>
             {/* TESTIMONIAL SECTION END */}
+
             {/* OUR BLOG START */}
             <div className="section-full p-t120 p-b90 site-bg-gray">
                 <div className="container">
-                    {/* title="" START*/}
+                    {/* title START*/}
                     <div className="section-head center wt-small-separator-outer">
                         <div className="wt-small-separator site-text-primary">
                             <div>Our Blogs</div>
                         </div>
                         <h2 className="wt-title">Latest Article</h2>
                     </div>
-                    {/* title="" END*/}
+                    {/* title END*/}
                     <div className="section-content">
                         <div className="twm-blog-post-1-outer-wrap">
                             <div className="owl-carousel twm-la-home-blog owl-btn-bottom-center">
