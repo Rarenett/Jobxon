@@ -24,3 +24,14 @@ class CandidateProfileListSerializer(serializers.ModelSerializer):
             'full_address',
             'description',
         ]
+
+
+from rest_framework import serializers
+from .models import CandidateAdditionalDetail
+
+
+class CandidateAdditionalDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CandidateAdditionalDetail
+        fields = "__all__"
+        read_only_fields = ['candidate', 'created_at']
