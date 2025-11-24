@@ -114,7 +114,8 @@ export const admin = {
     PACKAGES:       "/packages",
     MESSAGES1:      "/messages-style-1",
     MESSAGES2:      "/messages-style-2",
-    RESUME_ALERTS:  "/resume-alerts"
+    RESUME_ALERTS:  "/resume-alerts",
+    JOB_CATEGORY:"/job-category"
 }
 
 export function pubRoute(_route) {

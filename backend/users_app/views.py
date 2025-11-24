@@ -161,3 +161,5 @@ def profile_view(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
