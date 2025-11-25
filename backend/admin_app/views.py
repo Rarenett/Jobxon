@@ -1,3 +1,5 @@
+
+from requests import Response
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -18,6 +20,15 @@ class CandidateProfileViewSet(viewsets.ModelViewSet):
             {"message": "Deleted successfully"},
             status=status.HTTP_204_NO_CONTENT
         )
+
+from rest_framework.response import Response
+from rest_framework import status
+
+def destroy(self, request, *args, **kwargs):
+    instance = self.get_object()
+    instance.delete()
+    return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
+
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -44,6 +55,8 @@ class ResumeHeadlineView(APIView):
         return Response({"message": "Saved successfully"})
 
 from rest_framework.views import APIView
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import CandidateKeySkills
@@ -115,5 +128,17 @@ class CandidateITSkillViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return CandidateITSkill.objects.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    
+ 
+
+
+#pricing
+from rest_framework import viewsets
+from .models import PricingPlan
+from .serializers import PricingPlanSerializer
+
+class PricingPlanViewSet(viewsets.ModelViewSet):
+    queryset = PricingPlan.objects.all().order_by('id')
+    serializer_class = PricingPlanSerializer
+    
+

@@ -10,10 +10,24 @@ from .views import CandidateITSkillViewSet
 
 router = DefaultRouter()
 router.register(r'admin/candidates', CandidateProfileViewSet, basename='admin-candidates')
+from .views import CandidateProfileViewSet
+from admin_app.views import CandidateResumeHeadlineView
+from .views import CompanyProfileViewSet
+from .views import PricingPlanViewSet
+
+from backend.admin_app import views
+
+
+router = DefaultRouter()
+router.register(r'admin/candidates', CandidateProfileViewSet, basename='admin-candidates')
+path('resume-headline/', CandidateResumeHeadlineView.as_view(), name='resume-headline'),
+path('api/pricing-plans/', PricingPlanViewSet.as_view(), name='pricing-plans'),
 router.register(r'companies', CompanyProfileViewSet, basename='company')
 router.register(r'employment', CandidateEmploymentViewSet, basename='employment')
 router.register(r'education', CandidateEducationViewSet, basename='education')
 router.register(r'it-skills', CandidateITSkillViewSet, basename='it-skills')
+
+
 
 
 

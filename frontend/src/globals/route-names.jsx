@@ -119,7 +119,9 @@ export const admin = {
     MESSAGES2:      "/messages-style-2",
     RESUME_ALERTS:  "/resume-alerts",
     COMPANY_LIST:"/company-list",
-    JOB_CATEGORY:"/job-category"
+    JOB_CATEGORY:"/job-category",
+    JOB_TYPE:"/job_types",
+    PRICING:"/pricing"
 }
 
 export function pubRoute(_route) {
