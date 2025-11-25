@@ -9,25 +9,25 @@ function AdminJobCategory() {
     const { user } = useAuth();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     // Form State
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         icon: ''
     });
-    
+
     // Edit Mode
     const [editMode, setEditMode] = useState(false);
     const [editId, setEditId] = useState(null);
-    
+
     // Loading States
     const [saving, setSaving] = useState(false);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const [recordsPerPage] = useState(10);
-    
+
     // Search and Filter State
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredCategories, setFilteredCategories] = useState([]);
@@ -45,9 +45,12 @@ function AdminJobCategory() {
     const fetchCategories = async () => {
         try {
             const token = localStorage.getItem('access_token');
-            const response = await axios.get(`${API_URL}/categories/`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const headers = {};
+            // Only add header if token is valid (user is authenticated)
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            const response = await axios.get(`${API_URL}/categories/`, { headers });
             setCategories(response.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -111,7 +114,7 @@ function AdminJobCategory() {
     // Handle form submission (Add/Update)
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!formData.name.trim()) {
             alert('⚠️ WARNING: Category name is required');
             return;
@@ -121,7 +124,7 @@ function AdminJobCategory() {
 
         try {
             const token = localStorage.getItem('access_token');
-            
+
             if (editMode) {
                 await axios.put(
                     `${API_URL}/categories/${editId}/`,
@@ -137,16 +140,16 @@ function AdminJobCategory() {
                 );
                 alert('✅ SUCCESS: Category added successfully!');
             }
-            
+
             setFormData({ name: '', icon: '' });
             setEditMode(false);
             setEditId(null);
             setShowForm(false);
             fetchCategories();
         } catch (error) {
-            const errorMsg = error.response?.data?.name?.[0] || 
-                            error.response?.data?.detail || 
-                            'Failed to save category';
+            const errorMsg = error.response?.data?.name?.[0] ||
+                error.response?.data?.detail ||
+                'Failed to save category';
             alert(`❌ ERROR: ${errorMsg}`);
             console.error(error);
         } finally {
@@ -219,7 +222,7 @@ function AdminJobCategory() {
                 {/* Add Category Button */}
                 {!showForm && (
                     <div className="mb-4">
-                        <button 
+                        <button
                             className="site-button"
                             onClick={() => setShowForm(true)}
                         >
@@ -255,7 +258,7 @@ function AdminJobCategory() {
                                                 />
                                             </div>
                                         </div>
-                                        
+
                                         <div className="col-xl-6 col-lg-6 col-md-12">
                                             <div className="form-group">
                                                 <label>Icon Class (FontAwesome)</label>
@@ -350,8 +353,8 @@ function AdminJobCategory() {
                                                         <div className="p-4">
                                                             <i className="fa fa-info-circle fa-2x text-muted mb-2"></i>
                                                             <p>
-                                                                {searchTerm 
-                                                                    ? `No categories found matching "${searchTerm}"` 
+                                                                {searchTerm
+                                                                    ? `No categories found matching "${searchTerm}"`
                                                                     : 'No categories found. Add your first category!'}
                                                             </p>
                                                         </div>
@@ -361,7 +364,7 @@ function AdminJobCategory() {
                                                 currentRecords.map((category, index) => {
                                                     // Calculate serial number based on current page
                                                     const serialNumber = indexOfFirstRecord + index + 1;
-                                                    
+
                                                     return (
                                                         <tr key={category.id}>
                                                             <td>
@@ -372,14 +375,14 @@ function AdminJobCategory() {
                                                             <td>
                                                                 <div className="text-center">
                                                                     {category.icon ? (
-                                                                        <i 
-                                                                            className={category.icon} 
+                                                                        <i
+                                                                            className={category.icon}
                                                                             style={{ fontSize: '28px' }}
                                                                             title={category.icon}
                                                                         ></i>
                                                                     ) : (
-                                                                        <i 
-                                                                            className="fa fa-briefcase text-muted" 
+                                                                        <i
+                                                                            className="fa fa-briefcase text-muted"
                                                                             style={{ fontSize: '28px' }}
                                                                         ></i>
                                                                     )}
@@ -424,9 +427,9 @@ function AdminJobCategory() {
                                                                 <div className="twm-table-controls">
                                                                     <ul className="twm-DT-controls-icon list-unstyled">
                                                                         <li>
-                                                                            <button 
-                                                                                title="Edit" 
-                                                                                data-bs-toggle="tooltip" 
+                                                                            <button
+                                                                                title="Edit"
+                                                                                data-bs-toggle="tooltip"
                                                                                 data-bs-placement="top"
                                                                                 onClick={() => handleEdit(category)}
                                                                             >
@@ -434,9 +437,9 @@ function AdminJobCategory() {
                                                                             </button>
                                                                         </li>
                                                                         <li>
-                                                                            <button 
-                                                                                title="Delete" 
-                                                                                data-bs-toggle="tooltip" 
+                                                                            <button
+                                                                                title="Delete"
+                                                                                data-bs-toggle="tooltip"
                                                                                 data-bs-placement="top"
                                                                                 onClick={() => handleDelete(category.id, category.name)}
                                                                             >
@@ -475,14 +478,14 @@ function AdminJobCategory() {
                                                     Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, filteredCategories.length)} of {filteredCategories.length} entries
                                                 </p>
                                             </div>
-                                            
+
                                             {/* Right side - Pagination buttons */}
                                             <div className="col-md-6">
                                                 <nav aria-label="Page navigation" className="d-flex justify-content-end">
                                                     <ul className="pagination mb-0" style={{ gap: '5px' }}>
                                                         {/* Previous Button */}
                                                         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                                            <button 
+                                                            <button
                                                                 className="page-link"
                                                                 onClick={goToPreviousPage}
                                                                 disabled={currentPage === 1}
@@ -503,11 +506,11 @@ function AdminJobCategory() {
                                                         {[...Array(totalPages)].map((_, index) => {
                                                             const pageNumber = index + 1;
                                                             return (
-                                                                <li 
-                                                                    key={pageNumber} 
+                                                                <li
+                                                                    key={pageNumber}
                                                                     className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}
                                                                 >
-                                                                    <button 
+                                                                    <button
                                                                         className="page-link"
                                                                         onClick={() => paginate(pageNumber)}
                                                                         style={{
@@ -529,7 +532,7 @@ function AdminJobCategory() {
 
                                                         {/* Next Button */}
                                                         <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                                                            <button 
+                                                            <button
                                                                 className="page-link"
                                                                 onClick={goToNextPage}
                                                                 disabled={currentPage === totalPages}

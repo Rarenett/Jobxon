@@ -174,3 +174,14 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Photo deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         except CompanyPhoto.DoesNotExist:
             return Response({'error': 'Photo not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+#pricing
+from rest_framework import viewsets
+from .models import PricingPlan
+from .serializers import PricingPlanSerializer
+
+class PricingPlanViewSet(viewsets.ModelViewSet):
+    queryset = PricingPlan.objects.all().order_by('id')
+    serializer_class = PricingPlanSerializer
+    
