@@ -23,7 +23,6 @@ class JobCategory(models.Model):
 class JobType(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
