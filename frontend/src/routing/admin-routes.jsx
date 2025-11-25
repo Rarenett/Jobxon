@@ -19,6 +19,9 @@ import AdminAPPLIEDCANDIDATES from "../app/pannels/public-user/components/candid
 
 import AdminCompaniesPage from "../app/pannels/admin/components/AdminCompaniesPage";
 
+import AdminCompanyDetailPage from '../app/pannels/admin/components/AdminCompanyDetailPage';
+
+
 function AdminRoutes() {
     return (
         <Routes>
@@ -39,6 +42,9 @@ function AdminRoutes() {
             <Route path={admin.MESSAGES2} element={<AdminMessages2Page />} />
             <Route path={admin.RESUME_ALERTS} element={<AdminResumeAlertsPage />} />
             <Route path={admin.COMPANY_LIST} element={<AdminCompaniesPage />} />
+
+            <Route path={admin.COMPANY_DETAIL} element={<AdminCompanyDetailPage />} />
+
 
             <Route path="*" element={<Error404Page />} />
         </Routes>

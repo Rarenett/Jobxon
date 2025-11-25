@@ -470,7 +470,17 @@ function AdminCompaniesPage() {
                                                     </tr>
                                                 )}
                                             </tbody>
-                                           
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Company Details</th>
+                                                    <th>Contact Info</th>
+                                                    <th>Company Info</th>
+                                                    <th>Photos</th>
+                                                    <th>Registered On</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 )}
