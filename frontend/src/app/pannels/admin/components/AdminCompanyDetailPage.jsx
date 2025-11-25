@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import SectionEmployerInfo from "../../public-user/sections/employers/detail/section-emp-info";
-import SectionEmployersCandidateSidebar from "../../public-user/sections/common/section-emp-can-sidebar";
-import SectionOfficeVideo1 from "../../public-user/sections/common/section-office-video1";
-import SectionOfficePhotos3 from "../../public-user/sections/common/section-office-photos3";
+import SectionEmployerAdminInfo from "../../admin/sections/employers/detail/section-emp-info";
+import SectionEmployersCandidateSidebarAdmin from "../../admin/sections/common/section-emp-can-sidebar";
+import SectionOfficeVideo1Admin from "../../admin/sections/common/section-office-video1";
+import SectionOfficePhotos3Admin from "../../admin/sections/common/section-office-photos3";
 import SectionAvailableJobsGrid from "../../public-user/sections/employers/detail/section-available-jobs-grid";
 import { loadScript } from "../../../../globals/constants";
 
@@ -127,14 +127,14 @@ function AdminCompanyDetailPage() {
 
             <div className="section-full p-t0 p-b90 bg-white">
                 {/*Top Wide banner Start*/}
-                <SectionEmployerInfo company={company} getImageUrl={getImageUrl} />
+                <SectionEmployerAdminInfo company={company} getImageUrl={getImageUrl} />
                 {/*Top Wide banner End*/}
                 
                 <div className="container">
                     <div className="section-content">
                         <div className="row d-flex justify-content-center">
                             <div className="col-lg-4 col-md-12 rightSidebar">
-                                <SectionEmployersCandidateSidebar 
+                                <SectionEmployersCandidateSidebarAdmin 
                                     type="2" 
                                     company={company}
                                     getImageUrl={getImageUrl}
@@ -228,7 +228,7 @@ function AdminCompanyDetailPage() {
                                             {company.video && (
                                                 <div className="col-lg-12 col-md-12 m-b30">
                                                     <h4 className="twm-s-title">Company Video</h4>
-                                                    <SectionOfficeVideo1 videoUrl={company.video} />
+                                                    <SectionOfficeVideo1Admin videoUrl={company.video} />
                                                 </div>
                                             )}
                                             

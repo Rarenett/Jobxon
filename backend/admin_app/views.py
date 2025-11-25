@@ -164,6 +164,52 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except CompanyPhoto.DoesNotExist:
             return Response({'error': 'Photo not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+           
+    @action(detail=False, methods=['get'], url_path='current')
+    def current_profile(self, request):
+        """Return the current user's complete company profile"""
+        try:
+            profile = CompanyProfile.objects.get(user=request.user)
+            serializer = CompanyProfileSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except CompanyProfile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+    @action(detail=True, methods=['post'])
+    def toggle_verified(self, request, pk=None):
+        company = self.get_object()
+        company.is_verified = not company.is_verified
+        company.save()
+        serializer = CompanyProfileSerializer(company)
+        return Response({
+            'message': f'Verified status updated to {company.is_verified}',
+            'profile': serializer.data
+        })
+
+    @action(detail=True, methods=['post'])
+    def toggle_favourite(self, request, pk=None):
+        company = self.get_object()
+        company.is_favourite = not company.is_favourite
+        company.save()
+        serializer = CompanyProfileSerializer(company)
+        return Response({
+            'message': f'Favourite status updated to {company.is_favourite}',
+            'profile': serializer.data
+        })
+
+    @action(detail=True, methods=['post'])
+    def toggle_status(self, request, pk=None):
+        company = self.get_object()
+        company.is_active = not company.is_active
+        company.save()
+        serializer = CompanyProfileSerializer(company)
+        return Response({
+            'message': f'Status updated to {company.is_active}',
+            'profile': serializer.data
+        })
+
+
 
 
 class CompanyReviewViewSet(viewsets.ModelViewSet):
