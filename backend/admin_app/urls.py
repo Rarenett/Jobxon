@@ -20,8 +20,6 @@ from backend.admin_app import views
 
 router = DefaultRouter()
 router.register(r'admin/candidates', CandidateProfileViewSet, basename='admin-candidates')
-path('resume-headline/', CandidateResumeHeadlineView.as_view(), name='resume-headline'),
-path('api/pricing-plans/', PricingPlanViewSet.as_view(), name='pricing-plans'),
 router.register(r'companies', CompanyProfileViewSet, basename='company')
 router.register(r'employment', CandidateEmploymentViewSet, basename='employment')
 router.register(r'education', CandidateEducationViewSet, basename='education')
@@ -36,5 +34,9 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/resume-headline/', ResumeHeadlineView.as_view(), name="resume-headline"),
     path('api/key-skills/', KeySkillsView.as_view(), name="key-skills"),
+    path('api/pricing-plans/', PricingPlanViewSet.as_view(), name='pricing-plans'),
+    path('resume-headline/', ResumeHeadlineView.as_view(), name='resume-headline'),
+
+
 ]
 

@@ -26,18 +26,7 @@ urlpatterns = [
     path('', include('jobs_app.urls')),
     path('', include('companies_app.urls')),
     path('', include('admin_app.urls')),
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
     path('api/', include('jobs_app.urls')), 
-=======
-<<<<<<< HEAD
-=======
-
->>>>>>> main
->>>>>>> main
->>>>>>> main
-
 
 ]
 # Serve media files in development
