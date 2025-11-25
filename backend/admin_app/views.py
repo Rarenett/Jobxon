@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from requests import Response
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -11,7 +11,7 @@ class CandidateProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-    from rest_framework.response import Response
+from rest_framework.response import Response
 from rest_framework import status
 
 def destroy(self, request, *args, **kwargs):
@@ -50,7 +50,6 @@ class CandidateResumeHeadlineView(APIView):
 
         return Response({"message": "Headline updated successfully"}, status=status.HTTP_200_OK)
 
-=======
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -227,4 +226,16 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Photo deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         except CompanyPhoto.DoesNotExist:
             return Response({'error': 'Photo not found'}, status=status.HTTP_404_NOT_FOUND)
->>>>>>> main
+
+
+
+#pricing
+from rest_framework import viewsets
+from .models import PricingPlan
+from .serializers import PricingPlanSerializer
+
+class PricingPlanViewSet(viewsets.ModelViewSet):
+    queryset = PricingPlan.objects.all().order_by('id')
+    serializer_class = PricingPlanSerializer
+    
+
