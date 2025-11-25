@@ -26,10 +26,18 @@ urlpatterns = [
     path('', include('jobs_app.urls')),
     path('', include('companies_app.urls')),
     path('', include('admin_app.urls')),
+<<<<<<< HEAD
     path('api/', include('jobs_app.urls')), 
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
+>>>>>>> main
 
 
 ]
 # Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

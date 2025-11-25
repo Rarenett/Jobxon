@@ -2,10 +2,12 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import RegisterViewSet, LoginViewSet, google_login, profile_view
-
+from .views import CandidateProfileViewSet
 router = DefaultRouter()
 router.register(r'register', RegisterViewSet, basename='register')
 router.register(r'login', LoginViewSet, basename='login')
+router.register("candidate-profile", CandidateProfileViewSet, basename="candidate-profile")
+
 
 urlpatterns = [
     path('api/google-login/', google_login, name='google_login'),
