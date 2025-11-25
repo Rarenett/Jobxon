@@ -50,7 +50,6 @@ class CandidateResumeHeadlineView(APIView):
 
         return Response({"message": "Headline updated successfully"}, status=status.HTTP_200_OK)
 
-=======
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
