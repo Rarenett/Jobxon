@@ -5,20 +5,30 @@ function SectionCanResumeHeadline() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
+    // ✅ Load data from API
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/resume-headline/", {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`
+        const fetchHeadline = async () => {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/api/resume-headline/", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("access_token")}`
+                    }
+                });
+
+                const data = await res.json();
+                setHeadline(data.headline || "");
+            } catch (err) {
+                console.log("Failed to load headline");
             }
-        })
-        .then(res => res.json())
-        .then(data => setHeadline(data.headline || ""))
-        .catch(() => {});
+        };
+
+        fetchHeadline();
     }, []);
 
+    // ✅ Save data to API
     const saveHeadline = async () => {
         if (!headline.trim()) {
-            setMessage("Headline cannot be empty");
+            setMessage("Headline cannot be empty ❌");
             return;
         }
 
@@ -26,32 +36,33 @@ function SectionCanResumeHeadline() {
         setMessage("");
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/resume-headline/", {
+            const res = await fetch("http://127.0.0.1:8000/api/resume-headline/", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`
                 },
-                body: JSON.stringify({ headline }),
+                body: JSON.stringify({ headline })
             });
 
-            if (response.ok) {
+            if (res.ok) {
                 setMessage("Saved successfully ✅");
 
-                // Auto close modal after save
+                // ✅ Close modal
                 const modal = document.getElementById("Resume_Headline");
-                const bootstrapModal = window.bootstrap?.Modal.getInstance(modal);
-                bootstrapModal?.hide();
+                const bsModal = window.bootstrap?.Modal.getInstance(modal);
+                bsModal?.hide();
             } else {
-                setMessage("Failed to save ❌");
+                setMessage("Save failed ❌");
             }
-        } catch {
+        } catch (err) {
             setMessage("Server error ❌");
         }
 
         setLoading(false);
     };
 
+    
     return (
         <>
             <div className="panel-heading wt-panel-heading p-a20 panel-heading-with-btn">

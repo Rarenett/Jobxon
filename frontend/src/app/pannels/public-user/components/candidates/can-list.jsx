@@ -18,11 +18,12 @@ function AdminCandidateListPage() {
     try {
         const token = localStorage.getItem("access_token");
 
-        const res = await fetch("http://127.0.0.1:8000/api/admin/candidates/", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+const res = await fetch("http://127.0.0.1:8000/api/admin/candidates/", {
+    headers: {
+        Authorization: `Bearer ${token}`,
+    },
+});
+
 
         const data = await res.json();
 
@@ -112,32 +113,30 @@ const deleteCandidate = async (id) => {
 
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/api/admin/candidates/${id}/`,
+            `http://127.0.0.1:8000/api/admin-candidates/${id}/`,
             {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
                 },
             }
         );
 
-        const text = await res.text();
-        console.log("Delete response:", res.status, text);
-
         if (res.ok) {
-            alert("Deleted from database ✅");
+            alert("Deleted ✅");
 
-            // ✅ re-fetch from server instead of local delete
+            // ✅ remove from UI instantly
+            const updated = candidates.filter(c => c.id !== id);
+            setCandidates(updated);
+            setFilteredCandidates(updated);
         } else {
-            alert("Delete failed ❌ Check console");
+            alert("Delete failed ❌");
         }
     } catch (err) {
-        console.error("Delete error:", err);
+        console.error(err);
         alert("Server error ❌");
     }
 };
-
 
     return (
         <>
