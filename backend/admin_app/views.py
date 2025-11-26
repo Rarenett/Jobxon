@@ -71,6 +71,7 @@ class ResumeHeadlineView(APIView):
 
         return Response({"message": "Saved successfully"})
 
+<<<<<<< HEAD
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -85,6 +86,9 @@ from companies_app.serializers import (
     CompanyVideoLinksSerializer,
     CompanyPhotoSerializer
 )
+=======
+
+>>>>>>> main
 
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
