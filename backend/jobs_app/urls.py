@@ -8,6 +8,6 @@ router.register(r'job-type', JobTypeViewSet, basename='jobtype')
 router.register(r'jobs', JobViewSet, basename='job')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
     
 ]

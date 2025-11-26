@@ -764,7 +764,7 @@ function AdminManageJobsPage() {
                     </div>
 
                     <div className="twm-D_table table-responsive">
-                        <table id="jobs_bookmark_table" className="table table-bordered twm-bookmark-list-wrap">
+                        <table id="jobs_bookmark" className="table table-bordered twm-bookmark-list-wrap">
                             <thead>
                                 <tr>
                                     <th>Sl No.</th>

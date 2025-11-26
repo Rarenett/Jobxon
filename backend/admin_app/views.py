@@ -127,6 +127,10 @@ class CandidateITSkillViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return CandidateITSkill.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        # Automatically attach the logged-in user
+        serializer.save(user=self.request.user)
 
     
  
@@ -135,10 +139,118 @@ class CandidateITSkillViewSet(viewsets.ModelViewSet):
 #pricing
 from rest_framework import viewsets
 from .models import PricingPlan
-from .serializers import PricingPlanSerializer
+from admin_app.serializer import PricingPlanSerializer
 
 class PricingPlanViewSet(viewsets.ModelViewSet):
     queryset = PricingPlan.objects.all().order_by('id')
     serializer_class = PricingPlanSerializer
     
 
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import CandidateProject
+from .serializer import CandidateProjectSerializer
+
+
+class CandidateProjectViewSet(viewsets.ModelViewSet):
+    serializer_class = CandidateProjectSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return CandidateProject.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import DesiredCareerProfile
+from .serializer import DesiredCareerProfileSerializer
+
+
+class DesiredCareerProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = DesiredCareerProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return DesiredCareerProfile.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+from rest_framework import viewsets, permissions
+from .models import PersonalDetail
+from .serializer import PersonalDetailSerializer
+
+class PersonalDetailViewSet(viewsets.ModelViewSet):
+    serializer_class = PersonalDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return PersonalDetail.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+from rest_framework import viewsets, permissions
+from .models import ResumeAttachment
+from .serializer import ResumeAttachmentSerializer
+
+class ResumeAttachmentViewSet(viewsets.ModelViewSet):
+    serializer_class = ResumeAttachmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ResumeAttachment.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+from rest_framework import generics, permissions
+from .models import (
+    OnlineProfile, WorkSample, ResearchPublication,
+    Presentation, Certification, Patent
+)
+from .serializer import (
+    OnlineProfileSerializer, WorkSampleSerializer,
+    ResearchPublicationSerializer, PresentationSerializer,
+    CertificationSerializer, PatentSerializer
+)
+
+class BaseUserCreateView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class OnlineProfileView(BaseUserCreateView):
+    queryset = OnlineProfile.objects.all()
+    serializer_class = OnlineProfileSerializer
+
+
+class WorkSampleView(BaseUserCreateView):
+    queryset = WorkSample.objects.all()
+    serializer_class = WorkSampleSerializer
+
+
+class ResearchPublicationView(BaseUserCreateView):
+    queryset = ResearchPublication.objects.all()
+    serializer_class = ResearchPublicationSerializer
+
+
+class PresentationView(BaseUserCreateView):
+    queryset = Presentation.objects.all()
+    serializer_class = PresentationSerializer
+
+
+class CertificationView(BaseUserCreateView):
+    queryset = Certification.objects.all()
+    serializer_class = CertificationSerializer
+
+
+class PatentView(BaseUserCreateView):
+    queryset = Patent.objects.all()
+    serializer_class = PatentSerializer

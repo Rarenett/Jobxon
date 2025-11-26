@@ -1,118 +1,292 @@
+import { useEffect, useState } from "react";
+
 function SectionCanProjects() {
+    const [projects, setProjects] = useState([]);
+    const [formData, setFormData] = useState({
+        project_title: "",
+        client: "",
+        status: "Finished",
+        start_date: "",
+        end_date: "",
+        description: ""
+    });
+    const [editId, setEditId] = useState(null);
+
+    const token = localStorage.getItem("access_token");
+    const API_URL = "http://127.0.0.1:8000/api/projects/";
+
+    const loadProjects = async () => {
+        try {
+            const res = await fetch(API_URL, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+
+            if (Array.isArray(data)) setProjects(data);
+            else if (data?.results) setProjects(data.results);
+            else setProjects([]);
+        } catch {
+            setProjects([]);
+        }
+    };
+
+    useEffect(() => {
+        loadProjects();
+    }, []);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const saveProject = async () => {
+        const method = editId ? "PUT" : "POST";
+        const url = editId ? `${API_URL}${editId}/` : API_URL;
+
+        const res = await fetch(url, {
+            method,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (res.ok) {
+            loadProjects();
+            resetForm();
+            window.bootstrap.Modal.getInstance(document.getElementById("Pro_ject"))?.hide();
+        } else {
+            const err = await res.json();
+            alert(JSON.stringify(err));
+        }
+    };
+
+    const editProject = (proj) => {
+        setFormData({
+            project_title: proj.project_title || "",
+            client: proj.client || "",
+            status: proj.status || "Finished",
+            start_date: proj.start_date || "",
+            end_date: proj.end_date || "",
+            description: proj.description || ""
+        });
+
+        setEditId(proj.id);
+        new window.bootstrap.Modal(document.getElementById("Pro_ject")).show();
+    };
+
+    const deleteProject = async (id) => {
+        if (!window.confirm("Delete this project?")) return;
+        await fetch(`${API_URL}${id}/`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        setProjects(projects.filter(p => p.id !== id));
+    };
+
+    const resetForm = () => {
+        setFormData({
+            project_title: "",
+            client: "",
+            status: "Finished",
+            start_date: "",
+            end_date: "",
+            description: ""
+        });
+        setEditId(null);
+    };
+
     return (
         <>
+            {/* Header */}
             <div className="panel-heading wt-panel-heading p-a20 panel-heading-with-btn ">
                 <h4 className="panel-tittle m-a0">Project</h4>
-                <a data-bs-toggle="modal" href="#Pro_ject" role="button" title="Edit" className="site-text-primary">
+                <a
+                    className="site-text-primary"
+                    data-bs-toggle="modal"
+                    href="#Pro_ject"
+                    onClick={resetForm}
+                >
                     <span className="fa fa-edit" />
                 </a>
             </div>
+
+            {/* List - ORIGINAL LAYOUT */}
             <div className="panel-body wt-panel-body p-a20 ">
                 <div className="twm-panel-inner">
-                    <p><b>Jobzilla</b></p>
-                    <p>Google INC</p>
-                    <p>January 2023 to Present</p>
-                    <p>Jobjilla Template</p>
+
+                    {projects.length === 0 ? (
+                        <p>No projects added</p>
+                    ) : (
+                        projects.map((p) => (
+                            <div key={p.id} className="mb-3">
+                                <p><b>{p.project_title}</b></p>
+                                <p>{p.client}</p>
+                                <p>
+                                    {p.start_date} to {p.end_date || "Present"}
+                                </p>
+                                <p>{p.description}</p>
+
+                                <a
+                                    className="site-text-primary me-2"
+                                    href="#Pro_ject"
+                                    data-bs-toggle="modal"
+                                    onClick={() => editProject(p)}
+                                >
+                                    <span className="fa fa-edit" />
+                                </a>
+
+                                <a
+                                    className="site-text-primary"
+                                    onClick={() => deleteProject(p.id)}
+                                >
+                                    <span className="fa fa-trash" />
+                                </a>
+
+                                <hr />
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
-            {/*Project */}
+
+            {/* Modal - ORIGINAL DESIGN */}
             <div className="modal fade twm-saved-jobs-view" id="Pro_ject" tabIndex={-1}>
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <form>
                             <div className="modal-header">
-                                <h2 className="modal-title">Add Project</h2>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                                <h2 className="modal-title">
+                                    {editId ? "Edit Project" : "Add Project"}
+                                </h2>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" />
                             </div>
+
                             <div className="modal-body">
                                 <div className="row">
-                                    <div className="col-xl-12 col-lg-12">
+                                    <div className="col-xl-12">
                                         <div className="form-group">
                                             <label>Project Title</label>
                                             <div className="ls-inputicon-box">
-                                                <input className="form-control" type="text" placeholder="Enter Project Title" />
+                                                <input
+                                                    className="form-control"
+                                                    name="project_title"
+                                                    value={formData.project_title}
+                                                    onChange={handleChange}
+                                                    placeholder="Enter Project Title"
+                                                />
                                                 <i className="fs-input-icon fa fa-address-card" />
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group">
-                                            <label>Education</label>
-                                            <div className="ls-inputicon-box">
-                                                <select className="wt-select-box selectpicker" data-live-search="true" title="" data-bv-field="size">
-                                                    <option className="bs-title-option" value>Select Category</option>
-                                                    <option>Graduation/Diploma</option>
-                                                    <option>Masters/Post-Graduation</option>
-                                                </select>
-                                                <i className="fs-input-icon fa fa-user-graduate" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-12 col-lg-12">
+
+                                    <div className="col-xl-12">
                                         <div className="form-group">
                                             <label>Client</label>
                                             <div className="ls-inputicon-box">
-                                                <input className="form-control" type="text" placeholder="Enter Client Name" />
+                                                <input
+                                                    className="form-control"
+                                                    name="client"
+                                                    value={formData.client}
+                                                    onChange={handleChange}
+                                                    placeholder="Enter Client Name"
+                                                />
                                                 <i className="fs-input-icon fa fa-user" />
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
+
+                                    <div className="col-xl-12">
                                         <div className="form-group">
                                             <label>Project Status</label>
                                             <div className="row twm-form-radio-inline">
                                                 <div className="col-md-6">
-                                                    <input className="form-check-input" type="radio" name="flexRadioDefault" id="In_Progress" />
-                                                    <label className="form-check-label" htmlFor="In_Progress">
-                                                        In Progress
-                                                    </label>
+                                                    <input
+                                                        type="radio"
+                                                        name="status"
+                                                        value="In Progress"
+                                                        checked={formData.status === "In Progress"}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label>In Progress</label>
                                                 </div>
                                                 <div className="col-md-6">
-                                                    <input className="form-check-input" type="radio" name="flexRadioDefault" id="Finished" defaultChecked />
-                                                    <label className="form-check-label" htmlFor="Finished">
-                                                        Finished
-                                                    </label>
+                                                    <input
+                                                        type="radio"
+                                                        name="status"
+                                                        value="Finished"
+                                                        checked={formData.status === "Finished"}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <label>Finished</label>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    {/*Start Date*/}
+
                                     <div className="col-md-6">
                                         <div className="form-group">
                                             <label>Started Working From</label>
                                             <div className="ls-inputicon-box">
-                                                <input className="form-control datepicker" data-provide="datepicker" name="company_since" type="text" placeholder="mm/dd/yyyy" />
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    name="start_date"
+                                                    value={formData.start_date}
+                                                    onChange={handleChange}
+                                                />
                                                 <i className="fs-input-icon far fa-calendar" />
                                             </div>
                                         </div>
                                     </div>
-                                    {/*End Date*/}
+
                                     <div className="col-md-6">
                                         <div className="form-group">
                                             <label>Worked Till</label>
                                             <div className="ls-inputicon-box">
-                                                <input className="form-control datepicker" data-provide="datepicker" name="company_since" type="text" placeholder="mm/dd/yyyy" />
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    name="end_date"
+                                                    value={formData.end_date}
+                                                    onChange={handleChange}
+                                                />
                                                 <i className="fs-input-icon far fa-calendar" />
                                             </div>
                                         </div>
                                     </div>
+
                                     <div className="col-md-12">
                                         <div className="form-group mb-0">
                                             <label>Detail of Projects</label>
-                                            <textarea className="form-control" rows={3} placeholder="Describe your Job" defaultValue={""} />
+                                            <textarea
+                                                className="form-control"
+                                                rows={3}
+                                                name="description"
+                                                value={formData.description}
+                                                onChange={handleChange}
+                                                placeholder="Describe your project"
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <div className="modal-footer">
-                                <button type="button" className="site-button" data-bs-dismiss="modal">Close</button>
-                                <button type="button" className="site-button">Save</button>
+                                <button type="button" className="site-button" data-bs-dismiss="modal">
+                                    Close
+                                </button>
+                                <button type="button" className="site-button" onClick={saveProject}>
+                                    {editId ? "Update" : "Save"}
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </>
-    )
+    );
 }
+
 export default SectionCanProjects;
