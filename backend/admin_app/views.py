@@ -22,7 +22,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from users_app.models import CandidateProfile
-from .serializer import CandidateProfileListSerializer
+from .serializer import CandidateKeySkillSerializer, CandidateProfileListSerializer
 
 
 class CandidateProfileViewSet(viewsets.ModelViewSet):
@@ -80,8 +80,22 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import CandidateKeySkills
 
-class KeySkillsView(APIView):
+class CandidateKeySkillViewSet(viewsets.ModelViewSet):
+    serializer_class = CandidateKeySkillSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Return the single skill record for the authenticated user"""
+        return CandidateKeySkills.objects.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        """Create or update skills (handles duplicate user_id)"""
+        skills_obj, created = CandidateKeySkills.objects.update_or_create(
+            user=request.user,
+            defaults={'skills': request.data.get('skills', '')}
+        )
+        serializer = self.get_serializer(skills_obj)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 class CompanyProfileViewSet(viewsets.ModelViewSet):
     """
