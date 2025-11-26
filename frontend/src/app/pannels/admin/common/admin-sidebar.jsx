@@ -50,6 +50,22 @@ function AdminSidebarSection(props) {
 
                         <li
                             className={
+                                setMenuActive(currentpath, adRoute(admin.COMPANY_LIST))
+
+
+                            }>
+                            <a href="#">
+                                <i className="fa fa-user-friends" />
+                                <span className="admin-nav-text">Companies</span>
+                            </a>
+                            <ul className="sub-menu">
+                                <li> <NavLink to={adRoute(admin.COMPANY_LIST)} id="canMenuId1"><span className="admin-nav-text">Companies List</span></NavLink></li>
+
+                            </ul>
+                        </li>
+
+                        <li
+                            className={
                                 setMenuActive(currentpath, adRoute(admin.AllCANDIDATES)) +
                                 setMenuActive(currentpath, adRoute(admin.CAND_BOOKMARKS))
 
@@ -81,9 +97,9 @@ function AdminSidebarSection(props) {
                         </li>
 
                         <li className={setMenuActive(currentpath, adRoute(admin.MESSAGES1))}>
-                                <NavLink to={adRoute(admin.MESSAGES1)} > <i className="fa fa-envelope" /><span className="admin-nav-text">Messages</span></NavLink>
+                            <NavLink to={adRoute(admin.MESSAGES1)} > <i className="fa fa-envelope" /><span className="admin-nav-text">Messages</span></NavLink>
                         </li>
-                      
+
                         <li className={setMenuActive(currentpath, adRoute(admin.RESUME_ALERTS))}>
                             <NavLink to={adRoute(admin.RESUME_ALERTS)}><i className="fa fa-bell" /><span className="admin-nav-text">Resume Alerts</span></NavLink>
                         </li>

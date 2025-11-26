@@ -21,3 +21,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/backend/admin_app/__pycache__
+backend/admin_app/__pycache__/serializer.cpython-312.pyc
+/backend/admin_app/__pycache__
+backend/admin_app/__pycache__/admin.cpython-312.pyc
+*.pyc
+*.pyc
+*.pyc

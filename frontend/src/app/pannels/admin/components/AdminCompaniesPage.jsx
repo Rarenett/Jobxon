@@ -298,8 +298,8 @@ function AdminCompaniesPage() {
                                                                                     src={getImageUrl(company.logo)} 
                                                                                     alt={company.name}
                                                                                     style={{
-                                                                                        width: '50px',
-                                                                                        height: '50px',
+                                                                                        width: '90px',
+                                                                                        height: '90px',
                                                                                         objectFit: 'cover',
                                                                                         borderRadius: '4px'
                                                                                     }}
@@ -470,7 +470,17 @@ function AdminCompaniesPage() {
                                                     </tr>
                                                 )}
                                             </tbody>
-                                           
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Company Details</th>
+                                                    <th>Contact Info</th>
+                                                    <th>Company Info</th>
+                                                    <th>Photos</th>
+                                                    <th>Registered On</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 )}
