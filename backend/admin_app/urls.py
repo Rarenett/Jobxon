@@ -1,22 +1,18 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CandidateProfileViewSet
+from .views import CandidateProfileViewSet, CompanyProfileViewSet, PricingPlanViewSet
 from admin_app.views import CandidateResumeHeadlineView
-from .views import CompanyProfileViewSet
-from .views import PricingPlanViewSet
-
-from backend.admin_app import views
-
 
 router = DefaultRouter()
+
+# Register ViewSets
 router.register(r'admin/candidates', CandidateProfileViewSet, basename='admin-candidates')
-path('resume-headline/', CandidateResumeHeadlineView.as_view(), name='resume-headline'),
-path('api/pricing-plans/', PricingPlanViewSet.as_view(), name='pricing-plans'),
 router.register(r'companies', CompanyProfileViewSet, basename='company')
-
-
+router.register(r'pricing-plans', PricingPlanViewSet, basename='pricing-plans')
 
 urlpatterns = [
     path('api/', include(router.urls)),
-]
 
+    # Normal API views (non-viewsets)
+    path('api/resume-headline/', CandidateResumeHeadlineView.as_view(), name='resume-headline'),
+]

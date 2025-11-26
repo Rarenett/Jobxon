@@ -26,14 +26,6 @@ urlpatterns = [
     path('', include('jobs_app.urls')),
     path('', include('companies_app.urls')),
     path('', include('admin_app.urls')),
-<<<<<<< HEAD
-    path('api/', include('jobs_app.urls')), 
-=======
-<<<<<<< HEAD
-=======
-
->>>>>>> main
->>>>>>> main
 
 
 ]
