@@ -1,15 +1,42 @@
+from rest_framework import viewsets, status, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
+from django.db.models import Q
+from companies_app.models import CompanyProfile, CompanyPhoto, CompanyReview
+from companies_app.serializers import (
+    CompanyProfileSerializer,
+    CompanyBasicInfoSerializer,
+    CompanyLogoSerializer,
+    CompanyBannerSerializer,
+    CompanySocialLinksSerializer,
+    CompanyVideoLinksSerializer,
+    CompanyPhotoSerializer,
+    CompanyReviewSerializer
+)
+
 
 from requests import Response
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 from users_app.models import CandidateProfile
-from admin_app.serializer import CandidateProfileListSerializer
+from .serializer import CandidateProfileListSerializer
+
 
 class CandidateProfileViewSet(viewsets.ModelViewSet):
     queryset = CandidateProfile.objects.all().order_by('-id')
     serializer_class = CandidateProfileListSerializer
     permission_classes = [IsAuthenticated]
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.delete()
+        return Response(
+            {"message": "Deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -20,20 +47,17 @@ def destroy(self, request, *args, **kwargs):
     return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
 
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import ResumeHeadline
 
-
-
-class CandidateResumeHeadlineView(APIView):
+class ResumeHeadlineView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        try:
-            profile = CandidateProfile.objects.get(user=request.user)
-            return Response({
-                "headline": profile.resume_headline
-            })
-        except CandidateProfile.DoesNotExist:
-            return Response({"headline": ""}, status=200)
+        obj, _ = ResumeHeadline.objects.get_or_create(user=request.user)
+        return Response({"headline": obj.headline or ""})
 
     def put(self, request):
         headline = request.data.get("headline")
@@ -41,11 +65,11 @@ class CandidateResumeHeadlineView(APIView):
         if not headline:
             return Response({"error": "Headline is required"}, status=400)
 
-        profile, created = CandidateProfile.objects.get_or_create(user=request.user)
-        profile.resume_headline = headline
-        profile.save()
+        obj, _ = ResumeHeadline.objects.get_or_create(user=request.user)
+        obj.headline = headline
+        obj.save()
 
-        return Response({"message": "Headline updated successfully"}, status=status.HTTP_200_OK)
+        return Response({"message": "Saved successfully"})
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -62,19 +86,27 @@ from companies_app.serializers import (
     CompanyPhotoSerializer
 )
 
+from rest_framework.views import APIView
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .models import CandidateKeySkills
+
+class KeySkillsView(APIView):
+    permission_classes = [IsAuthenticated]
 
 class CompanyProfileViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for managing company profiles in admin panel
-    Provides CRUD operations and custom actions
+    ViewSet for managing company profiles
     """
-    queryset = CompanyProfile.objects.select_related('user').prefetch_related('photos').all()
+    queryset = CompanyProfile.objects.select_related('user').prefetch_related('photos', 'reviews').all()
     serializer_class = CompanyProfileSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated, IsAdminUser] 
     
     def get_queryset(self):
         """
-        Optionally filter companies by search term and active status
+        Optionally filter companies by search term and flags
         """
         queryset = super().get_queryset()
         
@@ -84,14 +116,24 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(
                 Q(name__icontains=search) |
                 Q(location__icontains=search) |
+                Q(address__icontains=search) |
                 Q(user__email__icontains=search) |
                 Q(phone__icontains=search)
             )
         
-        # Filter by active status
+        # Filters
         is_active = self.request.query_params.get('is_active', None)
+        is_verified = self.request.query_params.get('is_verified', None)
+        is_favourite = self.request.query_params.get('is_favourite', None)
+
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active.lower() == 'true')
+        
+        if is_verified is not None:
+            queryset = queryset.filter(is_verified=is_verified.lower() == 'true')
+            
+        if is_favourite is not None:
+            queryset = queryset.filter(is_favourite=is_favourite.lower() == 'true')
         
         # Ordering (default: newest first)
         ordering = self.request.query_params.get('ordering', '-created_at')
@@ -100,9 +142,6 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
         return queryset
     
     def get_serializer_class(self):
-        """
-        Return appropriate serializer based on action
-        """
         if self.action == 'update_basic_info':
             return CompanyBasicInfoSerializer
         elif self.action == 'update_logo':
@@ -117,93 +156,79 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def toggle_status(self, request, pk=None):
-        """
-        Toggle company active/inactive status
-        """
         company = self.get_object()
         company.is_active = not company.is_active
         company.save()
-        serializer = self.get_serializer(company)
-        return Response({
-            'message': f'Company status updated to {"Active" if company.is_active else "Inactive"}',
-            'data': serializer.data
-        })
+        return Response({'message': f'Status updated to {company.is_active}'})
+
+    @action(detail=True, methods=['post'])
+    def toggle_verified(self, request, pk=None):
+        company = self.get_object()
+        company.is_verified = not company.is_verified
+        company.save()
+        return Response({'message': f'Verified status updated to {company.is_verified}'})
+
+    @action(detail=True, methods=['post'])
+    def toggle_favourite(self, request, pk=None):
+        company = self.get_object()
+        company.is_favourite = not company.is_favourite
+        company.save()
+        return Response({'message': f'Favourite status updated to {company.is_favourite}'})
     
     @action(detail=False, methods=['get'])
     def stats(self, request):
-        """
-        Get company statistics for admin dashboard
-        """
         total = self.queryset.count()
         active = self.queryset.filter(is_active=True).count()
-        inactive = self.queryset.filter(is_active=False).count()
+        verified = self.queryset.filter(is_verified=True).count()
         
         return Response({
             'total': total,
             'active': active,
-            'inactive': inactive
+            'verified': verified
         })
     
     @action(detail=True, methods=['patch'])
     def update_basic_info(self, request, pk=None):
-        """
-        Update only basic company information
-        """
         company = self.get_object()
         serializer = self.get_serializer(company, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['patch'])
     def update_logo(self, request, pk=None):
-        """
-        Update company logo
-        """
         company = self.get_object()
         serializer = self.get_serializer(company, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['patch'])
     def update_banner(self, request, pk=None):
-        """
-        Update company banner image
-        """
         company = self.get_object()
         serializer = self.get_serializer(company, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['patch'])
     def update_social_links(self, request, pk=None):
-        """
-        Update company social media links
-        """
         company = self.get_object()
         serializer = self.get_serializer(company, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['patch'])
     def update_video_links(self, request, pk=None):
-        """
-        Update company video links
-        """
         company = self.get_object()
         serializer = self.get_serializer(company, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    
+        
     @action(detail=True, methods=['post'])
     def add_photo(self, request, pk=None):
-        """
-        Add a photo to company gallery
-        """
         company = self.get_object()
         serializer = CompanyPhotoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -212,17 +237,141 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['delete'], url_path='photos/(?P<photo_id>[^/.]+)')
     def delete_photo(self, request, pk=None, photo_id=None):
-        """
-        Delete a specific photo from company gallery
-        """
         company = self.get_object()
         try:
             photo = company.photos.get(id=photo_id)
             photo.delete()
-            return Response({'message': 'Photo deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         except CompanyPhoto.DoesNotExist:
             return Response({'error': 'Photo not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+           
+    @action(detail=False, methods=['get'], url_path='current')
+    def current_profile(self, request):
+        """Return the current user's complete company profile"""
+        try:
+            profile = CompanyProfile.objects.get(user=request.user)
+            serializer = CompanyProfileSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except CompanyProfile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+    @action(detail=True, methods=['post'])
+    def toggle_verified(self, request, pk=None):
+        company = self.get_object()
+        company.is_verified = not company.is_verified
+        company.save()
+        serializer = CompanyProfileSerializer(company)
+        return Response({
+            'message': f'Verified status updated to {company.is_verified}',
+            'profile': serializer.data
+        })
 
+    @action(detail=True, methods=['post'])
+    def toggle_favourite(self, request, pk=None):
+        company = self.get_object()
+        company.is_favourite = not company.is_favourite
+        company.save()
+        serializer = CompanyProfileSerializer(company)
+        return Response({
+            'message': f'Favourite status updated to {company.is_favourite}',
+            'profile': serializer.data
+        })
+
+    @action(detail=True, methods=['post'])
+    def toggle_status(self, request, pk=None):
+        company = self.get_object()
+        company.is_active = not company.is_active
+        company.save()
+        serializer = CompanyProfileSerializer(company)
+        return Response({
+            'message': f'Status updated to {company.is_active}',
+            'profile': serializer.data
+        })
+
+
+
+
+class CompanyReviewViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for handling company reviews (Admin Only)
+    """
+    queryset = CompanyReview.objects.all()
+    serializer_class = CompanyReviewSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser] # Only admins can create/edit reviews
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        company_id = self.request.query_params.get('company_id', None)
+        if company_id:
+            queryset = queryset.filter(company_id=company_id)
+        return queryset
+    def get(self, request):
+        try:
+            obj = CandidateKeySkills.objects.get(user=request.user)
+            return Response({"skills": obj.skills})
+        except CandidateKeySkills.DoesNotExist:
+            return Response({"skills": ""})
+
+    def post(self, request):
+        skills = request.data.get("skills", "")
+
+        obj, created = CandidateKeySkills.objects.get_or_create(user=request.user)
+        obj.skills = skills
+        obj.save()
+
+        return Response({"message": "Saved successfully"})
+
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import CandidateEmployment
+from admin_app.serializer import EmploymentSerializer
+
+class CandidateEmploymentViewSet(viewsets.ModelViewSet):
+    serializer_class = EmploymentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return CandidateEmployment.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import CandidateEducation
+from .serializer import CandidateEducationSerializer
+
+class CandidateEducationViewSet(viewsets.ModelViewSet):
+    serializer_class = CandidateEducationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return logged-in user's data
+        return CandidateEducation.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Automatically attach the logged-in user
+        serializer.save(user=self.request.user)
+
+
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import CandidateITSkill
+from admin_app.serializer import CandidateITSkillSerializer
+
+class CandidateITSkillViewSet(viewsets.ModelViewSet):
+    serializer_class = CandidateITSkillSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return CandidateITSkill.objects.filter(user=self.request.user)
+
+    
+ 
 
 
 #pricing

@@ -25,13 +25,57 @@ class CandidateProfileListSerializer(serializers.ModelSerializer):
             'description',
         ]
 
+from rest_framework import serializers
+from .models import ResumeHeadline
+
+class ResumeHeadlineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResumeHeadline
+        fields = ['id', 'headline']
+
 
 from rest_framework import serializers
-from .models import CandidateAdditionalDetail
+from .models import CandidateKeySkills
 
-
-class CandidateAdditionalDetailSerializer(serializers.ModelSerializer):
+class CandidateKeySkillSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CandidateAdditionalDetail
+        model = CandidateKeySkills
+        fields = ['id', 'skills']
+
+# admin_app/serializer.py
+
+from rest_framework import serializers
+from .models import CandidateEmployment
+
+class EmploymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CandidateEmployment
         fields = "__all__"
-        read_only_fields = ['candidate', 'created_at']
+        read_only_fields = ["user"]
+from rest_framework import serializers
+from .models import CandidateEducation
+
+class CandidateEducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CandidateEducation
+        fields = "__all__"
+        read_only_fields = ["user"]
+
+
+from rest_framework import serializers
+from .models import CandidateITSkill
+
+class CandidateITSkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CandidateITSkill
+        fields = "__all__"
+        read_only_fields = ["user"]
+
+
+from rest_framework import serializers
+from .models import PricingPlan
+
+class PricingPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PricingPlan
+        fields = '__all__'

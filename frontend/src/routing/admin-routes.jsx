@@ -22,6 +22,9 @@ import AdminJobCategory from "../app/pannels/admin/components/admin-JobCategory"
 import AdminManageJobTypesPage from "../app/pannels/admin/components/jobs/AdminManageJobTypesPage";
 import AdminPricingPlan from "../app/pannels/admin/components/AdminPricingPlan";
 
+import AdminCompanyDetailPage from '../app/pannels/admin/components/AdminCompanyDetailPage';
+
+
 function AdminRoutes() {
     return (
         <Routes>
@@ -44,6 +47,9 @@ function AdminRoutes() {
             <Route path={admin.JOB_CATEGORY} element={<AdminJobCategory />} />
             <Route path={admin.JOB_TYPE} element={<AdminManageJobTypesPage />} />
             <Route path={admin.PRICING} element={<AdminPricingPlan />} />
+
+
+            <Route path={admin.COMPANY_DETAIL} element={<AdminCompanyDetailPage />} />
 
 
             <Route path="*" element={<Error404Page />} />

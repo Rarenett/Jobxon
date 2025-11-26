@@ -119,6 +119,7 @@ export const admin = {
     MESSAGES2:      "/messages-style-2",
     RESUME_ALERTS:  "/resume-alerts",
     COMPANY_LIST:"/company-list",
+    COMPANY_DETAIL: "/companies/:id",
     JOB_CATEGORY:"/job-category",
     JOB_TYPE:"/job_types",
     PRICING:"/pricing"
