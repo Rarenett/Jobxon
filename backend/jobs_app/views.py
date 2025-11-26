@@ -1,46 +1,24 @@
-from django.shortcuts import render
-
-# Create your views here.
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from .models import JobCategory
-from .serializers import JobCategorySerializer
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import JobCategory, JobType, Job
+from .serializers import JobCategorySerializer, JobTypeSerializer, JobSerializer
+from rest_framework.permissions import AllowAny
 
 
 class JobCategoryViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for viewing and editing JobCategory instances.
-    Provides CRUD operations: list, create, retrieve, update, delete
-    """
-    queryset = JobCategory.objects.all()
+    queryset = JobCategory.objects.all().order_by('name')
     serializer_class = JobCategorySerializer
-    lookup_field = 'slug'
-    
-    def get_queryset(self):
-        """
-        Optionally filter categories by active status
-        """
-        queryset = JobCategory.objects.all().order_by('name')
-        return queryset
-    
-    @action(detail=False, methods=['get'])
-    def popular(self, request):
-        """
-        Custom endpoint to get categories with most jobs
-        URL: /api/categories/popular/
-        """
-        categories = self.get_queryset()[:10]  # Top 10 categories
-        serializer = self.get_serializer(categories, many=True)
-        return Response(serializer.data)
+    permission_classes = [AllowAny]
 
-def home(request):
-    return render(request,'home.html')
+class JobTypeViewSet(viewsets.ModelViewSet):
+    queryset = JobType.objects.all().order_by('name')
+    serializer_class = JobTypeSerializer
+    permission_classes = [AllowAny]
 
+class JobViewSet(viewsets.ModelViewSet):
+    queryset = Job.objects.select_related('category', 'job_type', 'posted_by').all().order_by('-created_at')
+    serializer_class = JobSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
-def index(request):
-    return render(request,'home.html')
-
-def register(request):
-    return render(request,'register.html')
-
+    def perform_create(self, serializer):
+        serializer.save(posted_by=self.request.user)

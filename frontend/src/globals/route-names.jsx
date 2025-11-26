@@ -104,6 +104,8 @@ export const admin = {
     DASHBOARD:      "/dashboard",
     PROFILE:        "/profile",
     POST_A_JOB:     "/post-a-job",
+    JOB_TYPE:       "/job_type",
+    
     MANAGE_JOBS:    "/manage-jobs",
     CANDIDATES:     "/candidates-list",
     AllCANDIDATES:"/can-list",
@@ -118,6 +120,9 @@ export const admin = {
     RESUME_ALERTS:  "/resume-alerts",
     COMPANY_LIST:"/company-list",
     COMPANY_DETAIL: "/companies/:id",
+    JOB_CATEGORY:"/job-category",
+    JOB_TYPE:"/job_types",
+    PRICING:"/pricing"
 }
 
 export function pubRoute(_route) {

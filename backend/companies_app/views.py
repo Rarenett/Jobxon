@@ -125,7 +125,6 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
 
 
 
-
 class CompanyPhotoViewSet(viewsets.ModelViewSet):
     queryset = CompanyPhoto.objects.all()
     serializer_class = CompanyPhotoSerializer

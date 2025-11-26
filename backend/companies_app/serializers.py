@@ -79,3 +79,4 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
 
     def get_review_count(self, obj):
         return obj.reviews.count()
+    read_only_fields = ['id', 'email', 'created_at', 'updated_at']
