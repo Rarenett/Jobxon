@@ -8,6 +8,7 @@ from google.auth.transport import requests as google_requests
 
 from .models import CustomUser,CandidateProfile,CustomUserManager
 from .serializers import (
+    CandidateBasicInfoSerializer,
     RegisterSerializer, 
     LoginSerializer, 
     UserSerializer,
@@ -161,5 +162,70 @@ def profile_view(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from .models import CandidateProfile
+from .serializers import CandidateProfileSerializer, CandidateBasicInfoSerializer
 
 
+class CandidateProfileViewSet(viewsets.ModelViewSet):
+    queryset = CandidateProfile.objects.filter(is_active=True)
+    serializer_class = CandidateProfileSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    authentication_classes = [JWTAuthentication]
+
+    def get_permissions(self):
+        """Public read, authenticated write"""
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_queryset(self):
+        """Filter to user's own profile for updates"""
+        if self.action in ["update", "partial_update", "destroy"]:
+            if self.request.user.is_authenticated:
+                return CandidateProfile.objects.filter(user=self.request.user)
+            return CandidateProfile.objects.none()
+        return super().get_queryset()
+
+    @action(detail=False, methods=['put'], url_path='update-basic-info')
+    def update_basic_info(self, request):
+        """Update candidate basic information"""
+        
+        # Debug logging
+        print(f"User: {request.user}")
+        print(f"Is authenticated: {request.user.is_authenticated}")
+        print(f"Data received: {request.data}")
+        
+        # Get or create profile
+        try:
+            profile = CandidateProfile.objects.get(user=request.user)
+            print(f"Found existing profile: {profile.id}")
+        except CandidateProfile.DoesNotExist:
+            profile = CandidateProfile.objects.create(user=request.user)
+            print(f"Created new profile: {profile.id}")
+
+        # Serialize and save
+        serializer = CandidateBasicInfoSerializer(
+            profile, 
+            data=request.data, 
+            partial=True
+        )
+        
+        if serializer.is_valid():
+            serializer.save()
+            print(f"Profile saved successfully")
+            return Response({
+                'message': 'Profile updated successfully',
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+        else:
+            print(f"Validation errors: {serializer.errors}")
+            return Response({
+                'message': 'Validation failed',
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)

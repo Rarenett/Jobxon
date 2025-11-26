@@ -206,7 +206,7 @@ function AdminCompanyProfilePage() {
             const token = localStorage.getItem('access_token');
             const response = await axios.put(
                 `${API_URL}/profiles/update-basic-info/`,
-                basicInfo,
+                basicInfo,  
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
             setMessage('✅ Basic information updated successfully!');

@@ -105,3 +105,55 @@ class CandidateProfile(models.Model):
         verbose_name = "Candidate Profile"
         verbose_name_plural = "Candidate Profiles"
 
+
+
+from django.conf import settings
+from django.db import models
+
+from django.conf import settings
+from django.db import models
+
+
+class CandidateProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='candidate_profile'
+    )
+
+    # Basic Info
+    full_name = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=30, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+
+    # Professional
+    qualification = models.CharField(max_length=255, blank=True, null=True)
+    languages = models.CharField(max_length=255, blank=True, null=True)
+    job_category = models.CharField(max_length=255, blank=True, null=True)
+    experience = models.CharField(max_length=100, blank=True, null=True)
+
+    # Salary
+    current_salary = models.CharField(max_length=100, blank=True, null=True)
+    expected_salary = models.CharField(max_length=100, blank=True, null=True)
+    age = models.PositiveIntegerField(blank=True, null=True)
+
+    # Location
+    country = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    postcode = models.CharField(max_length=20, blank=True, null=True)
+    full_address = models.TextField(blank=True, null=True)
+
+    description = models.TextField(blank=True, null=True)
+
+    # Meta
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def _str_(self):
+        return self.full_name or f"Profile of {self.user.email}"
+
+    class Meta:
+        verbose_name = "Candidate Profile"
+        verbose_name_plural = "Candidate Profiles"

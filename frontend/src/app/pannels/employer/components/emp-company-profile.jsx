@@ -28,7 +28,13 @@ function EmpCompanyProfilePage() {
         established_since: '',
         team_size: '',
         location: '',  // NEW FIELD
-        description: ''
+        description: '',
+
+
+        about: '',              // NEW
+        address: '',            // NEW
+        map_iframe: '',         // NEW
+        responsibilities: ''    // NEW
     });
 
     // Social Links State
@@ -73,55 +79,71 @@ function EmpCompanyProfilePage() {
         fetchProfile();
     }, []);
 
-    const fetchProfile = async () => {
-        try {
-            const token = localStorage.getItem('access_token');
-            const response = await axios.get(`${API_URL}/profile/`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+ const fetchProfile = async () => {
+    setLoading(true);
+    setError('');
 
-            const profileData = response.data.profile;
-            setProfile(profileData);
+    try {
+        const token = localStorage.getItem('access_token');
 
-            // Set Basic Info
-            setBasicInfo({
-                name: profileData.name || '',
-                phone: profileData.phone || '',
-                website: profileData.website || '',
-                established_since: profileData.established_since || '',
-                team_size: profileData.team_size || '',
-                location: profileData.location || '',  // NEW FIELD
-                description: profileData.description || ''
-            });
+        // Fetch from the updated endpoint for FULL profile
+        const response = await axios.get(`${API_URL}/profiles/current/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-            // Set Social Links
-            setSocialLinks({
-                facebook: profileData.facebook || '',
-                twitter: profileData.twitter || '',
-                linkedin: profileData.linkedin || '',
-                whatsapp: profileData.whatsapp || '',
-                instagram: profileData.instagram || '',
-                pinterest: profileData.pinterest || '',
-                tumblr: profileData.tumblr || '',
-                youtube: profileData.youtube || ''
-            });
+        // Response is now the FULL profile object
+        const profileData = response.data;
 
-            // Set Video Links
-            if (profileData.youtube_links && profileData.youtube_links.length > 0) {
-                setYoutubeLinks(profileData.youtube_links);
-            }
-            if (profileData.vimeo_links && profileData.vimeo_links.length > 0) {
-                setVimeoLinks(profileData.vimeo_links);
-            }
+        // Debug: View all fields
+        console.log('API Response - Full Profile:', profileData);
+        console.log('Has about?', 'about' in profileData);
+        console.log('Has address?', 'address' in profileData);
+        console.log('Has map_iframe?', 'map_iframe' in profileData);
+        console.log('Has responsibilities?', 'responsibilities' in profileData);
 
-        } catch (error) {
-            console.error('Error fetching profile:', error);
-            setError('Failed to load profile data');
-            alert('❌ ERROR: Failed to load profile data. Please refresh the page.');
-        } finally {
-            setLoading(false);
-        }
-    };
+        setProfile(profileData);
+
+        // Set Basic Info (includes new fields)
+        setBasicInfo({
+            name: profileData.name || '',
+            phone: profileData.phone || '',
+            website: profileData.website || '',
+            established_since: profileData.established_since || '',
+            team_size: profileData.team_size || '',
+            location: profileData.location || '',
+            description: profileData.description || '',
+
+            about: profileData.about || '',              // NEW
+            address: profileData.address || '',          // NEW
+            map_iframe: profileData.map_iframe || '',    // NEW
+            responsibilities: profileData.responsibilities || '' // NEW
+        });
+
+        // Set Social Links
+        setSocialLinks({
+            facebook: profileData.facebook || '',
+            twitter: profileData.twitter || '',
+            linkedin: profileData.linkedin || '',
+            whatsapp: profileData.whatsapp || '',
+            instagram: profileData.instagram || '',
+            pinterest: profileData.pinterest || '',
+            tumblr: profileData.tumblr || '',
+            youtube: profileData.youtube || ''
+        });
+
+        // Set Video Links
+        setYoutubeLinks(Array.isArray(profileData.youtube_links) ? profileData.youtube_links : []);
+        setVimeoLinks(Array.isArray(profileData.vimeo_links) ? profileData.vimeo_links : []);
+
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        setError('Failed to load profile data');
+        alert('❌ ERROR: Failed to load profile data. Please refresh the page.');
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     // Handle viewing image
     const handleViewImage = (imageUrl) => {
@@ -674,13 +696,13 @@ function EmpCompanyProfilePage() {
                                     </div>
                                 </div>
                             </div>
-
+                            {/* Description */}
                             <div className="col-md-12">
                                 <div className="form-group">
                                     <label>Description</label>
                                     <textarea
                                         className="form-control"
-                                        rows={3}
+                                        rows="3"
                                         name="description"
                                         placeholder="Greetings! We are Galaxy Software Development Company."
                                         value={basicInfo.description}
@@ -688,6 +710,78 @@ function EmpCompanyProfilePage() {
                                     />
                                 </div>
                             </div>
+
+                            {/* NEW: About */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>About</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="5"
+                                        name="about"
+                                        placeholder="Detailed information about your company, history, mission, and values"
+                                        value={basicInfo.about}
+                                        onChange={handleBasicInfoChange}
+                                    />
+                                    <small className="text-muted">Provide comprehensive details about your organization</small>
+                                </div>
+                            </div>
+
+                            {/* NEW: Address */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Full Address</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="3"
+                                        name="address"
+                                        placeholder="Enter complete address with street, city, state, postal code"
+                                        value={basicInfo.address}
+                                        onChange={handleBasicInfoChange}
+                                    />
+                                    <small className="text-muted">Building/Floor, Street, City, State, Country - PIN</small>
+                                </div>
+                            </div>
+
+                            {/* NEW: Responsibilities */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Responsibilities / Culture</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="4"
+                                        name="responsibilities"
+                                        placeholder="Describe general company responsibilities, work culture, or expectations"
+                                        value={basicInfo.responsibilities}
+                                        onChange={handleBasicInfoChange}
+                                    />
+                                    <small className="text-muted">Outline workplace culture and organizational responsibilities</small>
+                                </div>
+                            </div>
+
+                            {/* NEW: Map iFrame */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Google Maps Embed Code</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="3"
+                                        name="map_iframe"
+                                        placeholder='<iframe src="https://www.google.com/maps/embed?..." width="600" height="450"></iframe>'
+                                        value={basicInfo.map_iframe}
+                                        onChange={handleBasicInfoChange}
+                                    />
+                                    <small className="text-muted">
+                                        Paste the complete iframe embed code from Google Maps
+                                    </small>
+                                </div>
+                            </div>
+
+                            
+
+
+
+
                             <div className="col-lg-12 col-md-12">
                                 <div className="text-left">
                                     <button
@@ -704,120 +798,120 @@ function EmpCompanyProfilePage() {
                 </div>
             </div>
 
-        {/*Photo gallery with Preview and Eye Icon*/}
-<div className="panel panel-default">
-    <div className="panel-heading wt-panel-heading p-a20">
-        <h4 className="panel-tittle m-a0">Photo Gallery</h4>
-    </div>
-    <div className="panel-body wt-panel-body p-a20 m-b30 ">
-        {/* Display existing photos */}
-        {profile?.photos && profile.photos.length > 0 ? (
-            <div className="row mb-4">
-                <div className="col-12">
-                    <h5 className="mb-3">Current Photos ({profile.photos.length})</h5>
-                    <div className="row">
-                        {profile.photos.map((photo) => (
-                            <div key={photo.id} className="col-lg-3 col-md-4 col-sm-6 mb-3">
-                                <div className="position-relative" style={{ 
-                                    height: '200px', 
-                                    overflow: 'hidden', 
-                                    borderRadius: '8px', 
-                                    border: '2px solid #ddd',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}>
-                                    <img 
-                                        src={getImageUrl(photo.image)} 
-                                        alt={photo.caption || 'Gallery'} 
-                                        style={{ 
-                                            width: '100%', 
-                                            height: '100%', 
-                                            objectFit: 'cover' 
-                                        }}
-                                        onError={(e) => {
-                                            e.target.src = 'images/jobs-company/pic1.jpg';
+            {/*Photo gallery with Preview and Eye Icon*/}
+            <div className="panel panel-default">
+                <div className="panel-heading wt-panel-heading p-a20">
+                    <h4 className="panel-tittle m-a0">Photo Gallery</h4>
+                </div>
+                <div className="panel-body wt-panel-body p-a20 m-b30 ">
+                    {/* Display existing photos */}
+                    {profile?.photos && profile.photos.length > 0 ? (
+                        <div className="row mb-4">
+                            <div className="col-12">
+                                <h5 className="mb-3">Current Photos ({profile.photos.length})</h5>
+                                <div className="row">
+                                    {profile.photos.map((photo) => (
+                                        <div key={photo.id} className="col-lg-3 col-md-4 col-sm-6 mb-3">
+                                            <div className="position-relative" style={{
+                                                height: '200px',
+                                                overflow: 'hidden',
+                                                borderRadius: '8px',
+                                                border: '2px solid #ddd',
+                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                            }}>
+                                                <img
+                                                    src={getImageUrl(photo.image)}
+                                                    alt={photo.caption || 'Gallery'}
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover'
+                                                    }}
+                                                    onError={(e) => {
+                                                        e.target.src = 'images/jobs-company/pic1.jpg';
+                                                    }}
+                                                />
+                                                <div className="position-absolute top-0 end-0 m-2" style={{ display: 'flex', gap: '5px' }}>
+                                                    <button
+                                                        className="btn btn-sm btn-info"
+                                                        onClick={() => handleViewImage(photo.image)}
+                                                        title="View Image"
+                                                        style={{ padding: '5px 10px' }}
+                                                    >
+                                                        <i className="fa fa-eye"></i>
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-danger"
+                                                        onClick={() => handleDeletePhoto(photo.id)}
+                                                        title="Delete Image"
+                                                        style={{ padding: '5px 10px' }}
+                                                    >
+                                                        <i className="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                                {photo.caption && (
+                                                    <div className="position-absolute bottom-0 start-0 end-0 p-2 text-white text-center"
+                                                        style={{
+                                                            backgroundColor: 'rgba(0,0,0,0.7)',
+                                                            fontSize: '12px'
+                                                        }}>
+                                                        {photo.caption}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="alert alert-info">
+                            <i className="fa fa-info-circle"></i> No photos uploaded yet. Upload some photos below!
+                        </div>
+                    )}
+
+                    {/* Upload new photos */}
+                    <form onSubmit={handleSavePhotos}>
+                        <div className="row">
+                            <div className="col-lg-12 col-md-12">
+                                <div className="form-group">
+                                    <label><strong>Upload New Photos</strong></label>
+                                    <input
+                                        type="file"
+                                        accept=".jpg, .jpeg, .png"
+                                        className="form-control"
+                                        multiple
+                                        onChange={(e) => {
+                                            const files = Array.from(e.target.files);
+                                            setPhotoFiles(files);
+                                            console.log('Selected files:', files.length);
                                         }}
                                     />
-                                    <div className="position-absolute top-0 end-0 m-2" style={{ display: 'flex', gap: '5px' }}>
-                                        <button
-                                            className="btn btn-sm btn-info"
-                                            onClick={() => handleViewImage(photo.image)}
-                                            title="View Image"
-                                            style={{ padding: '5px 10px' }}
-                                        >
-                                            <i className="fa fa-eye"></i>
-                                        </button>
-                                        <button
-                                            className="btn btn-sm btn-danger"
-                                            onClick={() => handleDeletePhoto(photo.id)}
-                                            title="Delete Image"
-                                            style={{ padding: '5px 10px' }}
-                                        >
-                                            <i className="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                    {photo.caption && (
-                                        <div className="position-absolute bottom-0 start-0 end-0 p-2 text-white text-center" 
-                                             style={{ 
-                                                 backgroundColor: 'rgba(0,0,0,0.7)',
-                                                 fontSize: '12px'
-                                             }}>
-                                            {photo.caption}
+                                    <small className="text-muted mt-2 d-block">
+                                        Select multiple photos to upload (JPG, JPEG, PNG)
+                                    </small>
+                                    {photoFiles.length > 0 && (
+                                        <div className="alert alert-success mt-2">
+                                            {photoFiles.length} file(s) selected
                                         </div>
                                     )}
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        ) : (
-            <div className="alert alert-info">
-                <i className="fa fa-info-circle"></i> No photos uploaded yet. Upload some photos below!
-            </div>
-        )}
-
-        {/* Upload new photos */}
-        <form onSubmit={handleSavePhotos}>
-            <div className="row">
-                <div className="col-lg-12 col-md-12">
-                    <div className="form-group">
-                        <label><strong>Upload New Photos</strong></label>
-                        <input 
-                            type="file" 
-                            accept=".jpg, .jpeg, .png"
-                            className="form-control"
-                            multiple
-                            onChange={(e) => {
-                                const files = Array.from(e.target.files);
-                                setPhotoFiles(files);
-                                console.log('Selected files:', files.length);
-                            }}
-                        />
-                        <small className="text-muted mt-2 d-block">
-                            Select multiple photos to upload (JPG, JPEG, PNG)
-                        </small>
-                        {photoFiles.length > 0 && (
-                            <div className="alert alert-success mt-2">
-                                {photoFiles.length} file(s) selected
+                            <div className="col-lg-12 col-md-12">
+                                <div className="text-left">
+                                    <button
+                                        type="submit"
+                                        className="site-button"
+                                        disabled={savingPhotos || photoFiles.length === 0}
+                                    >
+                                        {savingPhotos ? 'Uploading...' : `Upload  Photo`}
+                                    </button>
+                                </div>
                             </div>
-                        )}
-                    </div>
-                </div>
-                <div className="col-lg-12 col-md-12">
-                    <div className="text-left">
-                        <button 
-                            type="submit" 
-                            className="site-button"
-                            disabled={savingPhotos || photoFiles.length === 0}
-                        >
-                            {savingPhotos ? 'Uploading...' : `Upload  Photo`}
-                        </button>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
-    </div>
-</div>
 
             {/*Video gallery*/}
             <div className="panel panel-default">
