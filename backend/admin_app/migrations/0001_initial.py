@@ -25,21 +25,6 @@ class Migration(migrations.Migration):
                 ('recommended', models.BooleanField(default=False)),
             ],
         ),
-        migrations.CreateModel(
-            name='CandidateAdditionalDetail',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('detail_type', models.CharField(choices=[('online_profile', 'Online Profile'), ('work_sample', 'Work Sample'), ('research', 'Research / Publication'), ('presentation', 'Presentation'), ('certification', 'Certification'), ('patent', 'Patent')], max_length=50)),
-                ('title', models.CharField(blank=True, max_length=255, null=True)),
-                ('url', models.URLField(blank=True, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('organization', models.CharField(blank=True, max_length=255, null=True)),
-                ('application_number', models.CharField(blank=True, max_length=100, null=True)),
-                ('status', models.CharField(blank=True, max_length=100, null=True)),
-                ('published_on', models.DateField(blank=True, null=True)),
-                ('year', models.IntegerField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('candidate', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='additional_details', to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
+      
+        
     ]
