@@ -22,3 +22,14 @@ class JobViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(posted_by=self.request.user)
+
+from companies_app.models import CompanyProfile
+from companies_app.serializers import CompanyProfileSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(['GET'])
+def company_list(request):
+    """Simple endpoint to get active companies for dropdown"""
+    companies = CompanyProfile.objects.filter(is_active=True).values('id', 'name')
+    return Response(list(companies))

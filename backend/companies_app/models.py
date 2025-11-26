@@ -99,7 +99,7 @@ class CompanyReview(models.Model):
    
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        default=5
+        default=5 
     )
     review_title = models.CharField(max_length=200)
     review_content = models.TextField()

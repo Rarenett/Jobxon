@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 
+from companies_app.models import CompanyProfile
 from users_app.models import CustomUser
 
 
@@ -46,6 +47,7 @@ class Job(models.Model):
     title = models.CharField(max_length=200)
     category = models.ForeignKey(JobCategory, on_delete=models.SET_NULL, null=True)
     job_type = models.ForeignKey(JobType, on_delete=models.SET_NULL, null=True)
+    company = models.ForeignKey(CompanyProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='jobs')  # NEW FIELD
     offered_salary = models.CharField(max_length=50, blank=True, null=True)
     experience = models.CharField(max_length=100, blank=True, null=True)
     qualification = models.CharField(max_length=200, null=True, blank=True)

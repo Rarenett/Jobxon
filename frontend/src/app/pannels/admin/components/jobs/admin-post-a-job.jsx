@@ -4,13 +4,15 @@ import { useAuth } from "../../../../../contexts/AuthContext";
 
 
 function AdminPostAJobPage() {
-    const { token } = useAuth(); // ← Get token from context
+    const { token } = useAuth();
     const [categories, setCategories] = useState([]);
     const [jobTypes, setJobTypes] = useState([]);
+    const [companies, setCompanies] = useState([]);  // NEW
     const [form, setForm] = useState({
         title: "",
         category: "",
         job_type: "",
+        company: "",  // NEW
         offered_salary: "",
         experience: "",
         qualification: "",
@@ -29,23 +31,23 @@ function AdminPostAJobPage() {
         end_date: "",
     });
 
-    // Populate selects
     useEffect(() => {
         axios.get("http://127.0.0.1:8000/api/categories/")
-            .then(res => {
-                setCategories(res.data);
-                console.log('Categories loaded:', res.data);
-            })
+            .then(res => setCategories(res.data))
             .catch(err => console.error('Error loading categories:', err));
 
         axios.get("http://127.0.0.1:8000/api/job-type/")
-            .then(res => {
-                setJobTypes(res.data);
-                console.log('Job types loaded:', res.data);
-            })
+            .then(res => setJobTypes(res.data))
             .catch(err => console.error('Error loading job types:', err));
-    }, []);
 
+        // NEW: Fetch companies
+        axios.get("http://127.0.0.1:8000/api/companies/")
+            .then(res => {
+                setCompanies(res.data);
+                console.log('Companies loaded:', res.data);
+            })
+            .catch(err => console.error('Error loading companies:', err));
+    }, []);
     function handleChange(e) {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
@@ -55,7 +57,6 @@ function AdminPostAJobPage() {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        // Check if token exists
         if (!token) {
             alert("You are not logged in as admin. Please log in first.");
             return;
@@ -63,6 +64,9 @@ function AdminPostAJobPage() {
 
         const cleanedData = {
             ...form,
+            category: form.category ? parseInt(form.category) : null,
+            job_type: form.job_type ? parseInt(form.job_type) : null,
+            company: form.company ? parseInt(form.company) : null,  // NEW
             offered_salary: form.offered_salary || null,
             experience: form.experience || null,
             qualification: form.qualification || null,
@@ -74,8 +78,7 @@ function AdminPostAJobPage() {
             complete_address: form.complete_address || null,
             start_date: form.start_date || null,
             end_date: form.end_date || null,
-            category: form.category ? parseInt(form.category) : null,
-            job_type: form.job_type ? parseInt(form.job_type) : null,
+
         };
 
         console.log('Submitting data:', cleanedData);
@@ -120,7 +123,7 @@ function AdminPostAJobPage() {
             console.error('Error response:', error.response);
             console.error('Error data:', error.response?.data);
 
-            const errorMessage = error.response?.data 
+            const errorMessage = error.response?.data
                 ? JSON.stringify(error.response.data, null, 2)
                 : error.message;
             alert(`There was an error posting the job!\n\n${errorMessage}`);
@@ -144,6 +147,27 @@ function AdminPostAJobPage() {
                 <div className="panel-body wt-panel-body p-a20 m-b30">
                     <form onSubmit={handleSubmit} autoComplete="off">
                         <div className="row">
+                            {/* NEW: Select Company Field - Add after Job Type */}
+                            <div className="col-xl-4 col-lg-6 col-md-12">
+                                <div className="form-group">
+                                    <label>Select Company</label>
+                                    <div className="ls-inputicon-box">
+                                        <select
+                                            name="company"
+                                            className="form-control"
+                                            value={form.company || ""}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="">Select Company </option>
+                                            {companies.length === 0 && <option disabled>Loading...</option>}
+                                            {companies.map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
+                                        </select>
+                                        <i className="fs-input-icon fa fa-building" />
+                                    </div>
+                                </div>
+                            </div>
                             {/* Job title */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
