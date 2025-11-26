@@ -128,3 +128,60 @@ class PricingPlan(models.Model):
 
     def _str_(self):
         return self.name
+
+
+        from django.db import models
+
+class FAQ(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.question
+
+
+# Bank Details
+class BankDetail(models.Model):
+    bank_name = models.CharField(max_length=255)
+    ifsc_code = models.CharField(max_length=50)
+    account_no = models.CharField(max_length=50)
+    mode_of_payment = models.CharField(max_length=100)
+    pan_no = models.CharField(max_length=20)
+    uan_no = models.CharField(max_length=20)
+    esic_no = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.bank_name
+
+#Employe Documents
+# models.py
+
+class DocumentType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True, null=True)   # NEW FIELD
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class Department(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+class Designation(models.Model):
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="designations")
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("department", "name")
+
+    def __str__(self):
+        return f"{self.department.name} - {self.name}"

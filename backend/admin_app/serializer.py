@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from users_app.models import CandidateProfile
+from .models import BankDetail,DocumentType,Department,Designation
 
 
 class CandidateProfileListSerializer(serializers.ModelSerializer):
@@ -79,3 +80,44 @@ class PricingPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = PricingPlan
         fields = '__all__'
+
+# Bank Details
+
+class BankDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankDetail
+        fields = [
+            'id',
+            'bank_name',
+            'ifsc_code',
+            'account_no',
+            'mode_of_payment',
+            'pan_no',
+            'uan_no',
+            'esic_no',
+            'created_at'
+        ]
+
+# Employe Documents
+
+# serializers.py
+
+class DocumentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DocumentType
+        fields = ['id', 'name', 'description', 'created_at']
+
+
+
+
+class DesignationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Designation
+        fields = ["id", "department", "name", "description", "created_at"]
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    designations = DesignationSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Department
+        fields = ["id", "name", "description", "designations", "created_at"]

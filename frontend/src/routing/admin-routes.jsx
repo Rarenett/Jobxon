@@ -24,6 +24,11 @@ import AdminPricingPlan from "../app/pannels/admin/components/AdminPricingPlan";
 
 import AdminCompanyDetailPage from '../app/pannels/admin/components/AdminCompanyDetailPage';
 
+import AdminAddBankDetailsPage from "../app/pannels/admin/components/AdminAddBankDetailsPage";
+import AdminManageBankDetailsPage from "../app/pannels/admin/components/AdminManageBankDetailsPage";
+import AdminManageDocumentTypesPage from "../app/pannels/admin/components/AdminManageDocumentTypesPage";
+
+import AdminDepartmentListPage from "../app/pannels/admin/components/AdminDepartmentListPage";
 
 function AdminRoutes() {
     return (
@@ -51,6 +56,11 @@ function AdminRoutes() {
 
             <Route path={admin.COMPANY_DETAIL} element={<AdminCompanyDetailPage />} />
 
+            <Route path={admin.ADD_BANK_DETAILS} element={<AdminAddBankDetailsPage />} />
+            <Route path={admin.BANK_DETAILS} element={<AdminManageBankDetailsPage />} />
+            <Route path={admin.DOCUMENT} element={<AdminManageDocumentTypesPage />} />
+
+            <Route path={admin.DEPARTMENT_LIST} element={<AdminDepartmentListPage />} />
 
             <Route path="*" element={<Error404Page />} />
         </Routes>

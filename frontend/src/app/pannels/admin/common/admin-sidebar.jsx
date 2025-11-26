@@ -50,6 +50,28 @@ function AdminSidebarSection(props) {
 
                         <li
                             className={
+                                setMenuActive(currentpath, adRoute(admin.BANK_DETAILS)) 
+                                
+                            }>
+                            <a href="#">
+                                <i className="fa fa-suitcase" />
+                                <span className="admin-nav-text">Employes</span>
+                            </a>
+                            <ul className="sub-menu">
+                                <li> <NavLink to={adRoute(admin.ADD_BANK_DETAILS)} id="bankdetailsId1"><span className="admin-nav-text">Add Bank Details</span></NavLink></li>
+                                <li> <NavLink to={adRoute(admin.BANK_DETAILS)} id="bankdetailsId2"><span className="admin-nav-text">Bank Details</span></NavLink></li>
+
+                                <li> <NavLink to={adRoute(admin.DOCUMENT)} id="bankdetailsId2"><span className="admin-nav-text">Add Doument Names</span></NavLink></li>
+                                
+                            </ul>
+                        </li>
+
+                        <li className={setMenuActive(currentpath, adRoute(admin.DEPARTMENT_LIST))}>
+                            <NavLink to={adRoute(admin.DEPARTMENT_LIST)} > <i className="fa fa-envelope" /><span className="admin-nav-text">Department</span></NavLink>
+                        </li>
+                        
+                        <li
+                            className={
                                 setMenuActive(currentpath, adRoute(admin.AllCANDIDATES)) +
                                 setMenuActive(currentpath, adRoute(admin.CAND_BOOKMARKS))
 
@@ -66,7 +88,7 @@ function AdminSidebarSection(props) {
                             </ul>
                         </li>
 
-
+                        
 
                         <li className={setMenuActive(currentpath, adRoute(admin.BOOKMARKS))}>
                             <NavLink to={adRoute(admin.BOOKMARKS)} id="bookId1"><i className="fa fa-bookmark" /><span className="admin-nav-text">Bookmark Jobs</span></NavLink>

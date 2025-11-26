@@ -22,8 +22,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from users_app.models import CandidateProfile
-from .serializer import CandidateProfileListSerializer
-
+from .serializer import CandidateProfileListSerializer,BankDetailSerializer,DocumentTypeSerializer,DepartmentSerializer,DesignationSerializer
+from .models import BankDetail,DocumentType,Department,Designation
 
 class CandidateProfileViewSet(viewsets.ModelViewSet):
     queryset = CandidateProfile.objects.all().order_by('-id')
@@ -362,10 +362,36 @@ class CandidateITSkillViewSet(viewsets.ModelViewSet):
 #pricing
 from rest_framework import viewsets
 from .models import PricingPlan
-from .serializers import PricingPlanSerializer
+from .serializer import PricingPlanSerializer
 
 class PricingPlanViewSet(viewsets.ModelViewSet):
     queryset = PricingPlan.objects.all().order_by('id')
     serializer_class = PricingPlanSerializer
     
 
+# Bank Details
+from rest_framework.permissions import AllowAny
+
+class BankDetailViewSet(viewsets.ModelViewSet):
+    queryset = BankDetail.objects.all().order_by('-id')
+    serializer_class = BankDetailSerializer
+    permission_classes = [AllowAny]
+
+#Employe Documents
+
+# views.py
+
+class DocumentTypeViewSet(viewsets.ModelViewSet):
+    queryset = DocumentType.objects.all().order_by('id')
+    serializer_class = DocumentTypeSerializer
+    permission_classes = [AllowAny]
+
+class DepartmentViewSet(viewsets.ModelViewSet):
+    queryset = Department.objects.all().order_by('id')
+    serializer_class = DepartmentSerializer
+    permission_classes = [AllowAny]
+
+class DesignationViewSet(viewsets.ModelViewSet):
+    queryset = Designation.objects.all().order_by('id')
+    serializer_class = DesignationSerializer
+    permission_classes = [AllowAny]
