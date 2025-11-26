@@ -12,7 +12,7 @@ from companies_app.serializers import (
     CompanySocialLinksSerializer,
     CompanyVideoLinksSerializer,
     CompanyPhotoSerializer,
-    CompanyReviewSerializer
+    CompanyReviewSerializer,
 )
 
 
@@ -382,10 +382,119 @@ class CandidateITSkillViewSet(viewsets.ModelViewSet):
 #pricing
 from rest_framework import viewsets
 from .models import PricingPlan
-from .serializer import PricingPlanSerializer
+from admin_app.serializer import PricingPlanSerializer
 
 class PricingPlanViewSet(viewsets.ModelViewSet):
     queryset = PricingPlan.objects.all().order_by('id')
     serializer_class = PricingPlanSerializer
     
 
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import CandidateProject
+from .serializer import CandidateProjectSerializer
+
+
+class CandidateProjectViewSet(viewsets.ModelViewSet):
+    serializer_class = CandidateProjectSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return CandidateProject.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import DesiredCareerProfile
+from .serializer import DesiredCareerProfileSerializer
+
+
+class DesiredCareerProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = DesiredCareerProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return DesiredCareerProfile.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+from rest_framework import viewsets, permissions
+from .models import PersonalDetail
+from .serializer import PersonalDetailSerializer
+
+class PersonalDetailViewSet(viewsets.ModelViewSet):
+    serializer_class = PersonalDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return PersonalDetail.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+from rest_framework import viewsets, permissions
+from .models import ResumeAttachment
+from .serializer import ResumeAttachmentSerializer
+
+class ResumeAttachmentViewSet(viewsets.ModelViewSet):
+    serializer_class = ResumeAttachmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ResumeAttachment.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+from rest_framework import generics, permissions
+from .models import (
+    OnlineProfile, WorkSample, ResearchPublication,
+    Presentation, Certification, Patent
+)
+from .serializer import (
+    OnlineProfileSerializer, WorkSampleSerializer,
+    ResearchPublicationSerializer, PresentationSerializer,
+    CertificationSerializer, PatentSerializer
+)
+
+
+class BaseUserViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class OnlineProfileViewSet(BaseUserViewSet):
+    queryset = OnlineProfile.objects.all()
+    serializer_class = OnlineProfileSerializer
+
+
+class WorkSampleViewSet(BaseUserViewSet):
+    queryset = WorkSample.objects.all()
+    serializer_class = WorkSampleSerializer
+
+
+class ResearchPublicationViewSet(BaseUserViewSet):
+    queryset = ResearchPublication.objects.all()
+    serializer_class = ResearchPublicationSerializer
+
+
+class PresentationViewSet(BaseUserViewSet):
+    queryset = Presentation.objects.all()
+    serializer_class = PresentationSerializer
+
+
+class CertificationViewSet(BaseUserViewSet):
+    queryset = Certification.objects.all()
+    serializer_class = CertificationSerializer
+
+
+class PatentViewSet(BaseUserViewSet):
+    queryset = Patent.objects.all()
+    serializer_class = PatentSerializer
