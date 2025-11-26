@@ -362,7 +362,7 @@ class CandidateITSkillViewSet(viewsets.ModelViewSet):
 #pricing
 from rest_framework import viewsets
 from .models import PricingPlan
-from .serializers import PricingPlanSerializer
+from .serializer import PricingPlanSerializer
 
 class PricingPlanViewSet(viewsets.ModelViewSet):
     queryset = PricingPlan.objects.all().order_by('id')
