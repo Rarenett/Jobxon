@@ -3,6 +3,8 @@ import JobZImage from "../../../../common/jobz-img";
 import { NavLink } from "react-router-dom";
 import { publicUser } from "../../../../../globals/route-names";
 import SectionPagination from "../common/section-pagination";
+import SectionJobsSidebar1 from "./sidebar/section-jobs-sidebar1";
+
 import axios from 'axios';
 
 function SectionJobsGrid() {
