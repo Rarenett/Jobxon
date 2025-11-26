@@ -70,3 +70,12 @@ class CandidateITSkillSerializer(serializers.ModelSerializer):
         model = CandidateITSkill
         fields = "__all__"
         read_only_fields = ["user"]
+
+
+from rest_framework import serializers
+from .models import PricingPlan
+
+class PricingPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PricingPlan
+        fields = '__all__'
