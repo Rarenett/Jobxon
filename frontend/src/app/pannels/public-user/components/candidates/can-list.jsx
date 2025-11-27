@@ -113,7 +113,7 @@ const deleteCandidate = async (id) => {
 
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/api/admin-candidates/${id}/`,
+            `http://127.0.0.1:8000/api/admin/candidates/${id}/`,
             {
                 method: "DELETE",
                 headers: {
@@ -125,11 +125,12 @@ const deleteCandidate = async (id) => {
         if (res.ok) {
             alert("Deleted ✅");
 
-            // ✅ remove from UI instantly
             const updated = candidates.filter(c => c.id !== id);
             setCandidates(updated);
             setFilteredCandidates(updated);
         } else {
+            const errText = await res.text();
+            console.error("Delete failed:", errText);
             alert("Delete failed ❌");
         }
     } catch (err) {
@@ -137,6 +138,7 @@ const deleteCandidate = async (id) => {
         alert("Server error ❌");
     }
 };
+
 
     return (
         <>

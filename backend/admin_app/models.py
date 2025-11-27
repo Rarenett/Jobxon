@@ -26,10 +26,7 @@ class CandidateKeySkills(models.Model):
     def __str__(self):
         return self.user.username
 
-# users_app/models.py (or wherever your model lives)
-
-from django.db import models
-from django.conf import settings
+# users_app/models.py (or wherever your model lives)s
 
 class CandidateEmployment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="employments")
@@ -52,8 +49,7 @@ class CandidateEmployment(models.Model):
 
 
 # models.py
-from django.db import models
-from django.conf import settings
+
 
 class CandidateEducation(models.Model):
     user = models.ForeignKey(
@@ -90,8 +86,6 @@ class CandidateEducation(models.Model):
 
 
 
-from django.db import models
-from django.conf import settings
 
 class CandidateITSkill(models.Model):
     user = models.ForeignKey(
@@ -132,8 +126,6 @@ class PricingPlan(models.Model):
 
 
 
-from django.db import models
-from django.conf import settings
 
 
 class CandidateProject(models.Model):
@@ -172,8 +164,6 @@ class CandidateProject(models.Model):
     def __str__(self):
         return f"{self.project_title} - {self.user}"
 
-from django.db import models
-from django.conf import settings
 
 User = settings.AUTH_USER_MODEL
 
@@ -235,9 +225,6 @@ class DesiredCareerProfile(models.Model):
     def __str__(self):
         return f"{self.user} - Desired Career Profile"
 
-from django.db import models
-from django.conf import settings
-
 class PersonalDetail(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -276,9 +263,6 @@ class PersonalDetail(models.Model):
 
 # models.py
 
-from django.conf import settings
-from django.db import models
-
 class ResumeAttachment(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -292,9 +276,6 @@ class ResumeAttachment(models.Model):
         return f"{self.user} - Resume"
 
 
-
-from django.conf import settings
-from django.db import models
 
 
 # 1️⃣ Online Profile (LinkedIn, Facebook, etc.)
@@ -397,3 +378,21 @@ class Patent(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.title}"
+
+
+from django.db import models
+from django.conf import settings
+
+class ProfileSummary(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile_summary"
+    )
+    summary = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user} Profile Summary"

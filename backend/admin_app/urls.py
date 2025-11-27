@@ -19,17 +19,13 @@ from .views import CandidateProjectViewSet
 from .views import DesiredCareerProfileViewSet
 from .views import PersonalDetailViewSet
 from .views import ResumeAttachmentViewSet
+from .views import ProfileSummaryViewSet
+
 from .views import (
     OnlineProfileViewSet, WorkSampleViewSet,
     ResearchPublicationViewSet, PresentationViewSet,
     CertificationViewSet, PatentViewSet
 )
-
-
-
-
-
-
 
 router = DefaultRouter()
 
@@ -54,15 +50,14 @@ router.register(r'presentations', PresentationViewSet, basename='presentations')
 router.register(r'certifications', CertificationViewSet, basename='certifications')
 router.register(r'patents', PatentViewSet, basename='patents')
 router.register(r'key-skills', CandidateKeySkillViewSet, basename='keyskill')
-
-
-
+router.register(r'profile-summary', ProfileSummaryViewSet, basename='profile-summary')
 
 
 
 urlpatterns = [
     path('api/', include(router.urls)),
 path('api/resume-headline/', ResumeHeadlineView.as_view(), name='resume-headline'),
+
 
 
 ]

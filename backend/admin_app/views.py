@@ -323,8 +323,7 @@ class CompanyReviewViewSet(viewsets.ModelViewSet):
         return Response({"message": "Saved successfully"})
 
 
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+
 from .models import CandidateEmployment
 from admin_app.serializer import EmploymentSerializer
 
@@ -339,8 +338,6 @@ class CandidateEmploymentViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from .models import CandidateEducation
 from .serializer import CandidateEducationSerializer
 
@@ -358,8 +355,6 @@ class CandidateEducationViewSet(viewsets.ModelViewSet):
 
 
 
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from .models import CandidateITSkill
 from admin_app.serializer import CandidateITSkillSerializer
 
@@ -380,7 +375,6 @@ class CandidateITSkillViewSet(viewsets.ModelViewSet):
 
 
 #pricing
-from rest_framework import viewsets
 from .models import PricingPlan
 from admin_app.serializer import PricingPlanSerializer
 
@@ -389,8 +383,6 @@ class PricingPlanViewSet(viewsets.ModelViewSet):
     serializer_class = PricingPlanSerializer
     
 
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from .models import CandidateProject
 from .serializer import CandidateProjectSerializer
 
@@ -406,8 +398,6 @@ class CandidateProjectViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from .models import DesiredCareerProfile
 from .serializer import DesiredCareerProfileSerializer
 
@@ -423,7 +413,6 @@ class DesiredCareerProfileViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-from rest_framework import viewsets, permissions
 from .models import PersonalDetail
 from .serializer import PersonalDetailSerializer
 
@@ -437,7 +426,6 @@ class PersonalDetailViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-from rest_framework import viewsets, permissions
 from .models import ResumeAttachment
 from .serializer import ResumeAttachmentSerializer
 
@@ -494,7 +482,22 @@ class CertificationViewSet(BaseUserViewSet):
     queryset = Certification.objects.all()
     serializer_class = CertificationSerializer
 
-
-class PatentViewSet(BaseUserViewSet):
-    queryset = Patent.objects.all()
+class PatentViewSet(viewsets.ModelViewSet):
     serializer_class = PatentSerializer
+    queryset = Patent.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+
+from .models import ProfileSummary
+from .serializer import ProfileSummarySerializer
+
+class ProfileSummaryViewSet(viewsets.ModelViewSet):
+    serializer_class = ProfileSummarySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return ProfileSummary.objects.filter(user=self.request.user)

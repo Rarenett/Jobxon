@@ -47,65 +47,6 @@ class CustomUser(AbstractUser):
     
     def __str__(self):
         return f"{self.email} ({self.user_type})"
-from django.db import models
-
-class CandidateProfile(models.Model):
-    """Profile for job seekers"""
-    user = models.OneToOneField(
-        CustomUser, 
-        on_delete=models.CASCADE, 
-        related_name='candidate_profile'
-    )
-    
-    # Basic Information
-    name = models.CharField(max_length=150)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    website = models.URLField(blank=True, null=True)
-    
-    # Professional Details
-    qualification = models.CharField(max_length=200, blank=True, null=True)
-    languages = models.CharField(max_length=200, blank=True, null=True, help_text="Comma-separated")
-    job_category = models.CharField(max_length=150, blank=True, null=True)
-    experience = models.CharField(max_length=100, blank=True, null=True, help_text="e.g. 3 Years")
-    
-    # Salary Expectations
-    current_salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    expected_salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    age = models.PositiveIntegerField(blank=True, null=True)
-    
-    # Profile Media
-    profile_picture = models.ImageField(upload_to="candidates/profile_pics/", blank=True, null=True)
-    resume = models.FileField(upload_to="candidates/resumes/", blank=True, null=True)
-
-    # Address Information
-    country = models.CharField(max_length=100, blank=True, null=True)
-    city = models.CharField(max_length=100, blank=True, null=True)
-    post_code = models.CharField(max_length=20, blank=True, null=True)
-    full_address = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-
-    # Social Links
-    facebook = models.URLField(blank=True, null=True)
-    twitter = models.URLField(blank=True, null=True)
-    linkedin = models.URLField(blank=True, null=True)
-    whatsapp = models.URLField(blank=True, null=True)
-    instagram = models.URLField(blank=True, null=True)
-    pinterest = models.URLField(blank=True, null=True)
-    tumblr = models.URLField(blank=True, null=True)
-    youtube = models.URLField(blank=True, null=True)
-
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        verbose_name = "Candidate Profile"
-        verbose_name_plural = "Candidate Profiles"
-
-
 
 from django.conf import settings
 from django.db import models

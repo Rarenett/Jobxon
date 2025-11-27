@@ -16,8 +16,6 @@ from .serializers import (
     CompanyProfileSerializer
 
 )
-
-
 # -------------------------
 # Register ViewSet
 # -------------------------
@@ -229,3 +227,13 @@ class CandidateProfileViewSet(viewsets.ModelViewSet):
                 'message': 'Validation failed',
                 'errors': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+@action(detail=False, methods=['get'], url_path='get-basic-info', permission_classes=[IsAuthenticated])
+def get_basic_info(self, request):
+    try:
+        profile = CandidateProfile.objects.get(user=request.user)
+    except CandidateProfile.DoesNotExist:
+        return Response({}, status=status.HTTP_200_OK)
+
+    serializer = CandidateBasicInfoSerializer(profile)
+    return Response(serializer.data, status=status.HTTP_200_OK)

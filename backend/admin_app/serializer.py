@@ -1,5 +1,17 @@
 from rest_framework import serializers
 from users_app.models import CandidateProfile
+from .models import CandidateKeySkills
+from .models import ResumeHeadline
+from .models import CandidateEmployment
+from .models import CandidateEducation
+from .models import CandidateITSkill
+from .models import PricingPlan
+from .models import PersonalDetail
+from .models import DesiredCareerProfile
+from .models import CandidateProject
+from .models import ResumeAttachment
+from .models import ProfileSummary
+
 
 
 class CandidateProfileListSerializer(serializers.ModelSerializer):
@@ -25,8 +37,6 @@ class CandidateProfileListSerializer(serializers.ModelSerializer):
             'description',
         ]
 
-from rest_framework import serializers
-from .models import ResumeHeadline
 
 class ResumeHeadlineSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,8 +44,6 @@ class ResumeHeadlineSerializer(serializers.ModelSerializer):
         fields = ['id', 'headline']
 
 
-from rest_framework import serializers
-from .models import CandidateKeySkills
 
 class CandidateKeySkillSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,16 +52,12 @@ class CandidateKeySkillSerializer(serializers.ModelSerializer):
 
 # admin_app/serializer.py
 
-from rest_framework import serializers
-from .models import CandidateEmployment
 
 class EmploymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CandidateEmployment
         fields = "__all__"
         read_only_fields = ["user"]
-from rest_framework import serializers
-from .models import CandidateEducation
 
 class CandidateEducationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,8 +66,6 @@ class CandidateEducationSerializer(serializers.ModelSerializer):
         read_only_fields = ["user"]
 
 
-from rest_framework import serializers
-from .models import CandidateITSkill
 
 class CandidateITSkillSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,8 +74,6 @@ class CandidateITSkillSerializer(serializers.ModelSerializer):
         read_only_fields = ["user"]
 
 
-from rest_framework import serializers
-from .models import PricingPlan
 
 class PricingPlanSerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,8 +81,6 @@ class PricingPlanSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-from rest_framework import serializers
-from .models import CandidateProject
 
 
 class CandidateProjectSerializer(serializers.ModelSerializer):
@@ -91,8 +89,6 @@ class CandidateProjectSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ['user', 'created_at', 'updated_at']
 
-from rest_framework import serializers
-from .models import DesiredCareerProfile
 
 
 class DesiredCareerProfileSerializer(serializers.ModelSerializer):
@@ -102,8 +98,6 @@ class DesiredCareerProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ["user", "created_at"]
 
 
-from rest_framework import serializers
-from .models import PersonalDetail
 
 class PersonalDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -111,8 +105,6 @@ class PersonalDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['user']
 
-from rest_framework import serializers
-from .models import ResumeAttachment
 
 class ResumeAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -120,7 +112,6 @@ class ResumeAttachmentSerializer(serializers.ModelSerializer):
         fields = ["id", "file", "uploaded_at"]
 
 
-from rest_framework import serializers
 from .models import (
     OnlineProfile, WorkSample, ResearchPublication,
     Presentation, Certification, Patent
@@ -161,9 +152,17 @@ class CertificationSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ["user"]
 
-
 class PatentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patent
+        fields = '__all__'
+        read_only_fields = ['user']
+
+
+
+class ProfileSummarySerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = ProfileSummary
         fields = "__all__"
-        read_only_fields = ["user"]

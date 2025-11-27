@@ -23,14 +23,50 @@ function SectionCandicateBasicInfo() {
 
     const [loading, setLoading] = useState(false);
 
-    // Verify token on component mount
-    useEffect(() => {
-        const token = localStorage.getItem("refresh_token");
-        console.log("Token on mount:", token); // Debug log
-        if (!token) {
-            console.warn("No access token found in localStorage");
+    // ✅ FETCH STORED DATA ON LOAD
+const fetchSavedProfile = async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    try {
+        const res = await fetch("http://127.0.0.1:8000/api/candidate-profile/get-basic-info/", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data) {
+            const updatedData = {
+                full_name: data.full_name || "",
+                phone: data.phone || "",
+                email: data.email || "",
+                website: data.website || "",
+                qualification: data.qualification || "",
+                languages: data.languages || "",
+                job_category: data.job_category || "",
+                experience: data.experience || "",
+                current_salary: data.current_salary || "",
+                expected_salary: data.expected_salary || "",
+                age: data.age || "",
+                country: data.country || "",
+                city: data.city || "",
+                postcode: data.postcode || "",
+                full_address: data.full_address || "",
+                description: data.description || "",
+            };
+
+            setFormData(updatedData);
+
+            // ✅ cache it locally
+            localStorage.setItem("candidate_basic_info", JSON.stringify(updatedData));
         }
-    }, []);
+    } catch (err) {
+        console.error("Fetch error:", err);
+    }
+};
+
 
     const handleChange = (e) => {
         setFormData({
@@ -42,16 +78,9 @@ function SectionCandicateBasicInfo() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Get token inside the function to ensure latest value
         const token = localStorage.getItem("access_token");
-        
-        // Debug: Check what's actually in localStorage
-        console.log("Token retrieved:", token);
-        console.log("All localStorage keys:", Object.keys(localStorage));
-
-        if (!token || token === "null" || token === "undefined") {
-            alert("You are not logged in. Please login first.");
-            console.error("Token is missing or invalid:", token);
+        if (!token) {
+            alert("Please login again");
             return;
         }
 
@@ -64,49 +93,29 @@ function SectionCandicateBasicInfo() {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`, // Ensure proper format
+                        "Authorization": `Bearer ${token}`,
                     },
                     body: JSON.stringify(formData),
                 }
             );
 
-            // Debug: Log response status and headers
-            console.log("Response status:", response.status);
-            console.log("Response headers:", response.headers);
-
-            const text = await response.text();
-            let data = null;
-
-            try {
-                data = JSON.parse(text);
-            } catch (parseError) {
-                console.error("Failed to parse response:", text);
-            }
+            const data = await response.json();
 
             if (!response.ok) {
-                if (response.status === 401) {
-                    alert("Session expired or invalid token. Please log in again.");
-                    localStorage.removeItem("access");
-                    localStorage.removeItem("refresh");
-                    // Optionally redirect to login page
-                    // window.location.href = "/login";
-                } else {
-                    alert(`Server error: ${response.status}. Please check console.`);
-                }
-                console.error("Server error:", data || text);
+                alert("Save failed ❌");
                 return;
             }
 
-            console.log("Saved:", data);
-            alert("Profile saved successfully ✅");
+            alert("Profile saved ✅");
+            fetchSavedProfile();
 
         } catch (err) {
-            console.error("Network error:", err);
-            alert("Network error – backend not reachable");
+            alert("Network error ❌");
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <>
