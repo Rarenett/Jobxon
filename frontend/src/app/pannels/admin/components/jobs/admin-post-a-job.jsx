@@ -12,10 +12,14 @@ function AdminPostAJobPage() {
         title: "",
         category: "",
         job_type: "",
-        company: "",  // NEW
-        offered_salary: "",
+        company: "",  // Only in AdminPostAJobPage
+        work_mode: "Onsite",  // NEW FIELD with default
+        salary_range: "",
         experience: "",
         qualification: "",
+        requirements: "",
+        responsibilities: "",
+        skills_required: "",
         gender: "",
         country: "",
         city: "",
@@ -30,6 +34,7 @@ function AdminPostAJobPage() {
         start_date: "",
         end_date: "",
     });
+
 
     useEffect(() => {
         axios.get("http://127.0.0.1:8000/api/categories/")
@@ -54,6 +59,7 @@ function AdminPostAJobPage() {
     }
 
     // Handle form submit
+    // Handle form submit
     async function handleSubmit(e) {
         e.preventDefault();
 
@@ -64,10 +70,11 @@ function AdminPostAJobPage() {
 
         const cleanedData = {
             ...form,
-            category: form.category ? parseInt(form.category) : null,
-            job_type: form.job_type ? parseInt(form.job_type) : null,
-            company: form.company ? parseInt(form.company) : null,  // NEW
-            offered_salary: form.offered_salary || null,
+            work_mode: form.work_mode,  // Always has a value
+            salary_range: form.salary_range || null,
+            requirements: form.requirements || null,
+            responsibilities: form.responsibilities || null,
+            skills_required: form.skills_required || null,
             experience: form.experience || null,
             qualification: form.qualification || null,
             location: form.location || null,
@@ -78,7 +85,9 @@ function AdminPostAJobPage() {
             complete_address: form.complete_address || null,
             start_date: form.start_date || null,
             end_date: form.end_date || null,
-
+            category: form.category ? parseInt(form.category) : null,
+            job_type: form.job_type ? parseInt(form.job_type) : null,
+            company: form.company ? parseInt(form.company) : null,
         };
 
         console.log('Submitting data:', cleanedData);
@@ -89,21 +98,26 @@ function AdminPostAJobPage() {
                 cleanedData,
                 {
                     headers: {
-                        Authorization: `Bearer ${token}` // ← Use token from context
+                        Authorization: `Bearer ${token}`
                     }
                 }
             );
             console.log('Success response:', response.data);
             alert("Job posted successfully!");
 
-            // Reset form
+            // FIXED: Use setForm instead of useState to reset the form
             setForm({
                 title: "",
                 category: "",
                 job_type: "",
-                offered_salary: "",
+                company: "",  // Only in AdminPostAJobPage
+                work_mode: "Onsite",  // Reset to default
+                salary_range: "",
                 experience: "",
                 qualification: "",
+                requirements: "",
+                responsibilities: "",
+                skills_required: "",
                 gender: "",
                 country: "",
                 city: "",
@@ -118,6 +132,8 @@ function AdminPostAJobPage() {
                 start_date: "",
                 end_date: "",
             });
+
+
         } catch (error) {
             console.error('Full error object:', error);
             console.error('Error response:', error.response);
@@ -129,6 +145,7 @@ function AdminPostAJobPage() {
             alert(`There was an error posting the job!\n\n${errorMessage}`);
         }
     }
+
 
     return (
         <>
@@ -223,8 +240,29 @@ function AdminPostAJobPage() {
                                     </div>
                                 </div>
                             </div>
-                            {/* Offered Salary */}
+                            {/* Work Mode - NEW */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
+                                <div className="form-group">
+                                    <label>Work Mode</label>
+                                    <div className="ls-inputicon-box">
+                                        <select
+                                            name="work_mode"
+                                            className="form-control"
+                                            value={form.work_mode}
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="Remote">Remote</option>
+                                            <option value="Onsite">Onsite</option>
+                                            <option value="Hybrid">Hybrid</option>
+                                        </select>
+                                        <i className="fs-input-icon fa fa-laptop-house" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Offered Salary */}
+                            {/* <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Offered Salary</label>
                                     <div className="ls-inputicon-box">
@@ -234,7 +272,7 @@ function AdminPostAJobPage() {
                                         <i className="fs-input-icon fa fa-dollar-sign" />
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                             {/* Experience */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
@@ -395,6 +433,69 @@ function AdminPostAJobPage() {
                                         value={form.description} onChange={handleChange} required></textarea>
                                 </div>
                             </div>
+                            {/* Salary Range - CHANGED */}
+                            <div className="col-xl-4 col-lg-6 col-md-12">
+                                <div className="form-group">
+                                    <label>Salary Range</label>
+                                    <div className="ls-inputicon-box">
+                                        <input
+                                            name="salary_range"
+                                            className="form-control"
+                                            type="text"
+                                            placeholder="e.g. 30000-40000"
+                                            value={form.salary_range}
+                                            onChange={handleChange}
+                                        />
+                                        <i className="fs-input-icon fa fa-dollar-sign" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Requirements - NEW */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Requirements</label>
+                                    <textarea
+                                        name="requirements"
+                                        className="form-control"
+                                        rows={3}
+                                        placeholder="List job requirements..."
+                                        value={form.requirements}
+                                        onChange={handleChange}
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            {/* Responsibilities - NEW */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Responsibilities</label>
+                                    <textarea
+                                        name="responsibilities"
+                                        className="form-control"
+                                        rows={3}
+                                        placeholder="List job responsibilities..."
+                                        value={form.responsibilities}
+                                        onChange={handleChange}
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            {/* Skills Required - NEW */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Skills Required</label>
+                                    <textarea
+                                        name="skills_required"
+                                        className="form-control"
+                                        rows={3}
+                                        placeholder="List required skills..."
+                                        value={form.skills_required}
+                                        onChange={handleChange}
+                                    ></textarea>
+                                </div>
+                            </div>
+
                             {/* Start Date */}
                             <div className="col-md-6">
                                 <div className="form-group">

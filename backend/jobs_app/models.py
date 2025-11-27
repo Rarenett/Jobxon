@@ -39,18 +39,39 @@ class JobType(models.Model):
     class Meta:
         verbose_name_plural = "Job Types"
 
-
-
-#post a new job
+#post a job
 
 class Job(models.Model):
+    # Work mode choices
+    REMOTE = 'Remote'
+    ONSITE = 'Onsite'
+    HYBRID = 'Hybrid'
+    
+    WORK_MODE_CHOICES = [
+        (REMOTE, 'Remote'),
+        (ONSITE, 'Onsite'),
+        (HYBRID, 'Hybrid'),
+    ]
+    
     title = models.CharField(max_length=200)
     category = models.ForeignKey(JobCategory, on_delete=models.SET_NULL, null=True)
     job_type = models.ForeignKey(JobType, on_delete=models.SET_NULL, null=True)
-    company = models.ForeignKey(CompanyProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='jobs')  # NEW FIELD
-    offered_salary = models.CharField(max_length=50, blank=True, null=True)
+    company = models.ForeignKey(CompanyProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='jobs')
+    
+    # NEW FIELD
+    work_mode = models.CharField(
+        max_length=20,
+        choices=WORK_MODE_CHOICES,
+        default=ONSITE,
+        help_text="Mode of work"
+    )
+    
+    salary_range = models.CharField(max_length=100, blank=True, null=True, help_text="e.g. 30000-40000")
     experience = models.CharField(max_length=100, blank=True, null=True)
     qualification = models.CharField(max_length=200, null=True, blank=True)
+    requirements = models.TextField(blank=True, null=True, help_text="Job requirements")
+    responsibilities = models.TextField(blank=True, null=True, help_text="Job responsibilities")
+    skills_required = models.TextField(blank=True, null=True, help_text="Required skills")
     gender = models.CharField(
         max_length=10,
         choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other'), ('Any', 'Any')]

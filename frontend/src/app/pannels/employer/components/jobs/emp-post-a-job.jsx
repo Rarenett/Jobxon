@@ -1,274 +1,590 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useAuth } from "../../../../../contexts/AuthContext";
+
 function EmpPostAJobPage() {
+    const { token } = useAuth();
+    const [categories, setCategories] = useState([]);
+    const [jobTypes, setJobTypes] = useState([]);
+    const [form, setForm] = useState({
+        title: "",
+        category: "",
+        job_type: "",
+        work_mode: "Onsite",  // NEW
+        salary_range: "",  // CHANGED from offered_salary
+        experience: "",
+        qualification: "",
+        requirements: "",  // NEW
+        responsibilities: "",  // NEW
+        skills_required: "",  // NEW
+        gender: "",
+        country: "",
+        city: "",
+        location: "",
+        latitude: "",
+        longitude: "",
+        email: "",
+        website: "",
+        est_since: "",
+        complete_address: "",
+        description: "",
+        start_date: "",
+        end_date: "",
+    });
+
+    // Fetch categories and job types
+    useEffect(() => {
+        axios.get("http://127.0.0.1:8000/api/categories/")
+            .then(res => {
+                setCategories(res.data);
+                console.log('Categories loaded:', res.data);
+            })
+            .catch(err => console.error('Error loading categories:', err));
+
+        axios.get("http://127.0.0.1:8000/api/job-type/")
+            .then(res => {
+                setJobTypes(res.data);
+                console.log('Job types loaded:', res.data);
+            })
+            .catch(err => console.error('Error loading job types:', err));
+    }, []);
+
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        if (!token) {
+            alert("You are not logged in. Please log in first.");
+            return;
+        }
+
+        const cleanedData = {
+            ...form,
+            work_mode: form.work_mode,  // NEW
+            salary_range: form.salary_range || null,  // CHANGED
+            requirements: form.requirements || null,  // NEW
+            responsibilities: form.responsibilities || null,  // NEW
+            skills_required: form.skills_required || null,  // NEW
+            experience: form.experience || null,
+            qualification: form.qualification || null,
+            location: form.location || null,
+            latitude: form.latitude || null,
+            longitude: form.longitude || null,
+            website: form.website || null,
+            est_since: form.est_since || null,
+            complete_address: form.complete_address || null,
+            start_date: form.start_date || null,
+            end_date: form.end_date || null,
+            category: form.category ? parseInt(form.category) : null,
+            job_type: form.job_type ? parseInt(form.job_type) : null,
+        };
+
+        console.log('Submitting data:', cleanedData);
+
+        try {
+            const response = await axios.post(
+                "http://127.0.0.1:8000/api/jobs/",
+                cleanedData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            console.log('Success response:', response.data);
+            alert("Job posted successfully!");
+
+            // Reset form
+            setForm({
+                title: "",
+                category: "",
+                job_type: "",
+                work_mode: "Onsite",  // NEW
+                salary_range: "",  // CHANGED
+                experience: "",
+                qualification: "",
+                requirements: "",  // NEW
+                responsibilities: "",  // NEW
+                skills_required: "",  // NEW
+                gender: "",
+                country: "",
+                city: "",
+                location: "",
+                latitude: "",
+                longitude: "",
+                email: "",
+                website: "",
+                est_since: "",
+                complete_address: "",
+                description: "",
+                start_date: "",
+                end_date: "",
+            });
+        } catch (error) {
+            console.error('Full error object:', error);
+            console.error('Error response:', error.response);
+            console.error('Error data:', error.response?.data);
+
+            const errorMessage = error.response?.data 
+                ? JSON.stringify(error.response.data, null, 2)
+                : error.message;
+            alert(`There was an error posting the job!\n\n${errorMessage}`);
+        }
+    }
+
     return (
         <>
             <div className="wt-admin-right-page-header clearfix">
                 <h2>Post a Job</h2>
-                <div className="breadcrumbs"><a href="#">Home</a><a href="#">Dasboard</a><span>Job Submission Form</span></div>
+                <div className="breadcrumbs">
+                    <a href="#">Home</a>
+                    <a href="#">Dashboard</a>
+                    <span>Job Submission Form</span>
+                </div>
             </div>
             
-            {/*Basic Information*/}
             <div className="panel panel-default">
                 <div className="panel-heading wt-panel-heading p-a20">
                     <h4 className="panel-tittle m-a0"><i className="fa fa-suitcase" />Job Details</h4>
                 </div>
-                <div className="panel-body wt-panel-body p-a20 m-b30 ">
-                    <form>
+                <div className="panel-body wt-panel-body p-a20 m-b30">
+                    <form onSubmit={handleSubmit} autoComplete="off">
                         <div className="row">
-                            {/*Job title*/}
+                            {/* Job title */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Job Title</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_name" type="text" placeholder="Devid Smith" />
+                                        <input 
+                                            name="title" 
+                                            className="form-control" 
+                                            type="text" 
+                                            placeholder="Job Title"
+                                            value={form.title} 
+                                            onChange={handleChange} 
+                                            required 
+                                        />
                                         <i className="fs-input-icon fa fa-address-card" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Job Category*/}
+
+                            {/* Job Category */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group city-outer-bx has-feedback">
                                     <label>Job Category</label>
                                     <div className="ls-inputicon-box">
-                                        <select className="wt-select-box selectpicker" data-live-search="true" title="" id="j-category" data-bv-field="size">
-                                            <option disabled value="">Select Category</option>
-                                            <option>Accounting and Finance</option>
-                                            <option>Clerical &amp; Data Entry</option>
-                                            <option>Counseling</option>
-                                            <option>Court Administration</option>
-                                            <option>Human Resources</option>
-                                            <option>Investigative</option>
-                                            <option>IT and Computers</option>
-                                            <option>Law Enforcement</option>
-                                            <option>Management</option>
-                                            <option>Miscellaneous</option>
-                                            <option>Public Relations</option>
+                                        <select
+                                            name="category"
+                                            className="form-control"
+                                            value={form.category || ""}
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="">Select Category</option>
+                                            {categories.length === 0 && <option disabled>Loading...</option>}
+                                            {categories.map(c => (
+                                                <option key={c.id} value={c.id}>{c.name}</option>
+                                            ))}
                                         </select>
                                         <i className="fs-input-icon fa fa-border-all" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Job Type*/}
+
+                            {/* Job Type */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Job Type</label>
                                     <div className="ls-inputicon-box">
-                                        <select className="wt-select-box selectpicker" data-live-search="true" title="" id="s-category" data-bv-field="size">
-                                            <option className="bs-title-option" value>Select Category</option>
-                                            <option>Full Time</option>
-                                            <option>Freelance</option>
-                                            <option>Part Time</option>
-                                            <option>Internship</option>
-                                            <option>Temporary</option>
+                                        <select
+                                            name="job_type"
+                                            className="form-control"
+                                            value={form.job_type || ""}
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="">Select Type</option>
+                                            {jobTypes.length === 0 && <option disabled>Loading...</option>}
+                                            {jobTypes.map(jt => (
+                                                <option key={jt.id} value={jt.id}>{jt.name}</option>
+                                            ))}
                                         </select>
                                         <i className="fs-input-icon fa fa-file-alt" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Offered Salary*/}
+
+                            {/* Work Mode - NEW */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
-                                    <label>Offered Salary</label>
+                                    <label>Work Mode</label>
                                     <div className="ls-inputicon-box">
-                                        <select className="wt-select-box selectpicker" data-live-search="true" title="" id="salary" data-bv-field="size">
-                                            <option className="bs-title-option" value>Salary</option>
-                                            <option>$500</option>
-                                            <option>$1000</option>
-                                            <option>$1500</option>
-                                            <option>$2000</option>
-                                            <option>$2500</option>
+                                        <select
+                                            name="work_mode"
+                                            className="form-control"
+                                            value={form.work_mode}
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="Remote">Remote</option>
+                                            <option value="Onsite">Onsite</option>
+                                            <option value="Hybrid">Hybrid</option>
                                         </select>
+                                        <i className="fs-input-icon fa fa-laptop-house" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Salary Range - CHANGED */}
+                            <div className="col-xl-4 col-lg-6 col-md-12">
+                                <div className="form-group">
+                                    <label>Salary Range</label>
+                                    <div className="ls-inputicon-box">
+                                        <input 
+                                            name="salary_range" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="e.g. 30000-40000"
+                                            value={form.salary_range} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-dollar-sign" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Experience*/}
+
+                            {/* Experience */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Experience</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_Email" type="email" placeholder="E.g. Minimum 3 years" />
+                                        <input 
+                                            name="experience" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="E.g. Minimum 3 years"
+                                            value={form.experience} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-user-edit" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Qualification*/}
+
+                            {/* Qualification */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Qualification</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_Email" type="email" placeholder="Qualification Title" />
+                                        <input 
+                                            name="qualification" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="Qualification Title"
+                                            value={form.qualification} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-user-graduate" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Gender*/}
+
+                            {/* Gender */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Gender</label>
                                     <div className="ls-inputicon-box">
-                                        <select className="wt-select-box selectpicker" data-live-search="true" title="" id="gender" data-bv-field="size">
-                                            <option className="bs-title-option" value>Gender</option>
-                                            <option>Male</option>
-                                            <option>Female</option>
-                                            <option>Other</option>
+                                        <select
+                                            name="gender"
+                                            className="form-control"
+                                            value={form.gender}
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                            <option value="Any">Any</option>
                                         </select>
                                         <i className="fs-input-icon fa fa-venus-mars" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Country*/}
+
+                            {/* Country */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Country</label>
                                     <div className="ls-inputicon-box">
-                                        <select className="wt-select-box selectpicker" data-live-search="true" title="" id="country" data-bv-field="size">
-                                            <option className="bs-title-option" value>Country</option>
-                                            <option>Afghanistan</option>
-                                            <option>Albania</option>
-                                            <option>Algeria</option>
-                                            <option>Andorra</option>
-                                            <option>Angola</option>
-                                            <option>Antigua and Barbuda</option>
-                                            <option>Argentina</option>
-                                            <option>Armenia</option>
-                                            <option>Australia</option>
-                                            <option>Austria</option>
-                                            <option>Azerbaijan</option>
-                                            <option>The Bahamas</option>
-                                            <option>Bahrain</option>
-                                            <option>Bangladesh</option>
-                                            <option>Barbados</option>
-                                        </select>
+                                        <input 
+                                            name="country" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="Country"
+                                            value={form.country} 
+                                            onChange={handleChange} 
+                                            required 
+                                        />
                                         <i className="fs-input-icon fa fa-globe-americas" />
                                     </div>
                                 </div>
                             </div>
-                            {/*City*/}
+
+                            {/* City */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>City</label>
                                     <div className="ls-inputicon-box">
-                                        <select className="wt-select-box selectpicker" data-live-search="true" title="" id="city" data-bv-field="size">
-                                            <option className="bs-title-option" value>City</option>
-                                            <option>Sydney</option>
-                                            <option>Melbourne</option>
-                                            <option>Brisbane</option>
-                                            <option>Perth</option>
-                                            <option>Adelaide</option>
-                                            <option>Gold Coast</option>
-                                            <option>Cranbourne</option>
-                                            <option>Newcastle</option>
-                                            <option>Wollongong</option>
-                                            <option>Geelong</option>
-                                            <option>Hobart</option>
-                                            <option>Townsville</option>
-                                            <option>Ipswich</option>
-                                        </select>
+                                        <input 
+                                            name="city" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="City"
+                                            value={form.city} 
+                                            onChange={handleChange} 
+                                            required 
+                                        />
                                         <i className="fs-input-icon fa fa-map-marker-alt" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Location*/}
+
+                            {/* Location */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Location</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_Email" type="email" placeholder="Type Address" />
+                                        <input 
+                                            name="location" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="Type Address"
+                                            value={form.location} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-map-marker-alt" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Latitude*/}
+
+                            {/* Latitude */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Latitude</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_Email" type="email" placeholder="Los Angeles" />
+                                        <input 
+                                            name="latitude" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="Latitude"
+                                            value={form.latitude} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-map-pin" />
                                     </div>
                                 </div>
                             </div>
-                            {/*longitude*/}
+
+                            {/* Longitude */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Longitude</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_Email" type="email" placeholder="Los Angeles" />
+                                        <input 
+                                            name="longitude" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="Longitude"
+                                            value={form.longitude} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-map-pin" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Email Address*/}
+
+                            {/* Email Address */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Email Address</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_Email" type="email" placeholder="Devid@example.com" />
+                                        <input 
+                                            name="email" 
+                                            className="form-control" 
+                                            type="email"
+                                            placeholder="your@email.com"
+                                            value={form.email} 
+                                            onChange={handleChange} 
+                                            required 
+                                        />
                                         <i className="fs-input-icon fas fa-at" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Website*/}
+
+                            {/* Website */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Website</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_website" type="text" placeholder="https://..." />
+                                        <input 
+                                            name="website" 
+                                            className="form-control" 
+                                            type="url"
+                                            placeholder="https://..."
+                                            value={form.website} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-globe-americas" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Est. Since*/}
+
+                            {/* Est. Since */}
                             <div className="col-xl-4 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Est. Since</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_since" type="text" placeholder="Since..." />
+                                        <input 
+                                            name="est_since" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="Since..."
+                                            value={form.est_since} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-clock" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Complete Address*/}
+
+                            {/* Complete Address */}
                             <div className="col-xl-12 col-lg-6 col-md-12">
                                 <div className="form-group">
                                     <label>Complete Address</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control" name="company_since" type="text" placeholder="1363-1385 Sunset Blvd Los Angeles, CA 90026, USA" />
+                                        <input 
+                                            name="complete_address" 
+                                            className="form-control" 
+                                            type="text"
+                                            placeholder="Full address here..."
+                                            value={form.complete_address} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon fa fa-home" />
                                     </div>
                                 </div>
                             </div>
-                            {/*Description*/}
+
+                            {/* Description */}
                             <div className="col-md-12">
                                 <div className="form-group">
                                     <label>Description</label>
-                                    <textarea className="form-control" rows={3} placeholder="Greetings! We are Galaxy Software Development Company. We hope you enjoy our services and quality." defaultValue={""} />
+                                    <textarea 
+                                        name="description" 
+                                        className="form-control" 
+                                        rows={3} 
+                                        placeholder="Job description"
+                                        value={form.description} 
+                                        onChange={handleChange} 
+                                        required
+                                    ></textarea>
                                 </div>
                             </div>
-                            {/*Start Date*/}
+
+                            {/* Requirements - NEW */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Requirements</label>
+                                    <small className="form-text text-muted">Enter each requirement on a new line</small>
+                                    <textarea 
+                                        name="requirements" 
+                                        className="form-control" 
+                                        rows={4} 
+                                        placeholder="List job requirements (one per line)..."
+                                        value={form.requirements} 
+                                        onChange={handleChange}
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            {/* Responsibilities - NEW */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Responsibilities</label>
+                                    <small className="form-text text-muted">Enter each responsibility on a new line</small>
+                                    <textarea 
+                                        name="responsibilities" 
+                                        className="form-control" 
+                                        rows={4} 
+                                        placeholder="List job responsibilities (one per line)..."
+                                        value={form.responsibilities} 
+                                        onChange={handleChange}
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            {/* Skills Required - NEW */}
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label>Skills Required</label>
+                                    <small className="form-text text-muted">Enter each skill on a new line</small>
+                                    <textarea 
+                                        name="skills_required" 
+                                        className="form-control" 
+                                        rows={5} 
+                                        placeholder="Basic knowledge of programming languages (Java/Python/C++/NET or any other)
+Understanding of SQL and databases is an advantage
+Good analytical and problem-solving skills"
+                                        value={form.skills_required} 
+                                        onChange={handleChange}
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            {/* Start Date */}
                             <div className="col-md-6">
                                 <div className="form-group">
                                     <label>Start Date</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control datepicker" data-provide="datepicker" name="company_since" type="text" placeholder="mm/dd/yyyy" />
+                                        <input 
+                                            name="start_date" 
+                                            className="form-control" 
+                                            type="date"
+                                            value={form.start_date} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon far fa-calendar" />
                                     </div>
                                 </div>
                             </div>
-                            {/*End Date*/}
+
+                            {/* End Date */}
                             <div className="col-md-6">
                                 <div className="form-group">
                                     <label>End Date</label>
                                     <div className="ls-inputicon-box">
-                                        <input className="form-control datepicker" data-provide="datepicker" name="company_since" type="text" placeholder="mm/dd/yyyy" />
+                                        <input 
+                                            name="end_date" 
+                                            className="form-control" 
+                                            type="date"
+                                            value={form.end_date} 
+                                            onChange={handleChange} 
+                                        />
                                         <i className="fs-input-icon far fa-calendar" />
                                     </div>
                                 </div>
                             </div>
+
                             <div className="col-lg-12 col-md-12">
                                 <div className="text-left">
                                     <button type="submit" className="site-button m-r5">Publish Job</button>
-                                    <button type="submit" className="site-button outline-primary">Save Draft</button>
                                 </div>
                             </div>
                         </div>
@@ -276,6 +592,7 @@ function EmpPostAJobPage() {
                 </div>
             </div>
         </>
-    )
+    );
 }
+
 export default EmpPostAJobPage;
