@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import JobZImage from "../../../../common/jobz-img";
+import { useAuth } from "../../../../../contexts/AuthContext";
+
+
+const API_URL = process.env.REACT_APP_API_URL;
+console.log("hello")
 
 function AdminCandidateListPage() {
     const [candidates, setCandidates] = useState([]);
@@ -13,32 +18,33 @@ function AdminCandidateListPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredCandidates, setFilteredCandidates] = useState([]);
 
+    const { user } = useAuth();
+
+
     useEffect(() => {
         const fetchCandidates = async () => {
-    try {
-        const token = localStorage.getItem("access_token");
+            try {
+                const token = localStorage.getItem("access_token");
 
-const res = await fetch("http://127.0.0.1:8000/api/admin/candidates/", {
-    headers: {
-        Authorization: `Bearer ${token}`,
-    },
-});
+                const res = await fetch(`${API_URL}/api/admin/candidates/`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
+                const data = await res.json();
 
-        const data = await res.json();
-
-        const list = Array.isArray(data) ? data : data.results || [];
-        setCandidates(list);
-        setFilteredCandidates(list);
-    } catch (error) {
-        console.error("Failed to load candidates", error);
-        setCandidates([]);
-        setFilteredCandidates([]);
-    } finally {
-        setLoading(false);
-    }
-};
-
+                const list = Array.isArray(data) ? data : data.results || [];
+                setCandidates(list);
+                setFilteredCandidates(list);
+            } catch (error) {
+                console.error("Failed to load candidates", error);
+                setCandidates([]);
+                setFilteredCandidates([]);
+            } finally {
+                setLoading(false);
+            }
+        };
 
         fetchCandidates();
     }, []);
@@ -100,43 +106,78 @@ const res = await fetch("http://127.0.0.1:8000/api/admin/candidates/", {
             </div>
         );
     }
-// ✅ View Candidate
-const viewCandidate = (id) => {
-    window.location.href = `/admin/candidate-view/${id}`;
-};
 
-// ✅ Delete Candidate
-const deleteCandidate = async (id) => {
-    const token = localStorage.getItem("access_token");
+    // ✅ View Candidate
+    const viewCandidate = (id) => {
+        window.location.href = `/admin/candidate-view/${id}`;
+    };
 
-    if (!window.confirm("Are you sure you want to delete this candidate?")) return;
+    // ✅ Delete Candidate
+    const deleteCandidate = async (id) => {
+        const token = localStorage.getItem("access_token");
 
-    try {
-        const res = await fetch(
-            `http://127.0.0.1:8000/api/admin-candidates/${id}/`,
-            {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+        if (!window.confirm("Are you sure you want to delete this candidate?")) return;
+
+        try {
+            const res = await fetch(
+                `${API_URL}/api/admin-candidates/${id}/`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (res.ok) {
+                alert("Deleted ✅");
+
+                // ✅ remove from UI instantly
+                const updated = candidates.filter(c => c.id !== id);
+                setCandidates(updated);
+                setFilteredCandidates(updated);
+            } else {
+                alert("Delete failed ❌");
             }
-        );
-
-        if (res.ok) {
-            alert("Deleted ✅");
-
-            // ✅ remove from UI instantly
-            const updated = candidates.filter(c => c.id !== id);
-            setCandidates(updated);
-            setFilteredCandidates(updated);
-        } else {
-            alert("Delete failed ❌");
+        } catch (err) {
+            console.error(err);
+            alert("Server error ❌");
         }
-    } catch (err) {
-        console.error(err);
-        alert("Server error ❌");
+    };
+
+  const startConversation = async (candidateUserId) => {
+  console.log("candidateUserId:", candidateUserId); // <- add this
+  const token = localStorage.getItem("access_token");
+
+  try {
+    const res = await fetch(
+      `${API_URL}/api/conversations/start_conversation/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          receiver_id: candidateUserId,
+        }),
+      }
+    );
+    const data = await res.json();
+    console.log("start_conversation response:", data); // debug
+
+    if (res.ok) {
+      const basePath = user?.user_type === 'admin' ? '/admin' : '/employer';
+      window.location.href = `${basePath}/messages-style-1?conversation=${data.id}`;
+    } else {
+      alert(data.error || "Failed to start conversation ❌");
     }
+  } catch (err) {
+    console.error(err);
+    alert("Server error ❌");
+  }
 };
+
 
     return (
         <>
@@ -186,7 +227,7 @@ const deleteCandidate = async (id) => {
                                     </div>
                                     {/* Search box */}
                                     <div className="col-md-6 d-flex justify-content-md-end mt-2 mt-md-0">
-                                        <div style={{ display:"flex", alignItems:"center"}}>
+                                        <div style={{ display: "flex", alignItems: "center" }}>
                                             <span style={{ marginRight: "8px" }}>Search:</span>
                                             <input
                                                 type="text"
@@ -225,90 +266,113 @@ const deleteCandidate = async (id) => {
                                                         <div className="p-4">
                                                             <i className="fa fa-info-circle fa-2x text-muted mb-2"></i>
                                                             <p>
-                                                                {searchTerm 
-                                                                    ? `No candidates found matching "${searchTerm}"` 
+                                                                {searchTerm
+                                                                    ? `No candidates found matching "${searchTerm}"`
                                                                     : 'No candidates found'}
                                                             </p>
                                                         </div>
                                                     </td>
                                                 </tr>
                                             ) : (
-                                                currentRecords.map((c, index) => (
-                                                    <tr key={index}>
-                                                        <td>
-                                                            <div className="twm-bookmark-list">
-                                                                <div className="twm-media">
-                                                                    <div className="twm-media-pic">
-                                                                        <JobZImage
-                                                                            src={c.profile_image || "images/candidates/default.jpg"}
-                                                                            alt="#"
-                                                                        />
+                                                currentRecords.map((c, index) => {
+                                                    console.log("Admin candidate row:", c); // 👈 full object
+
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td>
+                                                                <div className="twm-bookmark-list">
+                                                                    <div className="twm-media">
+                                                                        <div className="twm-media-pic">
+                                                                            <JobZImage
+                                                                                src={c.profile_image || "images/candidates/default.jpg"}
+                                                                                alt="#"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="twm-mid-content">
+                                                                        <a href="#" className="twm-job-title">
+                                                                            <h4>{c.full_name}</h4>
+                                                                        </a>
+                                                                        <p className="twm-bookmark-address">
+                                                                            <i className="feather-map-pin" />
+                                                                            {c.city}, {c.country}
+                                                                        </p>
                                                                     </div>
                                                                 </div>
+                                                            </td>
 
-                                                                <div className="twm-mid-content">
-                                                                    <a href="#" className="twm-job-title">
-                                                                        <h4>{c.full_name}</h4>
-                                                                    </a>
-                                                                    <p className="twm-bookmark-address">
-                                                                        <i className="feather-map-pin" />
-                                                                        {c.city}, {c.country}
-                                                                    </p>
+                                                            <td>
+                                                                <div className="twm-jobs-category">
+                                                                    <span className="twm-bg-purple">
+                                                                        {c.experience || "N/A"}
+                                                                    </span>
                                                                 </div>
-                                                            </div>
-                                                        </td>
+                                                            </td>
 
-                                                        <td>
-                                                            <div className="twm-jobs-category">
-                                                                <span className="twm-bg-purple">
-                                                                    {c.experience || 'N/A'}
-                                                                </span>
-                                                            </div>
-                                                        </td>
+                                                            <td>
+                                                                <div className="twm-job-post-duration">
+                                                                    {c.phone || "N/A"}
+                                                                </div>
+                                                            </td>
 
-                                                        <td>
-                                                            <div className="twm-job-post-duration">
-                                                                {c.phone || 'N/A'}
-                                                            </div>
-                                                        </td>
+                                                            <td>{c.email}</td>
 
-                                                        <td>{c.email}</td>
+                                                            <td>
+                                                                <span className="text-clr-green2">Active</span>
+                                                            </td>
 
-                                                        <td>
-                                                            <span className="text-clr-green2">Active</span>
-                                                        </td>
+                                                            <td>
+                                                                <div className="twm-table-controls">
+                                                                    <ul className="twm-DT-controls-icon list-unstyled">
+                                                                        <li>
+                                                                            <button
+                                                                                title="View profile"
+                                                                                onClick={() => viewCandidate(c.id)}
+                                                                                data-bs-toggle="tooltip"
+                                                                                data-bs-placement="top"
+                                                                            >
+                                                                                <span className="fa fa-eye" />
+                                                                            </button>
+                                                                        </li>
 
-                                                        <td>
-                                                            <div className="twm-table-controls">
-                                                                <ul className="twm-DT-controls-icon list-unstyled">
-                                                                   <li>
-    <button 
-        title="View profile"
-        onClick={() => viewCandidate(c.id)}
-        data-bs-toggle="tooltip" 
-        data-bs-placement="top"
-    >
-        <span className="fa fa-eye" />
-    </button>
-</li>
+                                                                        <li>
+                                                                            <button
+                                                                                title="Send Message"
+                                                                                onClick={() => {
+                                                                                    console.log(
+                                                                                        "Send Message clicked -> candidate.id:",
+                                                                                        c.id,
+                                                                                        "candidate.user_id:",
+                                                                                        c.user_id
+                                                                                    ); // 👈 check this
+                                                                                    startConversation(c.user_id);
+                                                                                }}
+                                                                                data-bs-toggle="tooltip"
+                                                                                data-bs-placement="top"
+                                                                            >
+                                                                                <span className="far fa-comment-dots" />
+                                                                            </button>
+                                                                        </li>
 
-<li>
-    <button 
-        title="Delete"
-        onClick={() => deleteCandidate(c.id)}
-        data-bs-toggle="tooltip" 
-        data-bs-placement="top"
-    >
-        <span className="far fa-trash-alt" />
-    </button>
-</li>
-
-                                                                </ul>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))
+                                                                        <li>
+                                                                            <button
+                                                                                title="Delete"
+                                                                                onClick={() => deleteCandidate(c.id)}
+                                                                                data-bs-toggle="tooltip"
+                                                                                data-bs-placement="top"
+                                                                            >
+                                                                                <span className="far fa-trash-alt" />
+                                                                            </button>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
                                             )}
+
                                         </tbody>
 
                                         <tfoot>
@@ -334,14 +398,14 @@ const deleteCandidate = async (id) => {
                                                     Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, filteredCandidates.length)} of {filteredCandidates.length} entries
                                                 </p>
                                             </div>
-                                            
+
                                             {/* Right side - Pagination buttons */}
                                             <div className="col-md-6">
                                                 <nav aria-label="Page navigation" className="d-flex justify-content-end">
                                                     <ul className="pagination mb-0" style={{ gap: '5px' }}>
                                                         {/* Previous Button */}
                                                         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                                            <button 
+                                                            <button
                                                                 className="page-link"
                                                                 onClick={goToPreviousPage}
                                                                 disabled={currentPage === 1}
@@ -362,11 +426,11 @@ const deleteCandidate = async (id) => {
                                                         {[...Array(totalPages)].map((_, index) => {
                                                             const pageNumber = index + 1;
                                                             return (
-                                                                <li 
-                                                                    key={pageNumber} 
+                                                                <li
+                                                                    key={pageNumber}
                                                                     className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}
                                                                 >
-                                                                    <button 
+                                                                    <button
                                                                         className="page-link"
                                                                         onClick={() => paginate(pageNumber)}
                                                                         style={{
@@ -388,7 +452,7 @@ const deleteCandidate = async (id) => {
 
                                                         {/* Next Button */}
                                                         <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                                                            <button 
+                                                            <button
                                                                 className="page-link"
                                                                 onClick={goToNextPage}
                                                                 disabled={currentPage === totalPages}

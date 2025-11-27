@@ -1,8 +1,9 @@
+# users_app/serializers.py (example)
+
 from rest_framework import serializers
-from .models import CustomUser,CustomUserManager,CandidateProfile
+from .models import CustomUser, CandidateProfile
 from companies_app.models import CompanyPhoto, CompanyProfile
 from django.contrib.auth import authenticate
-
 
 # -------------------------
 # User Serializer
@@ -29,21 +30,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         phone = validated_data.pop('phone', None)
         name = validated_data.pop('name', '')
         user_type = validated_data.get('user_type')
-        
-        # Create user
+
         user = CustomUser.objects.create_user(
             email=validated_data['email'],
             username=validated_data['username'],
             password=validated_data['password'],
             user_type=user_type
         )
-        
-        # Create profile based on user_type
+
         if user_type == 'candidate':
-            CandidateProfile.objects.create(user=user, name=name, phone=phone)
+            CandidateProfile.objects.create(user=user, full_name=name, phone=phone)
         elif user_type == 'employer':
             CompanyProfile.objects.create(user=user, name=name, phone=phone)
-        
+
         return user
 
 
@@ -57,67 +56,27 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         email = data.get('email')
         password = data.get('password')
-        
-        # Since USERNAME_FIELD = 'email', authenticate with email directly
-        user = authenticate(request=self.context.get('request'), 
-                          username=email,  # Django uses 'username' parameter even when USERNAME_FIELD is email
-                          password=password)
-        
+
+        user = authenticate(
+            request=self.context.get('request'),
+            username=email,
+            password=password
+        )
+
         if not user:
             raise serializers.ValidationError({"non_field_errors": ["Invalid email or password"]})
-        
+
         if not user.is_active:
             raise serializers.ValidationError({"non_field_errors": ["Account is disabled"]})
-        
+
         return user
 
-# -------------------------
-# Candidate Profile Serializer
-# -------------------------
-class CandidateProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(source='user.email', read_only=True)
-    
-    class Meta:
-        model = CandidateProfile
-        fields = '__all__'
-        read_only_fields = ['user']
-
-
-class CompanyPhotoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CompanyPhoto
-        fields = ['id', 'image', 'caption', 'uploaded_at']
-
 
 # -------------------------
-# Company Profile Serializer (UPDATED)
+# Candidate Basic Info Serializer
 # -------------------------
-class CompanyProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(source='user.email', read_only=True)
-    photos = CompanyPhotoSerializer(many=True, read_only=True)  # ✅ ADD THIS LINE
-    
-    class Meta:
-        model = CompanyProfile
-        fields = [
-            'id', 'name', 'description', 'location', 'email', 'phone',
-            'website', 'established_since', 'team_size', 'logo', 'banner_image',
-            'video', 'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',
-            'whatsapp', 'pinterest', 'tumblr', 'youtube_links', 'vimeo_links',
-            'photos',  # ✅ INCLUDE photos FIELD
-            'is_active', 'created_at', 'updated_at'
-        ]
-        read_only_fields = ['user', 'id', 'email', 'created_at', 'updated_at']
-
-
-
-from rest_framework import serializers
-from .models import CandidateProfile
-
-
-
 class CandidateBasicInfoSerializer(serializers.ModelSerializer):
     """Serializer for candidate basic information update"""
-    
     class Meta:
         model = CandidateProfile
         fields = [
@@ -144,11 +103,41 @@ class CandidateBasicInfoSerializer(serializers.ModelSerializer):
         }
 
 
+# -------------------------
+# Candidate Profile Serializer (single definition, with user_id)
+# -------------------------
 class CandidateProfileSerializer(serializers.ModelSerializer):
-    """Full candidate profile serializer"""
+    """Full candidate profile serializer (used in admin list)"""
     email = serializers.EmailField(source='user.email', read_only=True)
-    
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
     class Meta:
         model = CandidateProfile
-        fields = '_all_'
+        fields = "__all__"
         read_only_fields = ['user', 'id', 'created_at', 'updated_at']
+
+
+# -------------------------
+# Company Photo + Company Profile
+# -------------------------
+class CompanyPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyPhoto
+        fields = ['id', 'image', 'caption', 'uploaded_at']
+
+
+class CompanyProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='user.email', read_only=True)
+    photos = CompanyPhotoSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = CompanyProfile
+        fields = [
+            'id', 'name', 'description', 'location', 'email', 'phone',
+            'website', 'established_since', 'team_size', 'logo', 'banner_image',
+            'video', 'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',
+            'whatsapp', 'pinterest', 'tumblr', 'youtube_links', 'vimeo_links',
+            'photos',
+            'is_active', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['user', 'id', 'email', 'created_at', 'updated_at']

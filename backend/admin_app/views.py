@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from django.db.models import Q
+from users_app.serializers import CandidateProfileSerializer
 from companies_app.models import CompanyProfile, CompanyPhoto, CompanyReview
 from companies_app.serializers import (
     CompanyProfileSerializer,
@@ -27,7 +28,7 @@ from .serializer import CandidateKeySkillSerializer, CandidateProfileListSeriali
 
 class CandidateProfileViewSet(viewsets.ModelViewSet):
     queryset = CandidateProfile.objects.all().order_by('-id')
-    serializer_class = CandidateProfileListSerializer
+    serializer_class = CandidateProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):

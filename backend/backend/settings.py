@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'jobs_app',
     'users_app',
     'admin_app',
+    'chat_app',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',

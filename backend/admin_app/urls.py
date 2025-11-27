@@ -10,7 +10,6 @@ from .views import CandidateEducationViewSet
 from .views import CandidateITSkillViewSet
 
 router = DefaultRouter()
-router.register(r'admin/candidates', CandidateProfileViewSet, basename='admin-candidates')
 from .views import CandidateProfileViewSet
 from .views import ResumeHeadlineView
 from .views import CompanyProfileViewSet

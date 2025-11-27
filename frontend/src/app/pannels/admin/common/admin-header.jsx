@@ -5,24 +5,29 @@ import { useAuth } from "../../../../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = process.env.REACT_APP_API_URL;
 
 function AdminHeaderSection(props) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
+    const [conversations, setConversations] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
         fetchProfile();
+        fetchRecentConversations();
+        
+        // Refresh conversations every 30 seconds
+        const interval = setInterval(fetchRecentConversations, 30000);
+        return () => clearInterval(interval);
     }, []);
 
     const fetchProfile = async () => {
         try {
             const token = localStorage.getItem('access_token');
-            const response = await axios.get(`${API_URL}/profile/`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            const response = await axios.get(`${API_URL}/api/profile/`, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             setProfile(response.data.profile);
         } catch (error) {
@@ -30,9 +35,48 @@ function AdminHeaderSection(props) {
         }
     };
 
+    const fetchRecentConversations = async () => {
+        const token = localStorage.getItem("access_token");
+        try {
+            const res = await fetch(`${API_URL}/api/conversations/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await res.json();
+            
+            // Get only first 4 conversations
+            const recent = data.slice(0, 4);
+            setConversations(recent);
+            
+            // Calculate total unread count
+            const totalUnread = data.reduce((sum, conv) => sum + conv.unread_count, 0);
+            setUnreadCount(totalUnread);
+        } catch (error) {
+            console.error("Failed to load conversations", error);
+        }
+    };
+
+    const formatTimeAgo = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 60) return `${diffMins} mins ago`;
+        if (diffHours < 24) return `${diffHours} hours ago`;
+        return `${diffDays} days ago`;
+    };
+
     const handleLogout = () => {
         logout();
         navigate(publicUser.HOME1);
+    };
+
+    const handleConversationClick = (convId) => {
+        navigate(`${adRoute(admin.MESSAGES1)}?conversation=${convId}`);
     };
 
     return (
@@ -52,64 +96,61 @@ function AdminHeaderSection(props) {
                                 {/*Message*/}
                                 <li className="header-widget dashboard-message-dropdown">
                                     <div className="dropdown">
-                                        <a href="#" className="dropdown-toggle jobzilla-admin-messange" id="ID-MSG_dropdown" data-bs-toggle="dropdown">
+                                        <a 
+                                            href="#" 
+                                            className="dropdown-toggle jobzilla-admin-messange" 
+                                            id="ID-MSG_dropdown" 
+                                            data-bs-toggle="dropdown"
+                                        >
                                             <i className="far fa-envelope" />
-                                            <span className="notification-animate">4</span>
+                                            {unreadCount > 0 && (
+                                                <span className="notification-animate">{unreadCount}</span>
+                                            )}
                                         </a>
                                         <div className="dropdown-menu" aria-labelledby="ID-MSG_dropdown">
                                             <div className="message-list dashboard-widget-scroll">
                                                 <ul>
-                                                    <li className="clearfix">
-                                                        <span className="msg-avtar">
-                                                            <JobZImage src="images/user-avtar/pic1.jpg" alt="" />
-                                                        </span>
-                                                        <div className="msg-texting">
-                                                            <strong>Alexa Johnson</strong>
-                                                            <small className="msg-time">
-                                                                <span className="far fa-clock p-r-5" />12 mins ago
-                                                            </small>
-                                                            <p>Lorem ipsum dolor sit amet, consectetur...</p>
-                                                        </div>
-                                                    </li>
-                                                    <li className="clearfix">
-                                                        <span className="msg-avtar">
-                                                            <JobZImage src="images/user-avtar/pic2.jpg" alt="" />
-                                                        </span>
-                                                        <div className="msg-texting">
-                                                            <strong>Johan Smith</strong>
-                                                            <small className="msg-time">
-                                                                <span className="far fa-clock p-r-5" />2 hours ago
-                                                            </small>
-                                                            <p>Lorem ipsum dolor sit amet, consectetur...</p>
-                                                        </div>
-                                                    </li>
-                                                    <li className="clearfix">
-                                                        <span className="msg-avtar">
-                                                            <JobZImage src="images/user-avtar/pic3.jpg" alt="" />
-                                                        </span>
-                                                        <div className="msg-texting">
-                                                            <strong>Bobby Brown</strong>
-                                                            <small className="msg-time">
-                                                                <span className="far fa-clock p-r-5" />3 hours ago
-                                                            </small>
-                                                            <p>Lorem ipsum dolor sit amet, consectetur...</p>
-                                                        </div>
-                                                    </li>
-                                                    <li className="clearfix">
-                                                        <span className="msg-avtar">
-                                                            <JobZImage src="images/user-avtar/pic4.jpg" alt="" />
-                                                        </span>
-                                                        <div className="msg-texting">
-                                                            <strong>David Deo</strong>
-                                                            <small className="msg-time">
-                                                                <span className="far fa-clock p-r-5" />4 hours ago
-                                                            </small>
-                                                            <p>Lorem ipsum dolor sit amet, consectetur...</p>
-                                                        </div>
-                                                    </li>
+                                                    {conversations.length === 0 ? (
+                                                        <li className="clearfix text-center p-3">
+                                                            <p className="text-muted mb-0">No messages</p>
+                                                        </li>
+                                                    ) : (
+                                                        conversations.map((conv) => (
+                                                            <li 
+                                                                key={conv.id} 
+                                                                className="clearfix"
+                                                                onClick={() => handleConversationClick(conv.id)}
+                                                                style={{ cursor: 'pointer' }}
+                                                            >
+                                                                <span className="msg-avtar">
+                                                                    <JobZImage 
+                                                                        src={conv.other_participant?.profile_image || "images/user-avtar/pic1.jpg"} 
+                                                                        alt="" 
+                                                                    />
+                                                                </span>
+                                                                <div className="msg-texting">
+                                                                    <strong>
+                                                                        {conv.other_participant?.name || conv.other_participant?.email || 'User'}
+                                                                        {conv.unread_count > 0 && (
+                                                                            <span className="badge bg-danger ms-1" style={{ fontSize: '10px', padding: '2px 6px' }}>
+                                                                                {conv.unread_count}
+                                                                            </span>
+                                                                        )}
+                                                                    </strong>
+                                                                    <small className="msg-time">
+                                                                        <span className="far fa-clock p-r-5" />
+                                                                        {formatTimeAgo(conv.updated_at)}
+                                                                    </small>
+                                                                    {conv.last_message && (
+                                                                        <p>{conv.last_message.body.substring(0, 50)}...</p>
+                                                                    )}
+                                                                </div>
+                                                            </li>
+                                                        ))
+                                                    )}
                                                 </ul>
                                                 <div className="message-view-all">
-                                                    <a href="#">View All</a>
+                                                    <NavLink to={adRoute(admin.MESSAGES1)}>View All</NavLink>
                                                 </div>
                                             </div>
                                         </div>
