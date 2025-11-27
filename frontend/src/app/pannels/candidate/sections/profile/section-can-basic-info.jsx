@@ -19,6 +19,8 @@ function SectionCandicateBasicInfo() {
         postcode: "",
         full_address: "",
         description: "",
+        profile_image: null,   // ✅ ADDED
+
     });
 
     const [loading, setLoading] = useState(false);
@@ -55,6 +57,8 @@ const fetchSavedProfile = async () => {
                 postcode: data.postcode || "",
                 full_address: data.full_address || "",
                 description: data.description || "",
+                profile_image: null,   // ✅ ADDED
+
             };
 
             setFormData(updatedData);
@@ -127,6 +131,18 @@ const fetchSavedProfile = async () => {
 
                     <div className="panel-body wt-panel-body p-a20 m-b30 ">
                         <div className="row">
+                              {/* ✅ PROFILE IMAGE FIELD (ADDED ONLY) */}
+                            <div className="col-xl-12 col-lg-12 col-md-12">
+                                <div className="form-group">
+                                    <label>Profile Image</label>
+                                    <input
+                                        type="file"
+                                        className="form-control"
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+
 
                             {/* Your Name */}
                             <div className="col-xl-6 col-lg-6 col-md-12">

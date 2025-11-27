@@ -169,6 +169,16 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import CandidateProfile
 from .serializers import CandidateProfileSerializer, CandidateBasicInfoSerializer
 
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from .models import CandidateProfile
+from .serializers import CandidateProfileSerializer, CandidateBasicInfoSerializer
+
 
 class CandidateProfileViewSet(viewsets.ModelViewSet):
     queryset = CandidateProfile.objects.filter(is_active=True)
@@ -183,57 +193,50 @@ class CandidateProfileViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
     def get_queryset(self):
-        """Filter to user's own profile for updates"""
+        # Only allow users to update their own profile
         if self.action in ["update", "partial_update", "destroy"]:
             if self.request.user.is_authenticated:
                 return CandidateProfile.objects.filter(user=self.request.user)
             return CandidateProfile.objects.none()
         return super().get_queryset()
 
+    # ✅ PUT – UPDATE BASIC INFO
     @action(detail=False, methods=['put'], url_path='update-basic-info')
     def update_basic_info(self, request):
-        """Update candidate basic information"""
-        
-        # Debug logging
-        print(f"User: {request.user}")
-        print(f"Is authenticated: {request.user.is_authenticated}")
-        print(f"Data received: {request.data}")
-        
-        # Get or create profile
-        try:
-            profile = CandidateProfile.objects.get(user=request.user)
-            print(f"Found existing profile: {profile.id}")
-        except CandidateProfile.DoesNotExist:
-            profile = CandidateProfile.objects.create(user=request.user)
-            print(f"Created new profile: {profile.id}")
+        print("User:", request.user)
+        print("Is authenticated:", request.user.is_authenticated)
+        print("Data received:", request.data)
 
-        # Serialize and save
+        if not request.user.is_authenticated:
+            return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        profile, created = CandidateProfile.objects.get_or_create(user=request.user)
+
         serializer = CandidateBasicInfoSerializer(
-            profile, 
-            data=request.data, 
+            profile,
+            data=request.data,
             partial=True
         )
-        
+
         if serializer.is_valid():
             serializer.save()
-            print(f"Profile saved successfully")
             return Response({
-                'message': 'Profile updated successfully',
-                'data': serializer.data
+                "message": "Profile updated successfully",
+                "data": serializer.data
             }, status=status.HTTP_200_OK)
-        else:
-            print(f"Validation errors: {serializer.errors}")
-            return Response({
-                'message': 'Validation failed',
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
 
-@action(detail=False, methods=['get'], url_path='get-basic-info', permission_classes=[IsAuthenticated])
-def get_basic_info(self, request):
-    try:
-        profile = CandidateProfile.objects.get(user=request.user)
-    except CandidateProfile.DoesNotExist:
-        return Response({}, status=status.HTTP_200_OK)
+        return Response({
+            "message": "Validation failed",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
-    serializer = CandidateBasicInfoSerializer(profile)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    # ✅ GET – FETCH BASIC INFO
+    @action(detail=False, methods=['get'], url_path='get-basic-info', permission_classes=[IsAuthenticated])
+    def get_basic_info(self, request):
+        try:
+            profile = CandidateProfile.objects.get(user=request.user)
+        except CandidateProfile.DoesNotExist:
+            return Response({}, status=status.HTTP_200_OK)
+
+        serializer = CandidateBasicInfoSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)

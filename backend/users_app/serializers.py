@@ -140,6 +140,8 @@ class CandidateBasicInfoSerializer(serializers.ModelSerializer):
 class CandidateProfileSerializer(serializers.ModelSerializer):
     """Full candidate profile serializer"""
     email = serializers.EmailField(source='user.email', read_only=True)
+    profile_image = serializers.ImageField(required=False)
+
     
     class Meta:
         model = CandidateProfile
