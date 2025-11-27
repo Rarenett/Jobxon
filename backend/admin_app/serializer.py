@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from users_app.models import CandidateProfile
+from .models import (
+    OnlineProfile, WorkSample, ResearchPublication,
+    Presentation, Certification, Patent
+)
 
+from .models import CandidateEducation, CandidateEmployment, CandidateITSkill, CandidateKeySkills, CandidateProject, DesiredCareerProfile, PersonalDetail, PricingPlan, ResumeAttachment, ResumeHeadline
 
 class CandidateProfileListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,8 +30,6 @@ class CandidateProfileListSerializer(serializers.ModelSerializer):
             'description',
         ]
 
-from rest_framework import serializers
-from .models import ResumeHeadline
 
 class ResumeHeadlineSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,8 +37,6 @@ class ResumeHeadlineSerializer(serializers.ModelSerializer):
         fields = ['id', 'headline']
 
 
-from rest_framework import serializers
-from .models import CandidateKeySkills
 
 class CandidateKeySkillSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,16 +45,13 @@ class CandidateKeySkillSerializer(serializers.ModelSerializer):
 
 # admin_app/serializer.py
 
-from rest_framework import serializers
-from .models import CandidateEmployment
 
 class EmploymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CandidateEmployment
         fields = "__all__"
         read_only_fields = ["user"]
-from rest_framework import serializers
-from .models import CandidateEducation
+        
 
 class CandidateEducationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,8 +60,6 @@ class CandidateEducationSerializer(serializers.ModelSerializer):
         read_only_fields = ["user"]
 
 
-from rest_framework import serializers
-from .models import CandidateITSkill
 
 class CandidateITSkillSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,8 +68,6 @@ class CandidateITSkillSerializer(serializers.ModelSerializer):
         read_only_fields = ["user"]
 
 
-from rest_framework import serializers
-from .models import PricingPlan
 
 class PricingPlanSerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,18 +75,11 @@ class PricingPlanSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-from rest_framework import serializers
-from .models import CandidateProject
-
-
 class CandidateProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = CandidateProject
         fields = "__all__"
         read_only_fields = ['user', 'created_at', 'updated_at']
-
-from rest_framework import serializers
-from .models import DesiredCareerProfile
 
 
 class DesiredCareerProfileSerializer(serializers.ModelSerializer):
@@ -102,8 +89,7 @@ class DesiredCareerProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ["user", "created_at"]
 
 
-from rest_framework import serializers
-from .models import PersonalDetail
+
 
 class PersonalDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -111,20 +97,12 @@ class PersonalDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['user']
 
-from rest_framework import serializers
-from .models import ResumeAttachment
 
 class ResumeAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResumeAttachment
         fields = ["id", "file", "uploaded_at"]
 
-
-from rest_framework import serializers
-from .models import (
-    OnlineProfile, WorkSample, ResearchPublication,
-    Presentation, Certification, Patent
-)
 
 
 class OnlineProfileSerializer(serializers.ModelSerializer):

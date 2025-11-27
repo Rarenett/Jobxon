@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser,CustomUserManager,CandidateProfile
+from .models import CandidateProfile, CustomUser,CustomUserManager
 from companies_app.models import CompanyPhoto, CompanyProfile
 from django.contrib.auth import authenticate
 
@@ -74,13 +74,6 @@ class LoginSerializer(serializers.Serializer):
 # -------------------------
 # Candidate Profile Serializer
 # -------------------------
-class CandidateProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(source='user.email', read_only=True)
-    
-    class Meta:
-        model = CandidateProfile
-        fields = '__all__'
-        read_only_fields = ['user']
 
 
 class CompanyPhotoSerializer(serializers.ModelSerializer):
@@ -108,10 +101,6 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['user', 'id', 'email', 'created_at', 'updated_at']
 
-
-
-from rest_framework import serializers
-from .models import CandidateProfile
 
 
 
