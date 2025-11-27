@@ -36,6 +36,7 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
         try:
             profile = CompanyProfile.objects.get(user=request.user)
             serializer = CompanyBasicInfoSerializer(profile, data=request.data, partial=True)
+            print(serializer)
             if serializer.is_valid():
                 serializer.save()
                 return Response({
@@ -109,6 +110,19 @@ class CompanyProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except CompanyProfile.DoesNotExist:
             return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+    @action(detail=False, methods=['get'], url_path='current')
+    def current_profile(self, request):
+        """Return the current user's complete company profile"""
+        try:
+            profile = CompanyProfile.objects.get(user=request.user)
+            serializer = CompanyProfileSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except CompanyProfile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
 
 
 class CompanyPhotoViewSet(viewsets.ModelViewSet):

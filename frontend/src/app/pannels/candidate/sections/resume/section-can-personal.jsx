@@ -1,210 +1,308 @@
+import { useEffect, useState } from "react";
+
 function SectionCanPersonalDetail() {
+    const [detail, setDetail] = useState({});
+    const [editId, setEditId] = useState(null);
+
+    const token = localStorage.getItem("access_token");
+    const API_URL = "http://127.0.0.1:8000/api/personal-details/";
+
+    // Load existing personal details
+    useEffect(() => {
+        fetch(API_URL, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                const d = Array.isArray(data) ? data[0] : data.results?.[0];
+                if (d) {
+                    setDetail(d);
+                    setEditId(d.id);
+                }
+            });
+    }, []);
+
+    // Handle input change
+    const handleChange = (e) => {
+        setDetail({
+            ...detail,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    // Save Details
+    const saveDetails = async () => {
+        const method = editId ? "PUT" : "POST";
+        const url = editId ? `${API_URL}${editId}/` : API_URL;
+
+        const res = await fetch(url, {
+            method,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(detail)
+        });
+
+        if (res.ok) {
+            const modal = window.bootstrap.Modal.getInstance(
+                document.getElementById("Personal_Details")
+            );
+            modal?.hide();
+            window.location.reload();
+        } else {
+            alert("Save failed ❌");
+        }
+    };
+
     return (
         <>
+            {/* HEADER */}
             <div className="panel-heading wt-panel-heading p-a20 panel-heading-with-btn ">
                 <h4 className="panel-tittle m-a0">Personal Details</h4>
                 <a data-bs-toggle="modal" href="#Personal_Details" role="button" title="Edit" className="site-text-primary">
                     <span className="fa fa-edit" />
                 </a>
             </div>
+
+            {/* DISPLAY */}
             <div className="panel-body wt-panel-body p-a20 ">
                 <div className="twm-panel-inner">
                     <div className="row">
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
                                 <div className="twm-title">Date of Birth</div>
-                                <span className="twm-s-info-discription">31 July 1998</span>
+                                <span className="twm-s-info-discription">
+                                    {detail.date_of_birth || "Add Date of Birth"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
                                 <div className="twm-title">Permanent Address</div>
-                                <span className="twm-s-info-discription">Add Permanent Address</span>
+                                <span className="twm-s-info-discription">
+                                    {detail.permanent_address || "Add Permanent Address"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
                                 <div className="twm-title">Gender</div>
-                                <span className="twm-s-info-discription">Male</span>
+                                <span className="twm-s-info-discription">
+                                    {detail.gender || "Not specified"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
                                 <div className="twm-title">Area Pin Code</div>
-                                <span className="twm-s-info-discription">302021</span>
+                                <span className="twm-s-info-discription">
+                                    {detail.pincode || "Add Pincode"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
                                 <div className="twm-title">Marital Status</div>
-                                <span className="twm-s-info-discription">Single / unmarried</span>
+                                <span className="twm-s-info-discription">
+                                    {detail.marital_status || "Not specified"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
                                 <div className="twm-title">Hometown</div>
-                                <span className="twm-s-info-discription">USA</span>
+                                <span className="twm-s-info-discription">
+                                    {detail.hometown || "Add Hometown"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
                                 <div className="twm-title">Passport Number</div>
-                                <span className="twm-s-info-discription">+123 456 7890</span>
+                                <span className="twm-s-info-discription">
+                                    {detail.passport_number || "Add Passport Number"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
-                                <div className="twm-title">Work permit of other country</div>
-                                <span className="twm-s-info-discription">UK</span>
+                                <div className="twm-title">Work Permit Country</div>
+                                <span className="twm-s-info-discription">
+                                    {detail.work_permit_country || "Add Country"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
-                                <div className="twm-title">Differently Abled</div>
-                                <span className="twm-s-info-discription">None</span>
+                                <div className="twm-title">Assistance Needed</div>
+                                <span className="twm-s-info-discription">
+                                    {detail.assistance_needed || "None"}
+                                </span>
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="twm-s-detail-section">
                                 <div className="twm-title">Languages</div>
-                                <span className="twm-s-info-discription">English</span>
+                                <span className="twm-s-info-discription">
+                                    {detail.languages || "Add Languages"}
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {/*Personal Details Modal */}
+
+            {/* MODAL (unchanged style, only added binding) */}
             <div className="modal fade twm-saved-jobs-view" id="Personal_Details" tabIndex={-1}>
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <form>
                             <div className="modal-header">
                                 <h2 className="modal-title">Personal Detail</h2>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" />
                             </div>
+
                             <div className="modal-body">
                                 <div className="row">
-                                    {/*Birth Date*/}
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group">
-                                            <label>Date of Birth</label>
-                                            <div className="ls-inputicon-box">
-                                                <input className="form-control datepicker" data-provide="datepicker" name="company_since" type="text" placeholder="mm/dd/yyyy" />
-                                                <i className="fs-input-icon far fa-calendar" />
-                                            </div>
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Date of Birth</label>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            name="date_of_birth"
+                                            value={detail.date_of_birth || ""}
+                                            onChange={handleChange}
+                                        />
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group">
-                                            <label>Gender</label>
-                                            <div className="row twm-form-radio-inline">
-                                                <div className="col-md-6">
-                                                    <input className="form-check-input" type="radio" name="flexRadioDefault" id="S_male" />
-                                                    <label className="form-check-label" htmlFor="S_male">
-                                                        Male
-                                                    </label>
-                                                </div>
-                                                <div className="col-md-6">
-                                                    <input className="form-check-input" type="radio" name="flexRadioDefault" id="S_female" defaultChecked />
-                                                    <label className="form-check-label" htmlFor="S_female">
-                                                        Female
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Gender</label>
+                                        <select
+                                            className="form-control"
+                                            name="gender"
+                                            value={detail.gender || ""}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="">Select</option>
+                                            <option>Male</option>
+                                            <option>Female</option>
+                                            <option>Other</option>
+                                        </select>
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group">
-                                            <label>Permanent Address</label>
-                                            <div className="ls-inputicon-box">
-                                                <input className="form-control" type="text" placeholder="Enter Permanent Address" />
-                                                <i className="fs-input-icon fa fa-map-marker-alt" />
-                                            </div>
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Permanent Address</label>
+                                        <input
+                                            className="form-control"
+                                            name="permanent_address"
+                                            value={detail.permanent_address || ""}
+                                            onChange={handleChange}
+                                        />
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group">
-                                            <label>Hometown</label>
-                                            <div className="ls-inputicon-box">
-                                                <input className="form-control" type="text" placeholder="Enter Hometown" />
-                                                <i className="fs-input-icon fa fa-map-marker-alt" />
-                                            </div>
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Hometown</label>
+                                        <input
+                                            className="form-control"
+                                            name="hometown"
+                                            value={detail.hometown || ""}
+                                            onChange={handleChange}
+                                        />
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group">
-                                            <label>Pincode</label>
-                                            <div className="ls-inputicon-box">
-                                                <input className="form-control" type="text" placeholder="Enter Pincode" />
-                                                <i className="fs-input-icon fa fa-map-pin" />
-                                            </div>
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Pincode</label>
+                                        <input
+                                            className="form-control"
+                                            name="pincode"
+                                            value={detail.pincode || ""}
+                                            onChange={handleChange}
+                                        />
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group">
-                                            <label>Marital Status</label>
-                                            <div className="ls-inputicon-box">
-                                                <select className="wt-select-box selectpicker" data-live-search="true" title="" data-bv-field="size">
-                                                    <option className="bs-title-option" value>Select Category</option>
-                                                    <option>Married</option>
-                                                    <option>Single</option>
-                                                </select>
-                                                <i className="fs-input-icon fa fa-user" />
-                                            </div>
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Marital Status</label>
+                                        <select
+                                            className="form-control"
+                                            name="marital_status"
+                                            value={detail.marital_status || ""}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="">Select</option>
+                                            <option>Single</option>
+                                            <option>Married</option>
+                                        </select>
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group">
-                                            <label>Passport Number</label>
-                                            <div className="ls-inputicon-box">
-                                                <input className="form-control" type="text" placeholder="Enter Passport Number" />
-                                                <i className="fs-input-icon fa fa-star-of-life" />
-                                            </div>
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Passport Number</label>
+                                        <input
+                                            className="form-control"
+                                            name="passport_number"
+                                            value={detail.passport_number || ""}
+                                            onChange={handleChange}
+                                        />
                                     </div>
-                                    <div className="col-md-12">
-                                        <div className="form-group">
-                                            <label>What assistance do you need</label>
-                                            <textarea className="form-control" rows={3} placeholder="Describe" defaultValue={""} />
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Assistance Needed</label>
+                                        <textarea
+                                            className="form-control"
+                                            name="assistance_needed"
+                                            value={detail.assistance_needed || ""}
+                                            onChange={handleChange}
+                                        />
                                     </div>
-                                    <div className="col-xl-12 col-lg-12">
-                                        <div className="form-group mb-0">
-                                            <label>Work Permit for Other Countries</label>
-                                            <div className="ls-inputicon-box">
-                                                <select className="wt-select-box selectpicker" data-live-search="true" title="" data-bv-field="size">
-                                                    <option className="bs-title-option" value>Country</option>
-                                                    <option>Afghanistan</option>
-                                                    <option>Albania</option>
-                                                    <option>Algeria</option>
-                                                    <option>Andorra</option>
-                                                    <option>Angola</option>
-                                                    <option>Antigua and Barbuda</option>
-                                                    <option>Argentina</option>
-                                                    <option>Armenia</option>
-                                                    <option>Australia</option>
-                                                    <option>Austria</option>
-                                                    <option>Azerbaijan</option>
-                                                    <option>The Bahamas</option>
-                                                    <option>Bahrain</option>
-                                                    <option>Bangladesh</option>
-                                                    <option>Barbados</option>
-                                                </select>
-                                                <i className="fs-input-icon fa fa-globe-americas" />
-                                            </div>
-                                        </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Work Permit Country</label>
+                                        <input
+                                            className="form-control"
+                                            name="work_permit_country"
+                                            value={detail.work_permit_country || ""}
+                                            onChange={handleChange}
+                                        />
                                     </div>
+
+                                    <div className="col-xl-12">
+                                        <label>Languages</label>
+                                        <input
+                                            className="form-control"
+                                            name="languages"
+                                            value={detail.languages || ""}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+
                                 </div>
                             </div>
+
                             <div className="modal-footer">
                                 <button type="button" className="site-button" data-bs-dismiss="modal">Close</button>
-                                <button type="button" className="site-button">Save</button>
+                                <button type="button" className="site-button" onClick={saveDetails}>
+                                    Save
+                                </button>
                             </div>
+
                         </form>
                     </div>
                 </div>
             </div>
         </>
-    )
+    );
 }
+
 export default SectionCanPersonalDetail;

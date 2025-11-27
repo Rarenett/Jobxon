@@ -6,6 +6,14 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const API_URL = "http://localhost:8000/api";
+const IMG_BASE_URL = "http://localhost:8000"; // Or your actual backend image base
+
+const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return 'images/jobs-company/pic1.jpg';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    if (imageUrl.startsWith('/')) return `${IMG_BASE_URL}${imageUrl}`;
+    return `${IMG_BASE_URL}/${imageUrl}`;
+};
 
 function EmpHeaderSection(props) {
     const { user, logout } = useAuth();
@@ -19,16 +27,16 @@ function EmpHeaderSection(props) {
     const fetchProfile = async () => {
         try {
             const token = localStorage.getItem('access_token');
-            const response = await axios.get(`${API_URL}/profile/`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            // Use the full company profile endpoint
+            const response = await axios.get(`${API_URL}/profiles/current/`, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-            setProfile(response.data.profile);
+            setProfile(response.data);
         } catch (error) {
             console.error('Error fetching profile:', error);
         }
     };
+
 
     const handleLogout = () => {
         logout();
@@ -170,12 +178,28 @@ function EmpHeaderSection(props) {
                                         <div className="listing-user">
                                             <div className="dropdown">
                                                 <a href="#" className="dropdown-toggle" id="ID-ACCOUNT_dropdown" data-bs-toggle="dropdown">
-                                                    <div className="user-name text-black">
-                                                        <span>
-                                                            <JobZImage src="images/user-avtar/pic4.jpg" alt="" />
-                                                        </span>
-                                                        {profile?.name || user?.username || 'User'}
-                                                    </div>
+                                                  <div className="user-name text-black">
+    <span>
+        <img
+            src={getImageUrl(profile?.logo)}
+            alt="Company Logo"
+            style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                objectFit: "cover",
+                marginRight: 8
+            }}
+            onError={e => {
+                e.target.src = 'images/jobs-company/pic1.jpg';
+            }}
+        />
+    </span>
+    {profile?.name || user?.username || 'User'}
+</div>
+
+
+
                                                 </a>
                                                 <div className="dropdown-menu" aria-labelledby="ID-ACCOUNT_dropdown">
                                                     <ul>

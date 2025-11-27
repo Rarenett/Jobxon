@@ -40,6 +40,9 @@ import UnderMaintenancePage from "../app/pannels/public-user/components/pages/un
 import ComingSoonPage from "../app/pannels/public-user/components/pages/coming-soon";
 import LoginPage from "../app/pannels/public-user/components/pages/login";
 import AfterLoginPage from "../app/pannels/public-user/components/pages/after-login";
+
+
+
 import IconsPage from "../app/pannels/public-user/components/pages/icons";
 
 import CandidateGridPage from "../app/pannels/public-user/components/candidates/can-grid";
@@ -105,6 +108,9 @@ function PublicUserRoutes() {
             <Route path={publicUser.blog.LIST} element={<BlogListPage />} />
             <Route path={publicUser.blog.DETAIL} element={<BlogDetailPage />} />
             <Route path="*" element={<Error404Page />} />
+
+
+
         </Routes>
     )
 }

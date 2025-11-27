@@ -1,7 +1,8 @@
 export const base = {
     PUBLIC_PRE: "",
     CANDIDATE_PRE: "/candidate",
-    EMPLOYER_PRE: "/employer"
+    EMPLOYER_PRE: "/employer",
+    ADMIN_PRE:"/admin"
 }
 
 export const publicUser = {
@@ -48,7 +49,8 @@ export const publicUser = {
         COMING:         "/coming-soon",
         LOGIN:          "/login",
         AFTER_LOGIN:    "/after-login",
-        ICONS:          "/icons"
+        ICONS:          "/icons",
+        ADMIN_LOGIN:    "/admin_login",
     },
     candidate: {
         GRID: "/can-grid",
@@ -96,6 +98,33 @@ export const employer = {
     RESUME_ALERTS:  "/resume-alerts"
 }
 
+
+export const admin = {
+    INITIAL:        "/",
+    DASHBOARD:      "/dashboard",
+    PROFILE:        "/profile",
+    POST_A_JOB:     "/post-a-job",
+    JOB_TYPE:       "/job_type",
+    
+    MANAGE_JOBS:    "/manage-jobs",
+    CANDIDATES:     "/candidates-list",
+    AllCANDIDATES:"/can-list",
+    ALLCOMPANIES:"",
+    VIEW_APPLIED_CANDIDATES:"/view-candidate",
+    CAND_BOOKMARKS:"/bookmarked-candidates",
+
+    BOOKMARKS:      "/bookmarked-jobs",
+    PACKAGES:       "/packages",
+    MESSAGES1:      "/messages-style-1",
+    MESSAGES2:      "/messages-style-2",
+    RESUME_ALERTS:  "/resume-alerts",
+    COMPANY_LIST:"/company-list",
+    COMPANY_DETAIL: "/companies/:id",
+    JOB_CATEGORY:"/job-category",
+    JOB_TYPE:"/job_types",
+    PRICING:"/pricing"
+}
+
 export function pubRoute(_route) {
     return base.PUBLIC_PRE + _route;
 }
@@ -106,4 +135,8 @@ export function empRoute(_route) {
 
 export function canRoute(_route) {
     return base.CANDIDATE_PRE + _route;
+}
+
+export function adRoute(_route) {
+    return base.ADMIN_PRE + _route;
 }
