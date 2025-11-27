@@ -20,16 +20,5 @@ class JobViewSet(viewsets.ModelViewSet):
     serializer_class = JobSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-<<<<<<< HEAD
-def index(request):
-    return render(request,'home.html')
-
-def register(request):
-    return render(request,'register.html')
-
-
-
-=======
     def perform_create(self, serializer):
         serializer.save(posted_by=self.request.user)
->>>>>>> main

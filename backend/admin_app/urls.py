@@ -26,19 +26,12 @@ from .views import (
 )
 
 
-
-
-
-
-
 router = DefaultRouter()
 
 # Register ViewSets
 router.register(r'admin/candidates', CandidateProfileViewSet, basename='admin-candidates')
 router.register(r'companies', CompanyProfileViewSet, basename='company')
-
 router.register(r'reviews', CompanyReviewViewSet, basename='review')  
-
 router.register(r'employment', CandidateEmploymentViewSet, basename='employment')
 router.register(r'education', CandidateEducationViewSet, basename='education')
 router.register(r'it-skills', CandidateITSkillViewSet, basename='it-skills')
@@ -55,14 +48,9 @@ router.register(r'certifications', CertificationViewSet, basename='certification
 router.register(r'patents', PatentViewSet, basename='patents')
 router.register(r'key-skills', CandidateKeySkillViewSet, basename='keyskill')
 
-
-
-
-
-
 urlpatterns = [
     path('api/', include(router.urls)),
-path('api/resume-headline/', ResumeHeadlineView.as_view(), name='resume-headline'),
+    path('api/resume-headline/', ResumeHeadlineView.as_view(), name='resume-headline'),
 
 
 ]
