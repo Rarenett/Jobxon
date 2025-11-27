@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models 
+from employee.models import Employee
 
 from django.conf import settings
 
@@ -144,6 +145,8 @@ class FAQ(models.Model):
 
 # Bank Details
 class BankDetail(models.Model):
+    employee = models.ForeignKey(Employee,on_delete=models.CASCADE,null=True,blank=True)
+
     bank_name = models.CharField(max_length=255)
     ifsc_code = models.CharField(max_length=50)
     account_no = models.CharField(max_length=50)

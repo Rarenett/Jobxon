@@ -24,11 +24,14 @@ import AdminPricingPlan from "../app/pannels/admin/components/AdminPricingPlan";
 
 import AdminCompanyDetailPage from '../app/pannels/admin/components/AdminCompanyDetailPage';
 
+import EmployeeRegistration from "../app/pannels/admin/components/EmployeeRegistration";
+import AdminEmployeeListPage from "../app/pannels/admin/components/AdminEmployeeListPage";
 import AdminAddBankDetailsPage from "../app/pannels/admin/components/AdminAddBankDetailsPage";
 import AdminManageBankDetailsPage from "../app/pannels/admin/components/AdminManageBankDetailsPage";
 import AdminManageDocumentTypesPage from "../app/pannels/admin/components/AdminManageDocumentTypesPage";
 
 import AdminDepartmentListPage from "../app/pannels/admin/components/AdminDepartmentListPage";
+
 
 function AdminRoutes() {
     return (
@@ -56,7 +59,21 @@ function AdminRoutes() {
 
             <Route path={admin.COMPANY_DETAIL} element={<AdminCompanyDetailPage />} />
 
-            <Route path={admin.ADD_BANK_DETAILS} element={<AdminAddBankDetailsPage />} />
+            <Route path={admin.REGISTER_EMPLOYEE} element={<EmployeeRegistration />} />
+            <Route path={admin.EMPLOYEE_LIST} element={<AdminEmployeeListPage />} />
+           <Route
+    path="/admin/add-bank-details"
+    element={<AdminAddBankDetailsPage />}
+/>
+
+<Route
+    path="/admin/add-bank-details/:employeeId"
+    element={<AdminAddBankDetailsPage />}
+/>
+
+
+
+            
             <Route path={admin.BANK_DETAILS} element={<AdminManageBankDetailsPage />} />
             <Route path={admin.DOCUMENT} element={<AdminManageDocumentTypesPage />} />
 

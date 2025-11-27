@@ -15,7 +15,7 @@ from companies_app.serializers import (
     CompanyReviewSerializer
 )
 
-
+from employee.models import Employee
 from requests import Response
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -373,9 +373,13 @@ class PricingPlanViewSet(viewsets.ModelViewSet):
 from rest_framework.permissions import AllowAny
 
 class BankDetailViewSet(viewsets.ModelViewSet):
-    queryset = BankDetail.objects.all().order_by('-id')
     serializer_class = BankDetailSerializer
-    permission_classes = [AllowAny]
+    queryset = BankDetail.objects.all()
+
+    def perform_create(self, serializer):
+        employee_id = self.request.GET.get("employee")  # OR from URL
+        serializer.save(employee_id=employee_id)
+
 
 #Employe Documents
 
@@ -395,3 +399,5 @@ class DesignationViewSet(viewsets.ModelViewSet):
     queryset = Designation.objects.all().order_by('id')
     serializer_class = DesignationSerializer
     permission_classes = [AllowAny]
+
+

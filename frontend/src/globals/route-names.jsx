@@ -106,6 +106,9 @@ export const admin = {
     POST_A_JOB:     "/post-a-job",
     JOB_TYPE:       "/job_type",
 
+    REGISTER_EMPLOYEE:"/add",
+    EMPLOYEE_LIST:"/list",
+
     ADD_BANK_DETAILS: "/add-bank-details",
     BANK_DETAILS: "/bank-details",
     DOCUMENT: "/document-types",

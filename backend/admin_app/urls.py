@@ -39,6 +39,7 @@ router.register(r'designations', DesignationViewSet, basename='designations')
 
 
 
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/resume-headline/', ResumeHeadlineView.as_view(), name="resume-headline"),

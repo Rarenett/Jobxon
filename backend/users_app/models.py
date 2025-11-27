@@ -34,6 +34,7 @@ class CustomUser(AbstractUser):
         ('candidate', 'Candidate'),
         ('employer', 'Employer'),
         ('admin', 'Admin'),
+        ('employee', 'Employee'), 
     )
     
     username = models.CharField(max_length=150, unique=True)

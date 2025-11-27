@@ -95,9 +95,10 @@ class BankDetailSerializer(serializers.ModelSerializer):
             'pan_no',
             'uan_no',
             'esic_no',
-            'created_at'
+            'created_at',
+            'employee'
         ]
-
+        read_only_fields = ['employee']
 # Employe Documents
 
 # serializers.py
@@ -121,3 +122,5 @@ class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = ["id", "name", "description", "designations", "created_at"]
+
+

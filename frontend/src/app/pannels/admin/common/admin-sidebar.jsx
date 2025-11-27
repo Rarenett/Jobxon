@@ -54,21 +54,29 @@ function AdminSidebarSection(props) {
                                 
                             }>
                             <a href="#">
-                                <i className="fa fa-suitcase" />
-                                <span className="admin-nav-text">Employes</span>
+                                <i class="fa-solid fa-users"></i>
+                                <span className="admin-nav-text">Employee</span>
                             </a>
                             <ul className="sub-menu">
-                                <li> <NavLink to={adRoute(admin.ADD_BANK_DETAILS)} id="bankdetailsId1"><span className="admin-nav-text">Add Bank Details</span></NavLink></li>
-                                <li> <NavLink to={adRoute(admin.BANK_DETAILS)} id="bankdetailsId2"><span className="admin-nav-text">Bank Details</span></NavLink></li>
-
+                                
+                                <li> <NavLink to={adRoute(admin.REGISTER_EMPLOYEE)} id="bankdetailsId2"><span className="admin-nav-text">Register Employee</span></NavLink></li>
+                                <li> <NavLink to={adRoute(admin.EMPLOYEE_LIST)} id="bankdetailsId1"><span className="admin-nav-text">Employee List</span></NavLink></li>
                                 <li> <NavLink to={adRoute(admin.DOCUMENT)} id="bankdetailsId2"><span className="admin-nav-text">Add Doument Names</span></NavLink></li>
                                 
+    <li>
+    <NavLink to="/admin/add-bank-details" id="bankdetailsId1">
+        <span className="admin-nav-text">Bank Details</span>
+    </NavLink>
+</li>
+
+                                <li> <NavLink to={adRoute(admin.BANK_DETAILS)} id="bankdetailsId2"><span className="admin-nav-text"></span></NavLink></li>
                             </ul>
                         </li>
 
                         <li className={setMenuActive(currentpath, adRoute(admin.DEPARTMENT_LIST))}>
-                            <NavLink to={adRoute(admin.DEPARTMENT_LIST)} > <i className="fa fa-envelope" /><span className="admin-nav-text">Department</span></NavLink>
+                            <NavLink to={adRoute(admin.DEPARTMENT_LIST)} > <i class="fa-solid fa-building-user"></i><span className="admin-nav-text">Department</span></NavLink>
                         </li>
+                        
                         
                         <li
                             className={
