@@ -5,9 +5,10 @@ import { loadScript } from "../../../../globals/constants";
 
 function CanChatPage() {
 
-    useEffect(()=>{
-        loadScript("js/custom.js")
-    })
+  useEffect(() => {
+    loadScript("js/custom.js");
+}, []);  
+
 
     return (
         <>

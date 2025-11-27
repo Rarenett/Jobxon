@@ -19,11 +19,24 @@ class ConversationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        """Get all conversations for the logged-in user"""
+        """Get all conversations for the logged-in user, skipping broken ones"""
         user = self.request.user
-        return Conversation.objects.filter(
+        base_qs = Conversation.objects.filter(
             Q(participant_one=user) | Q(participant_two=user)
         )
+
+        valid_ids = []
+        for conv in base_qs:
+            try:
+                # Access both participants to ensure they exist
+                _ = conv.participant_one
+                _ = conv.participant_two
+                valid_ids.append(conv.id)
+            except User.DoesNotExist:
+                # Skip conversations with deleted users
+                continue
+
+        return Conversation.objects.filter(id__in=valid_ids)
     
     def get_serializer_class(self):
         if self.action == 'list':

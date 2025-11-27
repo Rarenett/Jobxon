@@ -4,6 +4,7 @@ from .models import Conversation, Message
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -62,19 +63,28 @@ class ConversationListSerializer(serializers.ModelSerializer):
     
     def get_other_participant(self, obj):
         request = self.context.get('request')
-        other_user = obj.get_other_participant(request.user)
-        
-        # Get full name if available
+        try:
+            other_user = obj.get_other_participant(request.user)
+        except (User.DoesNotExist, ObjectDoesNotExist, AttributeError):
+            return {
+                'id': None,
+                'name': 'Unknown User',
+                'email': '',
+                'user_type': None,
+            }
+
         if hasattr(other_user, 'get_full_name'):
-            name = other_user.get_full_name()
+            name = other_user.get_full_name() or other_user.email
+        elif getattr(other_user, 'username', None):
+            name = other_user.username
         else:
             name = other_user.email
-        
+
         return {
             'id': other_user.id,
             'name': name,
             'email': other_user.email,
-            'user_type': getattr(other_user, 'user_type', None)
+            'user_type': getattr(other_user, 'user_type', None),
         }
     
     def get_last_message(self, obj):
@@ -84,14 +94,16 @@ class ConversationListSerializer(serializers.ModelSerializer):
                 'body': last_msg.body,
                 'created_at': last_msg.created_at,
                 'is_read': last_msg.is_read,
-                'sender_id': last_msg.sender.id
+                'sender_id': last_msg.sender.id if last_msg.sender_id else None,
             }
         return None
     
     def get_unread_count(self, obj):
         request = self.context.get('request')
-        return obj.get_unread_count(request.user)
-
+        try:
+            return obj.get_unread_count(request.user)
+        except (User.DoesNotExist, ObjectDoesNotExist):
+            return 0
 
 class ConversationDetailSerializer(serializers.ModelSerializer):
     messages = MessageSerializer(many=True, read_only=True)
@@ -103,17 +115,26 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
     
     def get_other_participant(self, obj):
         request = self.context.get('request')
-        other_user = obj.get_other_participant(request.user)
-        
-        # Get full name if available
+        try:
+            other_user = obj.get_other_participant(request.user)
+        except (User.DoesNotExist, ObjectDoesNotExist, AttributeError):
+            return {
+                'id': None,
+                'name': 'Unknown User',
+                'email': '',
+                'user_type': None,
+            }
+
         if hasattr(other_user, 'get_full_name'):
-            name = other_user.get_full_name()
+            name = other_user.get_full_name() or other_user.email
+        elif getattr(other_user, 'username', None):
+            name = other_user.username
         else:
             name = other_user.email
-        
+
         return {
             'id': other_user.id,
             'name': name,
             'email': other_user.email,
-            'user_type': getattr(other_user, 'user_type', None)
+            'user_type': getattr(other_user, 'user_type', None),
         }
