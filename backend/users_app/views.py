@@ -1,20 +1,22 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
-from .models import CustomUser,CandidateProfile,CustomUserManager
+from .models import CandidateProfile, CustomUser, CustomUserManager
 from .serializers import (
     CandidateBasicInfoSerializer,
-    RegisterSerializer, 
-    LoginSerializer, 
+    RegisterSerializer,
+    LoginSerializer,
     UserSerializer,
     CandidateProfileSerializer,
-    CompanyProfileSerializer
-
+    CompanyProfileSerializer,
 )
 
 
@@ -162,14 +164,7 @@ def profile_view(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from .models import CandidateProfile
-from .serializers import CandidateProfileSerializer, CandidateBasicInfoSerializer
+
 
 
 class CandidateProfileViewSet(viewsets.ModelViewSet):
