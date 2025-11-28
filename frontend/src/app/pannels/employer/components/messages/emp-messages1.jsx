@@ -329,81 +329,139 @@ function EmpMessages2Page() {
                                         </button>
                                     </div>
                                 </div>
+                                
+{/* Conversation List */}
+<div className="dashboard-chat-list" style={{ maxHeight: '600px', overflowY: 'auto' }}>
+    {filteredConversations.length === 0 ? (
+        <p className="text-center text-muted p-4">
+            {conversations.length === 0
+                ? 'No conversations yet.'
+                : 'No conversations match your search.'}
+        </p>
+    ) : (
+        filteredConversations.map((conv) => (
+            <div
+                key={conv.id}
+                className={`dashboard-messages-box ${selectedConversation?.id === conv.id ? 'active' : ''}`}
+                style={{
+                    cursor: 'pointer',
+                    backgroundColor: selectedConversation?.id === conv.id ? '#e7f3ff' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    padding: '12px 15px',
+                    borderBottom: '1px solid #f0f0f0',
+                    gap: '10px',
+                    transition: 'background-color 0.2s ease'
+                }}
+                onClick={() => loadConversation(conv.id)}
+                onMouseEnter={(e) => {
+                    if (selectedConversation?.id !== conv.id) {
+                        e.currentTarget.style.backgroundColor = '#f8f9fa';
+                    }
+                }}
+                onMouseLeave={(e) => {
+                    if (selectedConversation?.id !== conv.id) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                }}
+            >
+                {/* Avatar */}
+                <div style={{ flexShrink: 0 }}>
+                    {renderProfileImage(conv.other_participant, 48)}
+                </div>
 
-                                {/* Conversation List */}
-                                <div className="dashboard-chat-list" style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                                    {filteredConversations.length === 0 ? (
-                                        <p className="text-center text-muted p-4">
-                                            {conversations.length === 0
-                                                ? 'No conversations yet.'
-                                                : 'No conversations match your search.'}
-                                        </p>
-                                    ) : (
-                                        filteredConversations.map((conv) => (
-                                            <div
-                                                key={conv.id}
-                                                className={`dashboard-messages-box ${selectedConversation?.id === conv.id ? 'active' : ''}`}
-                                                style={{
-                                                    cursor: 'pointer',
-                                                    backgroundColor: selectedConversation?.id === conv.id ? '#f0f8ff' : 'transparent',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    padding: '10px 12px',
-                                                    borderBottom: '1px solid #eee',
-                                                    gap: '8px'  // Reduced from 10px to 8px
-                                                }}
-                                                onClick={() => loadConversation(conv.id)}
-                                            >
-                                                {/* Round Profile Image - Reduced gap */}
-                                                <div style={{ flexShrink: 0 }}>
-                                                    {renderProfileImage(conv.other_participant, 48)}  {/* Slightly smaller: 48px instead of 50px */}
-                                                </div>
+                {/* Right content */}
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {/* Top row: name + time */}
+                   {/* Top row: name + time + unread pill (WhatsApp style) */}
+<div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'center' }}>
+    {/* Name */}
+    <h5
+        style={{
+            margin: 0,
+            fontSize: '15px',
+            fontWeight: conv.unread_count > 0 ? 600 : 500,
+            color: '#1a1a1a',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            flex: 1
+        }}
+    >
+        {conv.other_participant?.name || conv.other_participant?.email || 'Unknown User'}
+    </h5>
 
-                                                <div className="dashboard-message-area" style={{ flex: 1, minWidth: 0 }}>
-                                                    <h5 style={{ margin: '0 0 3px 0', fontSize: '15px', fontWeight: '600' }}>
-                                                        {conv.other_participant?.name || conv.other_participant?.email || 'Unknown User'}
-                                                        {conv.unread_count > 0 && (
-                                                            <span className="badge bg-danger ms-2" style={{ fontSize: '10px', padding: '3px 7px' }}>
-                                                                {conv.unread_count}
-                                                            </span>
-                                                        )}
-                                                    </h5>
+    {/* Time + unread bubble */}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
+        <small
+            style={{
+                fontSize: '11px',
+                color: conv.unread_count > 0 ? '#22c55e' : '#999', // green when unread
+                whiteSpace: 'nowrap'
+            }}
+        >
+            {formatSidebarTime(conv.updated_at)}
+        </small>
 
-                                                    {/* Role displayed below name/email */}
-                                                    {conv.other_participant?.user_type && (
-                                                        <small style={{
-                                                            fontSize: '11px',
-                                                            color: '#999',
-                                                            display: 'block',
-                                                            marginBottom: '3px',
-                                                            textTransform: 'capitalize'
-                                                        }}>
-                                                            {conv.other_participant.user_type}
-                                                        </small>
-                                                    )}
+        {conv.unread_count > 0 && (
+            <span
+                style={{
+                    minWidth: '22px',
+                    height: '22px',
+                    borderRadius: '999px',
+                    backgroundColor: '#22c55e',
+                    color: '#fff',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
+            >
+                {conv.unread_count}
+            </span>
+        )}
+    </div>
+</div>
 
-                                                    <small className="msg-time" style={{ fontSize: '11px', color: '#999' }}>
-                                                        {formatSidebarTime(conv.updated_at)}
-                                                    </small>
 
-                                                    {conv.last_message && (
-                                                        <p style={{
-                                                            marginTop: '4px',
-                                                            fontSize: '13px',
-                                                            color: '#666',
-                                                            overflow: 'hidden',
-                                                            textOverflow: 'ellipsis',
-                                                            whiteSpace: 'nowrap',
-                                                            marginBottom: 0
-                                                        }}>
-                                                            {conv.last_message.body.substring(0, 50)}...
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
+                    {/* Role (optional) */}
+                    {conv.other_participant?.user_type && (
+                        <small
+                            style={{
+                                fontSize: '11px',
+                                color: '#999',
+                                textTransform: 'capitalize',
+                                display: 'block'
+                            }}
+                        >
+                            {conv.other_participant.user_type}
+                        </small>
+                    )}
+
+                    {/* Last message preview */}
+                    {conv.last_message && (
+                        <p
+                            style={{
+                                margin: 0,
+                                fontSize: '13px',
+                                color: '#666',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                lineHeight: '1.4'
+                            }}
+                        >
+                            {conv.last_message.body.substring(0, 50)}
+                            {conv.last_message.body.length > 50 ? '...' : ''}
+                        </p>
+                    )}
+                </div>
+            </div>
+        ))
+    )}
+</div>
+
 
                             </div>
                         </div>
@@ -504,7 +562,7 @@ function EmpMessages2Page() {
                                                                     maxWidth: '65%',
                                                                     padding: '10px 14px',
                                                                     borderRadius: '10px',
-                                                                    backgroundColor: isCurrentUser ? '#d9fdd3' : '#fff',
+                                                                    backgroundColor: isCurrentUser ? 'rgb(205 238 245)' : '#fff',
                                                                     boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
                                                                     position: 'relative'
                                                                 }}
