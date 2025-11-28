@@ -2,13 +2,17 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CandidateKeySkillViewSet, CandidateProfileViewSet, CompanyProfileViewSet, PricingPlanViewSet
+from .views import CandidateKeySkillViewSet, CandidateProfileViewSet, CompanyProfileViewSet, PricingPlanViewSet, assign_menu_permissions_api
 from .views import CompanyProfileViewSet, CompanyReviewViewSet
 from .views import CandidateProfileViewSet, ResumeHeadlineView
 from companies_app.views import CompanyProfileViewSet
 from admin_app.views import CandidateEmploymentViewSet
 from .views import CandidateEducationViewSet
 from .views import CandidateITSkillViewSet
+from admin_app.views import MenuViewSet, SubMenuViewSet
+from .views import assign_menu_permissions_api
+
+
 
 router = DefaultRouter()
 from .views import CandidateProfileViewSet
@@ -24,7 +28,8 @@ from .views import ProfileSummaryViewSet
 from .views import (
     OnlineProfileViewSet, WorkSampleViewSet,
     ResearchPublicationViewSet, PresentationViewSet,
-    CertificationViewSet, PatentViewSet
+    CertificationViewSet, PatentViewSet    
+
 )
 
 router = DefaultRouter()
@@ -51,12 +56,18 @@ router.register(r'certifications', CertificationViewSet, basename='certification
 router.register(r'patents', PatentViewSet, basename='patents')
 router.register(r'key-skills', CandidateKeySkillViewSet, basename='keyskill')
 router.register(r'profile-summary', ProfileSummaryViewSet, basename='profile-summary')
+router.register(r"add-menu", MenuViewSet)
+router.register(r"add-submenu", SubMenuViewSet)
+
 
 
 
 urlpatterns = [
     path('api/', include(router.urls)),
 path('api/resume-headline/', ResumeHeadlineView.as_view(), name='resume-headline'),
+path("assign-menu-permissions-api/<int:user_id>/", assign_menu_permissions_api),
+
+
 
 
 

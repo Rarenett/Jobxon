@@ -2,7 +2,27 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
+from .models import CandidateProject
+from .serializer import CandidateProjectSerializer
 from django.db.models import Q
+from rest_framework.views import APIView
+from .models import ResumeHeadline
+from .models import CandidateEducation
+from .models import PersonalDetail
+from .serializer import PersonalDetailSerializer
+from .serializer import CandidateEducationSerializer
+from .models import DesiredCareerProfile
+from .serializer import DesiredCareerProfileSerializer
+from .models import PricingPlan
+from admin_app.serializer import PricingPlanSerializer
+from .models import CandidateITSkill
+from admin_app.serializer import CandidateITSkillSerializer
+from .models import Menu, SubMenu, MenuPermission
+from .serializer import MenuSerializer, SubMenuSerializer, MenuPermissionSerializer
+from rest_framework.decorators import api_view, permission_classes
+from django.db.models import Prefetch
+from .models import ProfileSummary
+from .serializer import ProfileSummarySerializer
 from companies_app.models import CompanyProfile, CompanyPhoto, CompanyReview
 from companies_app.serializers import (
     CompanyProfileSerializer,
@@ -14,8 +34,24 @@ from companies_app.serializers import (
     CompanyPhotoSerializer,
     CompanyReviewSerializer,
 )
-
-
+from .models import CandidateEmployment
+from admin_app.serializer import EmploymentSerializer
+from .models import Menu, SubMenu, MenuPermission
+from .serializer import MenuSerializer
+from rest_framework import generics, permissions
+from .models import (
+    OnlineProfile, WorkSample, ResearchPublication,
+    Presentation, Certification, Patent
+)
+from .serializer import (
+    OnlineProfileSerializer, WorkSampleSerializer,
+    ResearchPublicationSerializer, PresentationSerializer,
+    CertificationSerializer, PatentSerializer
+)
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from django.db.models import Prefetch
+from .models import CandidateKeySkills
 from requests import Response
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -46,11 +82,6 @@ def destroy(self, request, *args, **kwargs):
     instance.delete()
     return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)
 
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-from .models import ResumeHeadline
 
 class ResumeHeadlineView(APIView):
     permission_classes = [IsAuthenticated]
@@ -72,12 +103,6 @@ class ResumeHeadlineView(APIView):
         return Response({"message": "Saved successfully"})
 
 
-from rest_framework.views import APIView
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from .models import CandidateKeySkills
 
 class CandidateKeySkillViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateKeySkillSerializer
@@ -324,8 +349,7 @@ class CompanyReviewViewSet(viewsets.ModelViewSet):
 
 
 
-from .models import CandidateEmployment
-from admin_app.serializer import EmploymentSerializer
+
 
 class CandidateEmploymentViewSet(viewsets.ModelViewSet):
     serializer_class = EmploymentSerializer
@@ -337,9 +361,6 @@ class CandidateEmploymentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-
-from .models import CandidateEducation
-from .serializer import CandidateEducationSerializer
 
 class CandidateEducationViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateEducationSerializer
@@ -354,9 +375,6 @@ class CandidateEducationViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-
-from .models import CandidateITSkill
-from admin_app.serializer import CandidateITSkillSerializer
 
 class CandidateITSkillViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateITSkillSerializer
@@ -374,17 +392,11 @@ class CandidateITSkillViewSet(viewsets.ModelViewSet):
  
 
 
-#pricing
-from .models import PricingPlan
-from admin_app.serializer import PricingPlanSerializer
-
 class PricingPlanViewSet(viewsets.ModelViewSet):
     queryset = PricingPlan.objects.all().order_by('id')
     serializer_class = PricingPlanSerializer
     
 
-from .models import CandidateProject
-from .serializer import CandidateProjectSerializer
 
 
 class CandidateProjectViewSet(viewsets.ModelViewSet):
@@ -398,10 +410,6 @@ class CandidateProjectViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-from .models import DesiredCareerProfile
-from .serializer import DesiredCareerProfileSerializer
-
-
 class DesiredCareerProfileViewSet(viewsets.ModelViewSet):
     serializer_class = DesiredCareerProfileSerializer
     permission_classes = [IsAuthenticated]
@@ -413,8 +421,7 @@ class DesiredCareerProfileViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-from .models import PersonalDetail
-from .serializer import PersonalDetailSerializer
+
 
 class PersonalDetailViewSet(viewsets.ModelViewSet):
     serializer_class = PersonalDetailSerializer
@@ -439,16 +446,7 @@ class ResumeAttachmentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-from rest_framework import generics, permissions
-from .models import (
-    OnlineProfile, WorkSample, ResearchPublication,
-    Presentation, Certification, Patent
-)
-from .serializer import (
-    OnlineProfileSerializer, WorkSampleSerializer,
-    ResearchPublicationSerializer, PresentationSerializer,
-    CertificationSerializer, PatentSerializer
-)
+
 
 
 class BaseUserViewSet(viewsets.ModelViewSet):
@@ -492,8 +490,6 @@ class PatentViewSet(viewsets.ModelViewSet):
 
 
 
-from .models import ProfileSummary
-from .serializer import ProfileSummarySerializer
 
 class ProfileSummaryViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSummarySerializer
@@ -501,3 +497,53 @@ class ProfileSummaryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ProfileSummary.objects.filter(user=self.request.user)
+
+
+
+
+class MenuViewSet(viewsets.ModelViewSet):
+    queryset = Menu.objects.all().order_by("id")
+    serializer_class = MenuSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Menu.objects.all()
+
+class SubMenuViewSet(viewsets.ModelViewSet):
+    queryset = SubMenu.objects.all().order_by("id")
+    serializer_class = SubMenuSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return SubMenu.objects.all()
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
+@api_view(["GET"])
+@permission_classes([AllowAny])  # ✅ temporarily disable auth
+def assign_menu_permissions_api(request, user_id):
+    try:
+        menus = Menu.objects.prefetch_related("submenus").all()
+
+        data = []
+        for m in menus:
+            data.append({
+                "id": m.id,
+                "name": m.name,
+                "submenus": [
+                    {
+                        "id": s.id,
+                        "name": s.name
+                    }
+                    for s in m.submenus.all()
+                ]
+            })
+
+        return Response({
+            "menus": data,
+            "allowed_submenus": []
+        })
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

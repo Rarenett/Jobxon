@@ -1,3 +1,9 @@
+import AddMenu from "../app/pannels/admin/common/AddMenu"
+import AddSubMenu from "../app/pannels/admin/common/AddSubMenu"
+import AssignMenuPermissionPage from "../app/pannels/admin/common/AssignMenuPermissionPage"
+import MenuList from "../app/pannels/admin/common/MenuList"
+import SubMenuList from "../app/pannels/admin/common/SubMenuList"
+
 export const base = {
     PUBLIC_PRE: "",
     CANDIDATE_PRE: "/candidate",
@@ -105,6 +111,12 @@ export const admin = {
     PROFILE:        "/profile",
     POST_A_JOB:     "/post-a-job",
     JOB_TYPE:       "/job_type",
+    SubMenuList:     "/submenu-list",
+    MenuList:     "/menu-list",
+    AddMenu:        "/add-menu",
+    AddSubMenu:     "/add-submenu",
+    AssignMenuPermissionPage:"/assign-permissions/:userId",
+
     
     MANAGE_JOBS:    "/manage-jobs",
     CANDIDATES:     "/candidates-list",

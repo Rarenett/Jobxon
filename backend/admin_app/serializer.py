@@ -166,3 +166,38 @@ class ProfileSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfileSummary
         fields = "__all__"
+
+
+from rest_framework import serializers
+from .models import Menu, SubMenu, MenuPermission
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+
+class SubMenuSerializer(serializers.ModelSerializer):
+    menu_name = serializers.CharField(source='menu.name', read_only=True)
+
+    class Meta:
+        model = SubMenu
+        fields = ['id', 'name', 'url', 'menu', 'menu_name']
+
+
+
+class MenuSerializer(serializers.ModelSerializer):
+    submenus = SubMenuSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Menu
+        fields = ["id", "name", "icon", "submenus"]
+
+
+class MenuPermissionSerializer(serializers.ModelSerializer):
+    submenu_name = serializers.CharField(source="submenu.name", read_only=True)
+    menu_name = serializers.CharField(source="submenu.menu.name", read_only=True)
+    user_email = serializers.EmailField(source="user_profile.user.email", read_only=True)
+
+    class Meta:
+        model = MenuPermission
+        fields = ["id", "user_profile", "submenu", "submenu_name", "menu_name", "user_email"]
