@@ -4,21 +4,32 @@ import JobZImage from "../../../../common/jobz-img";
 import { useAuth } from "../../../../../contexts/AuthContext";
 
 const API_URL = process.env.REACT_APP_API_URL;
+const IMG_BASE_URL = process.env.REACT_APP_API_URL;
+
+// Use the same getImageUrl function from your header
+const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return null;
+    if (imageUrl.startsWith('http')) return imageUrl;
+    if (imageUrl.startsWith('/')) return `${IMG_BASE_URL}${imageUrl}`;
+    return `${IMG_BASE_URL}/${imageUrl}`;
+};
 
 function EmpMessages2Page() {
     const { user } = useAuth();
     const [searchParams] = useSearchParams();
     const conversationId = searchParams.get('conversation');
-    
+
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentUserProfile, setCurrentUserProfile] = useState(null);
 
     useEffect(() => {
         fetchConversations();
+        fetchCurrentUserProfile();
     }, []);
 
     useEffect(() => {
@@ -26,6 +37,21 @@ function EmpMessages2Page() {
             loadConversation(conversationId);
         }
     }, [conversationId, conversations]);
+
+    const fetchCurrentUserProfile = async () => {
+        const token = localStorage.getItem("access_token");
+        try {
+            const res = await fetch(`${API_URL}/api/profiles/current/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await res.json();
+            setCurrentUserProfile(data);
+        } catch (error) {
+            console.error("Failed to load current user profile", error);
+        }
+    };
 
     const fetchConversations = async () => {
         const token = localStorage.getItem("access_token");
@@ -53,6 +79,7 @@ function EmpMessages2Page() {
                 },
             });
             const data = await res.json();
+            console.log(data)
             setSelectedConversation(data);
             setMessages(data.messages || []);
 
@@ -97,6 +124,85 @@ function EmpMessages2Page() {
         }
     };
 
+    // Generate avatar from name/email (first letter)
+    const generateAvatar = (name, email, size = 40) => {
+        const displayName = name || email || 'U';
+        const initial = displayName.charAt(0).toUpperCase();
+        const colors = ['#1abc9c', '#2ecc71', '#3498db', '#9b59b6', '#e74c3c', '#f39c12', '#16a085', '#27ae60'];
+        const colorIndex = displayName.charCodeAt(0) % colors.length;
+        const bgColor = colors[colorIndex];
+
+        return (
+            <div style={{
+                width: `${size}px`,
+                height: `${size}px`,
+                borderRadius: '50%',
+                backgroundColor: bgColor,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: `${size * 0.4}px`,
+                fontWeight: 'bold',
+                flexShrink: 0
+            }}>
+                {initial}
+            </div>
+        );
+    };
+
+    // Render profile image or avatar - only show avatar if no image
+    const renderProfileImage = (participant, size = 40) => {
+        // Check for logo (company/employer) or profile_image (candidate)
+        const imageUrl = getImageUrl(participant?.logo || participant?.profile_image);
+
+        if (imageUrl) {
+            return (
+                <img
+                    src={imageUrl}
+                    alt=""
+                    style={{
+                        width: `${size}px`,
+                        height: `${size}px`,
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        flexShrink: 0
+                    }}
+                    onError={(e) => {
+                        // If image fails to load, replace with avatar
+                        const parent = e.target.parentElement;
+                        e.target.style.display = 'none';
+                        const avatarDiv = document.createElement('div');
+                        const displayName = participant?.name || participant?.email || 'U';
+                        const initial = displayName.charAt(0).toUpperCase();
+                        const colors = ['#1abc9c', '#2ecc71', '#3498db', '#9b59b6', '#e74c3c', '#f39c12', '#16a085', '#27ae60'];
+                        const colorIndex = displayName.charCodeAt(0) % colors.length;
+                        const bgColor = colors[colorIndex];
+
+                        avatarDiv.style.cssText = `
+                            width: ${size}px;
+                            height: ${size}px;
+                            border-radius: 50%;
+                            background-color: ${bgColor};
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-size: ${size * 0.4}px;
+                            font-weight: bold;
+                            flex-shrink: 0;
+                        `;
+                        avatarDiv.textContent = initial;
+                        parent.appendChild(avatarDiv);
+                    }}
+                />
+            );
+        }
+
+        // No image, show avatar
+        return generateAvatar(participant?.name, participant?.email, size);
+    };
+
     // Format time for sidebar (WhatsApp style)
     const formatSidebarTime = (dateString) => {
         const date = new Date(dateString);
@@ -104,8 +210,7 @@ function EmpMessages2Page() {
         const diffMs = now - date;
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
-        
-        // Today - show hours ago
+
         if (diffHours < 24 && date.getDate() === now.getDate()) {
             if (diffHours === 0) {
                 const diffMins = Math.floor(diffMs / 60000);
@@ -113,73 +218,66 @@ function EmpMessages2Page() {
             }
             return `${diffHours} hours ago`;
         }
-        
-        // Yesterday
+
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
-        if (date.getDate() === yesterday.getDate() && 
-            date.getMonth() === yesterday.getMonth() && 
+        if (date.getDate() === yesterday.getDate() &&
+            date.getMonth() === yesterday.getMonth() &&
             date.getFullYear() === yesterday.getFullYear()) {
             return 'Yesterday';
         }
-        
-        // Within a week - show day name
+
         if (diffDays < 7) {
             return date.toLocaleDateString('en-US', { weekday: 'short' });
         }
-        
-        // Older - show date
+
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
 
-    // Format time for chat messages (just time)
     const formatChatTime = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
             minute: '2-digit',
-            hour12: true 
+            hour12: true
         });
     };
 
-    // Get date label for grouping messages
     const getDateLabel = (dateString) => {
         const date = new Date(dateString);
         const now = new Date();
-        
-        const isToday = date.getDate() === now.getDate() && 
-                       date.getMonth() === now.getMonth() && 
-                       date.getFullYear() === now.getFullYear();
-        
+
+        const isToday = date.getDate() === now.getDate() &&
+            date.getMonth() === now.getMonth() &&
+            date.getFullYear() === now.getFullYear();
+
         if (isToday) return 'Today';
-        
+
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
-        const isYesterday = date.getDate() === yesterday.getDate() && 
-                           date.getMonth() === yesterday.getMonth() && 
-                           date.getFullYear() === yesterday.getFullYear();
-        
+        const isYesterday = date.getDate() === yesterday.getDate() &&
+            date.getMonth() === yesterday.getMonth() &&
+            date.getFullYear() === yesterday.getFullYear();
+
         if (isYesterday) return 'Yesterday';
-        
-        // Show full date for older messages
-        return date.toLocaleDateString('en-US', { 
-            month: 'long', 
-            day: 'numeric', 
+
+        return date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
             year: 'numeric'
         });
     };
 
-    // Check if we need to show date separator
     const shouldShowDateSeparator = (currentMsg, previousMsg) => {
         if (!previousMsg) return true;
-        
+
         const currentDate = new Date(currentMsg.created_at).toDateString();
         const previousDate = new Date(previousMsg.created_at).toDateString();
-        
+
         return currentDate !== previousDate;
     };
 
-    const filteredConversations = conversations.filter(conv => 
+    const filteredConversations = conversations.filter(conv =>
         conv.other_participant?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         conv.other_participant?.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -236,29 +334,33 @@ function EmpMessages2Page() {
                                 <div className="dashboard-chat-list" style={{ maxHeight: '600px', overflowY: 'auto' }}>
                                     {filteredConversations.length === 0 ? (
                                         <p className="text-center text-muted p-4">
-                                            {conversations.length === 0 
-                                                ? 'No conversations yet.' 
+                                            {conversations.length === 0
+                                                ? 'No conversations yet.'
                                                 : 'No conversations match your search.'}
                                         </p>
                                     ) : (
                                         filteredConversations.map((conv) => (
-                                            <div 
+                                            <div
                                                 key={conv.id}
                                                 className={`dashboard-messages-box ${selectedConversation?.id === conv.id ? 'active' : ''}`}
-                                                style={{ 
+                                                style={{
                                                     cursor: 'pointer',
-                                                    backgroundColor: selectedConversation?.id === conv.id ? '#f0f8ff' : 'transparent'
+                                                    backgroundColor: selectedConversation?.id === conv.id ? '#f0f8ff' : 'transparent',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    padding: '10px 12px',
+                                                    borderBottom: '1px solid #eee',
+                                                    gap: '8px'  // Reduced from 10px to 8px
                                                 }}
                                                 onClick={() => loadConversation(conv.id)}
                                             >
-                                                <div className="dashboard-message-avtar">
-                                                    <JobZImage 
-                                                        src={conv.other_participant?.profile_image || "images/user-avtar/pic1.jpg"} 
-                                                        alt="" 
-                                                    />
+                                                {/* Round Profile Image - Reduced gap */}
+                                                <div style={{ flexShrink: 0 }}>
+                                                    {renderProfileImage(conv.other_participant, 48)}  {/* Slightly smaller: 48px instead of 50px */}
                                                 </div>
-                                                <div className="dashboard-message-area">
-                                                    <h5>
+
+                                                <div className="dashboard-message-area" style={{ flex: 1, minWidth: 0 }}>
+                                                    <h5 style={{ margin: '0 0 3px 0', fontSize: '15px', fontWeight: '600' }}>
                                                         {conv.other_participant?.name || conv.other_participant?.email || 'Unknown User'}
                                                         {conv.unread_count > 0 && (
                                                             <span className="badge bg-danger ms-2" style={{ fontSize: '10px', padding: '3px 7px' }}>
@@ -266,11 +368,34 @@ function EmpMessages2Page() {
                                                             </span>
                                                         )}
                                                     </h5>
-                                                    <small className="msg-time">
+
+                                                    {/* Role displayed below name/email */}
+                                                    {conv.other_participant?.user_type && (
+                                                        <small style={{
+                                                            fontSize: '11px',
+                                                            color: '#999',
+                                                            display: 'block',
+                                                            marginBottom: '3px',
+                                                            textTransform: 'capitalize'
+                                                        }}>
+                                                            {conv.other_participant.user_type}
+                                                        </small>
+                                                    )}
+
+                                                    <small className="msg-time" style={{ fontSize: '11px', color: '#999' }}>
                                                         {formatSidebarTime(conv.updated_at)}
                                                     </small>
+
                                                     {conv.last_message && (
-                                                        <p style={{ marginTop: '5px', fontSize: '13px', color: '#666' }}>
+                                                        <p style={{
+                                                            marginTop: '4px',
+                                                            fontSize: '13px',
+                                                            color: '#666',
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis',
+                                                            whiteSpace: 'nowrap',
+                                                            marginBottom: 0
+                                                        }}>
                                                             {conv.last_message.body.substring(0, 50)}...
                                                         </p>
                                                     )}
@@ -279,6 +404,7 @@ function EmpMessages2Page() {
                                         ))
                                     )}
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -288,23 +414,37 @@ function EmpMessages2Page() {
                         <div className="panel panel-default site-bg-white">
                             {selectedConversation ? (
                                 <>
-                                    {/* Chat Header */}
-                                    <div className="panel-heading wt-panel-heading p-a20">
-                                        <h4 className="panel-tittle m-a0">
-                                            {selectedConversation.other_participant?.name || 
-                                             selectedConversation.other_participant?.email || 
-                                             'Unknown User'}
-                                        </h4>
-                                        <p className="m-a0" style={{ fontSize: '13px', color: '#666' }}>
-                                            {selectedConversation.other_participant?.user_type || ''}
-                                        </p>
-                                        <button 
-                                            className="site-button-link text-danger" 
-                                            style={{ position: 'absolute', right: '20px', top: '20px' }}
+                                    {/* Chat Header with Profile Image */}
+                                    <div className="panel-heading wt-panel-heading p-a20" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        {/* Profile Image in Header */}
+                                        <div style={{ flexShrink: 0 }}>
+                                            {renderProfileImage(selectedConversation.other_participant, 45)}
+                                        </div>
+
+                                        <div style={{ flex: 1 }}>
+                                            <h4 className="panel-tittle m-a0" style={{ marginBottom: '4px' }}>
+                                                {selectedConversation.other_participant.name ||
+                                                    selectedConversation.other_participant?.email ||
+                                                    'Unknown User'}
+                                            </h4>
+                                            <p className="m-a0" style={{ fontSize: '13px', color: '#666', marginBottom: '2px' }}>
+                                                {selectedConversation.other_participant?.email || ''}
+                                            </p>
+                                            {/* Role below email */}
+                                            {selectedConversation.other_participant?.user_type && (
+                                                <p className="m-a0" style={{ fontSize: '12px', color: '#999', textTransform: 'capitalize' }}>
+                                                    {selectedConversation.other_participant.user_type}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            className="site-button-link text-danger"
                                         >
-                                            <i className="fa fa-trash" /> Delete Conversation
+                                            <i className="fa fa-trash" />
                                         </button>
                                     </div>
+
 
                                     {/* Messages Area */}
                                     <div className="panel-body wt-panel-body" style={{ minHeight: '500px', maxHeight: '500px', overflowY: 'auto', padding: '20px', background: '#f5f5f5' }}>
@@ -318,13 +458,13 @@ function EmpMessages2Page() {
                                                 const reversedMessages = [...messages].reverse();
                                                 const previousMsg = index > 0 ? reversedMessages[index - 1] : null;
                                                 const showDateSeparator = shouldShowDateSeparator(msg, previousMsg);
-                                                
+
                                                 return (
                                                     <div key={msg.id}>
                                                         {/* Date Separator */}
                                                         {showDateSeparator && (
-                                                            <div style={{ 
-                                                                textAlign: 'center', 
+                                                            <div style={{
+                                                                textAlign: 'center',
                                                                 margin: '20px 0',
                                                                 position: 'relative'
                                                             }}>
@@ -341,8 +481,8 @@ function EmpMessages2Page() {
                                                             </div>
                                                         )}
 
-                                                        {/* Message */}
-                                                        <div 
+                                                        {/* Message with Profile Image on Left */}
+                                                        <div
                                                             style={{
                                                                 display: 'flex',
                                                                 alignItems: 'flex-start',
@@ -351,34 +491,25 @@ function EmpMessages2Page() {
                                                                 gap: '8px'
                                                             }}
                                                         >
-                                                            {/* Profile Icon at top-left */}
+                                                            {/* Profile Image - Left side of message */}
                                                             {!isCurrentUser && (
                                                                 <div style={{ flexShrink: 0, marginTop: '2px' }}>
-                                                                    <img 
-                                                                        src={selectedConversation.other_participant?.profile_image || "images/user-avtar/pic1.jpg"}
-                                                                        alt=""
-                                                                        style={{
-                                                                            width: '32px',
-                                                                            height: '32px',
-                                                                            borderRadius: '50%',
-                                                                            objectFit: 'cover'
-                                                                        }}
-                                                                    />
+                                                                    {renderProfileImage(selectedConversation.other_participant, 32)}
                                                                 </div>
                                                             )}
 
-                                                            {/* Message Bubble with time inside */}
-                                                            <div 
+                                                            {/* Message Bubble */}
+                                                            <div
                                                                 style={{
                                                                     maxWidth: '65%',
                                                                     padding: '10px 14px',
                                                                     borderRadius: '10px',
-                                                                    backgroundColor: isCurrentUser ? '#e3f2fd' : '#fff',
+                                                                    backgroundColor: isCurrentUser ? '#d9fdd3' : '#fff',
                                                                     boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
                                                                     position: 'relative'
                                                                 }}
                                                             >
-                                                                <p style={{ 
+                                                                <p style={{
                                                                     margin: '0 0 5px 0',
                                                                     fontSize: '14px',
                                                                     wordWrap: 'break-word',
@@ -387,8 +518,7 @@ function EmpMessages2Page() {
                                                                 }}>
                                                                     {msg.body}
                                                                 </p>
-                                                                {/* Time inside bubble at bottom right */}
-                                                                <div style={{ 
+                                                                <div style={{
                                                                     fontSize: '11px',
                                                                     color: '#667781',
                                                                     textAlign: 'right',
@@ -398,19 +528,10 @@ function EmpMessages2Page() {
                                                                 </div>
                                                             </div>
 
-                                                            {/* Profile Icon at top-left for sent messages */}
+                                                            {/* Profile Image for Current User - Left side (only if logo exists) */}
                                                             {isCurrentUser && (
                                                                 <div style={{ flexShrink: 0, marginTop: '2px' }}>
-                                                                    <img 
-                                                                        src="images/user-avtar/pic1.jpg"
-                                                                        alt=""
-                                                                        style={{
-                                                                            width: '32px',
-                                                                            height: '32px',
-                                                                            borderRadius: '50%',
-                                                                            objectFit: 'cover'
-                                                                        }}
-                                                                    />
+                                                                    {renderProfileImage(currentUserProfile, 32)}
                                                                 </div>
                                                             )}
                                                         </div>
