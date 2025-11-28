@@ -109,9 +109,12 @@ export const admin = {
     REGISTER_EMPLOYEE:"/add",
     EMPLOYEE_LIST:"/list",
 
-    ADD_BANK_DETAILS: "/add-bank-details",
+    ADD_BANK_DETAILS: "/add-bank-details/:employeeId",
     BANK_DETAILS: "/bank-details",
     DOCUMENT: "/document-types",
+
+    EMPLOYEE_DOCUMENTS: "/employee-documents/:employeeId",
+  
 
     DEPARTMENT_LIST:"/department",
 

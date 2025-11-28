@@ -2,6 +2,8 @@ from django.db import models
 from employee.models import Employee
 
 from django.conf import settings
+from django.contrib.auth.models import User
+
 
 class ResumeHeadline(models.Model):
     user = models.OneToOneField(
@@ -188,3 +190,15 @@ class Designation(models.Model):
 
     def __str__(self):
         return f"{self.department.name} - {self.name}"
+
+
+
+
+class EmployeeDocument(models.Model):
+    employee = models.ForeignKey(Employee,on_delete=models.CASCADE,null=True,blank=True)
+    document_type = models.ForeignKey(DocumentType, on_delete=models.CASCADE)
+    document = models.FileField(upload_to="employee_documents/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.Employee.name} - {self.document_type.name}"

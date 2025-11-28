@@ -39,8 +39,8 @@ function AdminSidebarSection(props) {
                                 <span className="admin-nav-text">Jobs</span>
                             </a>
                             <ul className="sub-menu">
-                                <li> <NavLink to={adRoute(admin.POST_A_JOB)} id="jobMenuId1"><span className="admin-nav-text">Post a New Job</span></NavLink></li>
-                                <li> <NavLink to={adRoute(admin.MANAGE_JOBS)} id="jobMenuId2"><span className="admin-nav-text">Manage Jobs</span></NavLink></li>
+                                <li><NavLink to={adRoute(admin.POST_A_JOB)} id="jobMenuId1"><span className="admin-nav-text">Post a New Job</span></NavLink></li>
+                                <li><NavLink to={adRoute(admin.MANAGE_JOBS)} id="jobMenuId2"><span className="admin-nav-text">Manage Jobs</span></NavLink></li>
                                 <li><NavLink to={adRoute(admin.CANDIDATES)} id="jobMenuId3"><span className="admin-nav-text">Applied Candidates</span></NavLink></li>
                                 <li><NavLink to={adRoute(admin.JOB_CATEGORY)} id="jobMenuId4"><span className="admin-nav-text">Categories</span></NavLink></li>
                                 <li><NavLink to={adRoute(admin.JOB_TYPE)} id="jobMenuId5"><span className="admin-nav-text">Job types</span></NavLink></li>
@@ -62,13 +62,6 @@ function AdminSidebarSection(props) {
                                 <li> <NavLink to={adRoute(admin.REGISTER_EMPLOYEE)} id="bankdetailsId2"><span className="admin-nav-text">Register Employee</span></NavLink></li>
                                 <li> <NavLink to={adRoute(admin.EMPLOYEE_LIST)} id="bankdetailsId1"><span className="admin-nav-text">Employee List</span></NavLink></li>
                                 <li> <NavLink to={adRoute(admin.DOCUMENT)} id="bankdetailsId2"><span className="admin-nav-text">Add Doument Names</span></NavLink></li>
-                                
-    <li>
-    <NavLink to="/admin/add-bank-details" id="bankdetailsId1">
-        <span className="admin-nav-text">Bank Details</span>
-    </NavLink>
-</li>
-
                                 <li> <NavLink to={adRoute(admin.BANK_DETAILS)} id="bankdetailsId2"><span className="admin-nav-text"></span></NavLink></li>
                             </ul>
                         </li>

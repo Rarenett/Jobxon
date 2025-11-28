@@ -15,7 +15,6 @@ function EmployeeRegistration() {
     const [designations, setDesignations] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // DEBUG LOG HELPER
     const debugLogResponse = (label, res) => {
         console.log(`======== ${label} RESPONSE ========`);
         if (!res) {
@@ -27,7 +26,6 @@ function EmployeeRegistration() {
         console.log("====================================");
     };
 
-    // Normalizes all response shapes: array, {results}, {data}, etc.
     const normalizeList = (payload) => {
         if (!payload) return [];
         if (Array.isArray(payload)) return payload;
@@ -39,7 +37,6 @@ function EmployeeRegistration() {
         return [];
     };
 
-    // REFRESH TOKEN
     const refreshAccessToken = async () => {
         try {
             const refreshToken = localStorage.getItem("refresh_token");
@@ -57,7 +54,6 @@ function EmployeeRegistration() {
         }
     };
 
-    // AUTH FETCH
     const authFetch = async (url) => {
         try {
             const token = localStorage.getItem("access_token");
@@ -65,7 +61,6 @@ function EmployeeRegistration() {
                 headers: { Authorization: `Bearer ${token}` },
             });
         } catch (err) {
-            // Token expired?
             if (err.response?.status === 401) {
                 const newToken = await refreshAccessToken();
                 if (newToken) {
@@ -78,7 +73,6 @@ function EmployeeRegistration() {
         }
     };
 
-    // LOAD DEPARTMENTS
     const loadDepartments = async () => {
         const url = "http://localhost:8000/api/departments/";
 
@@ -89,7 +83,6 @@ function EmployeeRegistration() {
         } catch (err) {
             console.error("DEPT ERROR:", err.response?.data || err.message);
 
-            // Try no-auth fallback
             try {
                 const res2 = await axios.get(url);
                 debugLogResponse("DEPARTMENTS (NO AUTH)", res2);
@@ -100,7 +93,6 @@ function EmployeeRegistration() {
         }
     };
 
-    // LOAD DESIGNATIONS
     const loadDesignations = async () => {
         const url = "http://localhost:8000/api/designations/";
 
@@ -111,7 +103,6 @@ function EmployeeRegistration() {
         } catch (err) {
             console.error("DESIG ERROR:", err.response?.data || err.message);
 
-            // Try without auth
             try {
                 const res2 = await axios.get(url);
                 debugLogResponse("DESIGNATIONS (NO AUTH)", res2);
@@ -122,13 +113,11 @@ function EmployeeRegistration() {
         }
     };
 
-    // LOAD ON MOUNT
     useEffect(() => {
         loadDepartments();
         loadDesignations();
     }, []);
 
-    // HANDLE CHANGE
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -136,7 +125,6 @@ function EmployeeRegistration() {
         });
     };
 
-    // SUBMIT
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -166,7 +154,6 @@ function EmployeeRegistration() {
                 designation: "",
             });
         } catch (error) {
-            // TOKEN EXPIRED?
             if (error.response?.status === 401) {
                 const newToken = await refreshAccessToken();
 
@@ -206,106 +193,108 @@ function EmployeeRegistration() {
     };
 
     return (
-        <div className="card p-4 mt-4" style={{ maxWidth: "500px", margin: "0 auto" }}>
+        <div className="card p-4 mt-4" style={{ maxWidth: "1500px", margin: "0 auto" }}>
             <h2>Add New Employee</h2>
 
             <form onSubmit={handleSubmit}>
 
+                {/* NAME + PHONE */}
+                <div className="row">
+                    <div className="col-md-6 mb-3">
+                        <label>Full Name</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
 
-                {/* NAME */}
-                <div className="mb-3">
-                    <label>Full Name</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                    />
+                    <div className="col-md-6 mb-3">
+                        <label>Phone Number</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
                 </div>
 
-                {/* PHONE */}
-                <div className="mb-3">
-                    <label>Phone</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        required
-                    />
+                {/* EMAIL + PASSWORD */}
+                <div className="row">
+                    <div className="col-md-6 mb-3">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            className="form-control"
+                            name="email"
+                            autoComplete="new-email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="col-md-6 mb-3">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            name="password"
+                            autoComplete="new-password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
                 </div>
 
-                {/* EMAIL */}
-                <div className="mb-3">
-    <label>Email</label>
-    <input
-        type="email"
-        className="form-control"
-        name="email"
-        autoComplete="new-email"
-        value={formData.email}
-        onChange={handleChange}
-        required
-    />
-</div>
+                {/* DEPARTMENT + DESIGNATION */}
+                <div className="row">
+                    <div className="col-md-6 mb-3">
+                        <label>Department</label>
+                        <select
+                            className="form-control"
+                            name="department"
+                            value={formData.department}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select Department</option>
+                            {departments.map((d) => (
+                                <option key={d.id} value={d.id}>{d.name}</option>
+                            ))}
+                        </select>
+                    </div>
 
-
-                {/* DEPARTMENT */}
-                <div className="mb-3">
-                    <label>Department</label>
-                    <select
-                        className="form-control"
-                        name="department"
-                        value={formData.department}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="">Select Department</option>
-                        {departments.map((d) => (
-                            <option key={d.id} value={d.id}>{d.name}</option>
-                        ))}
-                    </select>
+                    <div className="col-md-6 mb-3">
+                        <label>Designation</label>
+                        <select
+                            className="form-control"
+                            name="designation"
+                            value={formData.designation}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select Designation</option>
+                            {designations.map((d) => (
+                                <option key={d.id} value={d.id}>{d.name}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
-                {/* DESIGNATION */}
-                <div className="mb-3">
-                    <label>Designation</label>
-                    <select
-                        className="form-control"
-                        name="designation"
-                        value={formData.designation}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="">Select Designation</option>
-                        {designations.map((d) => (
-                            <option key={d.id} value={d.id}>{d.name}</option>
-                        ))}
-                    </select>
+                {/* SUBMIT BUTTON CENTERED */}
+                <div className="d-flex justify-content-center">
+                    <button className="btn btn-primary" disabled={loading}>
+                        {loading ? "Registering..." : "Register Employee"}
+                    </button>
                 </div>
-
-                {/* PASSWORD */}
-                <div className="mb-3">
-    <label>Password</label>
-    <input
-        type="password"
-        className="form-control"
-        name="password"
-        autoComplete="new-password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-    />
-</div>
-
-
-                {/* SUBMIT */}
-                <button className="btn btn-primary w-100" disabled={loading}>
-                    {loading ? "Registering..." : "Register Employee"}
-                </button>
             </form>
         </div>
     );

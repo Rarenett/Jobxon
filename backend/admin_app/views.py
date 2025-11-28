@@ -22,8 +22,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from users_app.models import CandidateProfile
-from .serializer import CandidateProfileListSerializer,BankDetailSerializer,DocumentTypeSerializer,DepartmentSerializer,DesignationSerializer
-from .models import BankDetail,DocumentType,Department,Designation
+from .serializer import CandidateProfileListSerializer,BankDetailSerializer,DocumentTypeSerializer,DepartmentSerializer,DesignationSerializer,DocumentTypeSerializer,EmployeeDocumentSerializer
+from .models import BankDetail,DocumentType,Department,Designation, EmployeeDocument
 
 class CandidateProfileViewSet(viewsets.ModelViewSet):
     queryset = CandidateProfile.objects.all().order_by('-id')
@@ -399,5 +399,35 @@ class DesignationViewSet(viewsets.ModelViewSet):
     queryset = Designation.objects.all().order_by('id')
     serializer_class = DesignationSerializer
     permission_classes = [AllowAny]
+
+class DocumentTypeList(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        docs = DocumentType.objects.all()
+        serializer = DocumentTypeSerializer(docs, many=True)
+        return Response(serializer.data)
+
+
+class UploadEmployeeDocuments(viewsets.ModelViewSet):
+    queryset = EmployeeDocument.objects.all()
+    serializer_class = EmployeeDocumentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        employee_id = request.data.get("employee")
+
+        if not employee_id:
+            return Response({"error": "Employee ID required"}, status=400)
+
+        # Loop all uploaded files
+        for doc_type_id, uploaded_file in request.FILES.items():
+            EmployeeDocument.objects.create(
+                employee_id=employee_id,
+                document_type_id=doc_type_id,
+                document=uploaded_file
+            )
+
+        return Response({"message": "Documents uploaded successfully"}, status=201)
 
 

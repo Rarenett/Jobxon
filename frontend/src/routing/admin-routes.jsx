@@ -27,11 +27,13 @@ import AdminCompanyDetailPage from '../app/pannels/admin/components/AdminCompany
 import EmployeeRegistration from "../app/pannels/admin/components/EmployeeRegistration";
 import AdminEmployeeListPage from "../app/pannels/admin/components/AdminEmployeeListPage";
 import AdminAddBankDetailsPage from "../app/pannels/admin/components/AdminAddBankDetailsPage";
+import EmployeeDocumentUpload from "../app/pannels/admin/components/EmployeeDocumentUpload";
 import AdminManageBankDetailsPage from "../app/pannels/admin/components/AdminManageBankDetailsPage";
 import AdminManageDocumentTypesPage from "../app/pannels/admin/components/AdminManageDocumentTypesPage";
 
 import AdminDepartmentListPage from "../app/pannels/admin/components/AdminDepartmentListPage";
 
+import { Navigate } from "react-router-dom";
 
 function AdminRoutes() {
     return (
@@ -61,15 +63,10 @@ function AdminRoutes() {
 
             <Route path={admin.REGISTER_EMPLOYEE} element={<EmployeeRegistration />} />
             <Route path={admin.EMPLOYEE_LIST} element={<AdminEmployeeListPage />} />
-           <Route
-    path="/admin/add-bank-details"
-    element={<AdminAddBankDetailsPage />}
-/>
+            <Route path={admin.ADD_BANK_DETAILS}element={<AdminAddBankDetailsPage />} />
+            <Route path={admin.EMPLOYEE_DOCUMENTS}element={<EmployeeDocumentUpload />} />
+            
 
-<Route
-    path="/admin/add-bank-details/:employeeId"
-    element={<AdminAddBankDetailsPage />}
-/>
 
 
 

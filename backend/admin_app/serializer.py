@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users_app.models import CandidateProfile
-from .models import BankDetail,DocumentType,Department,Designation
+from .models import BankDetail,DocumentType,Department,Designation,EmployeeDocument
 
 
 class CandidateProfileListSerializer(serializers.ModelSerializer):
@@ -122,5 +122,13 @@ class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = ["id", "name", "description", "designations", "created_at"]
+
+
+
+
+class EmployeeDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeDocument
+        fields = "__all__"
 
 

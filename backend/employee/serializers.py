@@ -26,16 +26,17 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         return employee
 
 class EmployeeListSerializer(serializers.ModelSerializer):
-    department_name = serializers.CharField(source='department.name', read_only=True)
-    designation_name = serializers.CharField(source='designation.name', read_only=True)
+    department_name = serializers.CharField(source="department.name", read_only=True)
+    designation_name = serializers.CharField(source="designation.name", read_only=True)
 
     class Meta:
         model = Employee
         fields = [
-            'id',
-            'name',
-            'phone',
-            'email',
-            'department_name',
-            'designation_name',
+            "id",
+            "employee_code",      # ⭐ MUST BE HERE
+            "name",
+            "phone",
+            "email",
+            "department_name",
+            "designation_name",
         ]

@@ -14,8 +14,7 @@ router.register(r'admin/candidates', CandidateProfileViewSet, basename='admin-ca
 from .views import CandidateProfileViewSet
 from admin_app.views import ResumeHeadlineView
 from .views import CompanyProfileViewSet
-from .views import PricingPlanViewSet,BankDetailViewSet,DocumentTypeViewSet,DepartmentViewSet,DesignationViewSet
-
+from .views import PricingPlanViewSet,BankDetailViewSet,DocumentTypeViewSet,DepartmentViewSet,DesignationViewSet,UploadEmployeeDocuments
 
 
 router = DefaultRouter()
@@ -34,8 +33,7 @@ router.register(r'document-types', DocumentTypeViewSet, basename='documenttypes'
 router.register(r'departments', DepartmentViewSet, basename='departments')
 router.register(r'designations', DesignationViewSet, basename='designations')
 
-
-
+router.register(r'employee-documents', UploadEmployeeDocuments, basename='employee-documents')
 
 
 

@@ -22,3 +22,4 @@ class PricingPlanAdmin(admin.ModelAdmin):
         return format_html(features_str)
 
     features_summary.short_description = 'Features'
+

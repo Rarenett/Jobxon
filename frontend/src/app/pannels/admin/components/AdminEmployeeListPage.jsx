@@ -65,6 +65,7 @@ function EmployeeList() {
                             <thead>
                                 <tr>
                                     <th>Sl.No</th>
+                                    <th>Employee ID</th>
                                     <th>Name</th>
                                     <th>Phone</th>
                                     <th>Email</th>
@@ -87,6 +88,7 @@ function EmployeeList() {
                                     employees.map((emp, index) => (
                                         <tr key={emp.id}>
                                             <td>{index + 1}</td>
+                                            <td style={{ color: "black" }}>{emp.employee_code}</td>
                                             <td style={{ color: "black" }}>{emp.name}</td>
                                             <td style={{ color: "black" }}>{emp.phone}</td>
                                             <td style={{ color: "black" }}>{emp.email}</td>
@@ -117,9 +119,7 @@ function EmployeeList() {
                                                             <button
                                                                 className="dropdown-item"
                                                                 onClick={() => navigate(`/admin/add-bank-details/${emp.id}`)}
-
-
-                                                            >
+                                                        >
                                                                 Bank Details
                                                             </button>
                                                         </li>
@@ -127,7 +127,7 @@ function EmployeeList() {
                                                         <li>
                                                             <button
                                                                 className="dropdown-item"
-                                                                onClick={() => handleDocs(emp.id)}
+                                                                onClick={() =>navigate(`/admin/employee-documents/${emp.id}`)}
                                                             >
                                                                 Documents
                                                             </button>
@@ -145,6 +145,7 @@ function EmployeeList() {
                             <tfoot>
                                 <tr>
                                     <th>Sl.No</th>
+                                    <th>Employee ID</th>
                                     <th>Name</th>
                                     <th>Phone</th>
                                     <th>Email</th>

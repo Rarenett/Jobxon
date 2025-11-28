@@ -4,10 +4,10 @@ import { useNavigate, useParams } from "react-router-dom";
 
 function AdminAddBankDetailsPage() {
     const navigate = useNavigate();
-    const { employeeId, editId } = useParams();   // ⭐ FIXED
+    const { employeeId, editId } = useParams();
 
     const [formData, setFormData] = useState({
-        employee: employeeId || "",   // ⭐ Fill only when opened from EmployeeList
+        employee: employeeId || "",
         bank_name: "",
         ifsc_code: "",
         account_no: "",
@@ -17,7 +17,6 @@ function AdminAddBankDetailsPage() {
         esic_no: "",
     });
 
-    // ⭐ Load data when editing
     useEffect(() => {
         if (editId) {
             axios
@@ -44,7 +43,7 @@ function AdminAddBankDetailsPage() {
         apiCall
             .then(() => {
                 alert(editId ? "Updated Successfully" : "Created Successfully");
-                navigate("/admin/bank-details");
+                navigate("/admin/list");
             })
             .catch((err) => {
                 console.error(err);
@@ -58,12 +57,7 @@ function AdminAddBankDetailsPage() {
 
             <form onSubmit={handleSubmit}>
 
-                {/* Hidden Employee Field */}
-                <input
-                    type="hidden"
-                    name="employee"
-                    value={formData.employee}
-                />
+                <input type="hidden" name="employee" value={formData.employee} />
 
                 <div className="form-group">
                     <label>Bank Name</label>
