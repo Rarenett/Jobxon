@@ -1,12 +1,13 @@
-from rest_framework import viewsets
+from users_app.models import CandidateProfile
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
-
-from .models import Job, JobCategory, JobType
-from .serializers import JobSerializer, EmployerJobSerializer, JobCategorySerializer, JobTypeSerializer
+from .models import Job, JobApplication, JobCategory, JobType
+from .serializers import JobApplicationSerializer, JobSerializer, EmployerJobSerializer, JobCategorySerializer, JobTypeSerializer
 from companies_app.models import CompanyProfile
 
 
@@ -27,7 +28,8 @@ class JobViewSet(viewsets.ModelViewSet):
     queryset = Job.objects.select_related('category', 'job_type', 'posted_by', 'company').all().order_by('-created_at')
     serializer_class = JobSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-
+    
+    
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             if self.request.user.is_authenticated and self.request.user.is_staff:
@@ -55,3 +57,70 @@ def company_list(request):
     """Simple endpoint to get active companies for dropdown"""
     companies = CompanyProfile.objects.filter(is_active=True).values('id', 'name')
     return Response(list(companies))
+
+
+
+class JobApplicationViewSet(viewsets.ModelViewSet):
+    queryset = JobApplication.objects.all().order_by('-applied_at')
+    serializer_class = JobApplicationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # If candidate: see own applications
+        if hasattr(user, 'candidate_profile'):
+            return JobApplication.objects.filter(candidate__user=user).order_by('-applied_at')
+        # If employer: see applications to their jobs
+        if user.is_staff or hasattr(user, 'company_profile'):
+            return JobApplication.objects.filter(job__posted_by=user).order_by('-applied_at')
+        return JobApplication.objects.none()
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+
+        # Ensure user has a candidate profile
+        try:
+            candidate_profile = user.candidate_profile
+        except CandidateProfile.DoesNotExist:
+            return Response(
+                {"error": "You must create a candidate profile before applying for jobs."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        job_id = request.data.get('job')
+        if not job_id:
+            return Response(
+                {"error": "Job ID is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check job exists
+        try:
+            job = Job.objects.get(id=job_id)
+        except Job.DoesNotExist:
+            return Response(
+                {"error": "Job not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Prevent duplicate applications
+        if JobApplication.objects.filter(job=job, candidate=candidate_profile).exists():
+            return Response(
+                {"error": "You have already applied for this job."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Create application
+        cover_letter = request.data.get('cover_letter', '')
+        resume = request.FILES.get('resume')
+
+        application = JobApplication.objects.create(
+            job=job,
+            candidate=candidate_profile,
+            candidate_id_value=candidate_profile.candidate_id,  # store JXCAN001
+            cover_letter=cover_letter,
+            resume=resume
+        )
+
+        serializer = self.get_serializer(application)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

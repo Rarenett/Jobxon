@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 
 from companies_app.models import CompanyProfile
-from users_app.models import CustomUser
+from users_app.models import CandidateProfile, CustomUser
 
 
 class JobCategory(models.Model):
@@ -105,3 +105,31 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class JobApplication(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('reviewed', 'Reviewed'),
+        ('shortlisted', 'Shortlisted'),
+        ('rejected', 'Rejected'),
+        ('hired', 'Hired'),
+    ]
+
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    candidate = models.ForeignKey(
+        CandidateProfile, 
+        on_delete=models.CASCADE, 
+        related_name='applications'
+    )
+    candidate_id_value = models.CharField(
+        max_length=20,
+        help_text="Snapshot of candidate_id (e.g., JXCAN001)",
+    )
+    cover_letter = models.TextField(blank=True, null=True)
+    resume = models.FileField(upload_to='applications/resumes/', blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    applied_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.candidate_id_value} -> {self.job.title}"

@@ -71,16 +71,6 @@ class LoginSerializer(serializers.Serializer):
         
         return user
 
-# -------------------------
-# Candidate Profile Serializer
-# -------------------------
-class CandidateProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(source='user.email', read_only=True)
-    
-    class Meta:
-        model = CandidateProfile
-        fields = '__all__'
-        read_only_fields = ['user']
 
 
 class CompanyPhotoSerializer(serializers.ModelSerializer):
@@ -114,13 +104,13 @@ from rest_framework import serializers
 from .models import CandidateProfile
 
 
-
 class CandidateBasicInfoSerializer(serializers.ModelSerializer):
     """Serializer for candidate basic information update"""
     
     class Meta:
         model = CandidateProfile
         fields = [
+            "candidate_id",  # ✅ Added
             "full_name",
             "phone",
             "email",
@@ -138,6 +128,7 @@ class CandidateBasicInfoSerializer(serializers.ModelSerializer):
             "full_address",
             "description",
         ]
+        read_only_fields = ['candidate_id']  # ✅ Added - make it read-only
         extra_kwargs = {
             'email': {'required': False},
             'full_name': {'required': False},
@@ -150,5 +141,5 @@ class CandidateProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CandidateProfile
-        fields = '_all_'
-        read_only_fields = ['user', 'id', 'created_at', 'updated_at']
+        fields = '__all__'  # ✅ Fixed typo: was '_all_' should be '__all__'
+        read_only_fields = ['user', 'id', 'candidate_id', 'created_at', 'updated_at']  # ✅ Added candidate_id

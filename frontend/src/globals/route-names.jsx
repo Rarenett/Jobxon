@@ -29,15 +29,15 @@ export const publicUser = {
         GRID: "/job-grid",
         GRID_MAP: "/job-grid-with-map",
         LIST: "/job-list",
-        DETAIL1: "/job-detail/1",
-        DETAIL2: "/job-detail/2",
+        DETAIL1: "/job-detail/1/:id",  // ✅ Changed: Added :id parameter
+        DETAIL2: "/job-detail/2/:id",  // ✅ Changed: Added :id parameter
         APPLY: "/apply-job"
     },
     employer: {
         GRID: "/emp-grid",
         LIST: "/emp-list",
-        DETAIL1: "/emp-detail/1",
-        DETAIL2: "/emp-detail/2"
+        DETAIL1: "/emp-detail/1/:id",  // ✅ Added :id for consistency
+        DETAIL2: "/emp-detail/2/:id"   // ✅ Added :id for consistency
     },
     pages: {
         ABOUT:          "/about-us",
@@ -55,15 +55,15 @@ export const publicUser = {
     candidate: {
         GRID: "/can-grid",
         LIST: "/can-list",
-        DETAIL1: "/can-detail/1",
-        DETAIL2: "/can-detail/2"
+        DETAIL1: "/can-detail/1/:id",  // ✅ Added :id for consistency
+        DETAIL2: "/can-detail/2/:id"   // ✅ Added :id for consistency
     },
     blog: {
         GRID1: "/blog-grid/1",
         GRID2: "/blog-grid/2",
         GRID3: "/blog-grid/3",
         LIST: "/blog-list",
-        DETAIL: "/blog-detail"
+        DETAIL: "/blog-detail/:id"     // ✅ Added :id for blog details
     }
 }
 
@@ -87,10 +87,9 @@ export const employer = {
     POST_A_JOB:     "/post-a-job",
     MANAGE_JOBS:    "/manage-jobs",
     CANDIDATES:     "/candidates-list",
-    AllCANDIDATES:"/can-list",
-    VIEW_APPLIED_CANDIDATES:"/view-candidate",
-    CAND_BOOKMARKS:"/bookmarked-candidates",
-
+    AllCANDIDATES:  "/can-list",
+    VIEW_APPLIED_CANDIDATES:"/view-candidate/:id",  // ✅ Added :id
+    CAND_BOOKMARKS: "/bookmarked-candidates",
     BOOKMARKS:      "/bookmarked-jobs",
     PACKAGES:       "/packages",
     MESSAGES1:      "/messages-style-1",
@@ -98,31 +97,28 @@ export const employer = {
     RESUME_ALERTS:  "/resume-alerts"
 }
 
-
 export const admin = {
     INITIAL:        "/",
     DASHBOARD:      "/dashboard",
     PROFILE:        "/profile",
     POST_A_JOB:     "/post-a-job",
     JOB_TYPE:       "/job_type",
-    
     MANAGE_JOBS:    "/manage-jobs",
     CANDIDATES:     "/candidates-list",
-    AllCANDIDATES:"/can-list",
-    ALLCOMPANIES:"",
-    VIEW_APPLIED_CANDIDATES:"/view-candidate",
-    CAND_BOOKMARKS:"/bookmarked-candidates",
-
+    AllCANDIDATES:  "/can-list",
+    ALLCOMPANIES:   "/all-companies",
+    VIEW_APPLIED_CANDIDATES:"/view-candidate/:id",  // ✅ Added :id
+    CAND_BOOKMARKS: "/bookmarked-candidates",
     BOOKMARKS:      "/bookmarked-jobs",
     PACKAGES:       "/packages",
     MESSAGES1:      "/messages-style-1",
     MESSAGES2:      "/messages-style-2",
     RESUME_ALERTS:  "/resume-alerts",
-    COMPANY_LIST:"/company-list",
+    COMPANY_LIST:   "/company-list",
     COMPANY_DETAIL: "/companies/:id",
-    JOB_CATEGORY:"/job-category",
-    JOB_TYPE:"/job_types",
-    PRICING:"/pricing"
+    JOB_CATEGORY:   "/job-category",
+    JOB_TYPE:       "/job_types",
+    PRICING:        "/pricing"
 }
 
 export function pubRoute(_route) {

@@ -1,3 +1,5 @@
+import { useParams, NavLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import JobZImage from "../../../../common/jobz-img";
 import SectionJobsSidebar2 from "../../sections/jobs/sidebar/section-jobs-sidebar2";
 import SectionRelatedJobs from "../../sections/jobs/detail/section-related-jobs";
@@ -5,134 +7,296 @@ import SectionShareProfile from "../../sections/common/section-share-profile";
 import SectionJobLocation from "../../sections/jobs/detail/section-job-location";
 import SectionOfficePhotos2 from "../../sections/common/section-office-photos2";
 import SectionOfficeVideo2 from "../../sections/common/section-office-video2";
-import { useEffect } from "react";
 import { loadScript } from "../../../../../globals/constants";
 import ApplyJobPopup from "../../../../common/popups/popup-apply-job";
 
+
 function JobDetail2Page() {
+    // Change slug to id
+    const { id } = useParams();
+    const [job, setJob] = useState(null);
+    const [company, setCompany] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // State for Read More functionality
+    const [showFullDescription, setShowFullDescription] = useState(false);
+    const [showFullJobDescription, setShowFullJobDescription] = useState(false);
 
     const sidebarConfig = {
-        showJobInfo: false
+        showJobInfo: true
+    };
+
+    useEffect(() => {
+        const fetchJobDetails = async () => {
+            try {
+                setLoading(true);
+                // Change slug to id in the API URL
+                const jobResponse = await fetch(`http://127.0.0.1:8000/api/jobs/${id}/`);
+                if (!jobResponse.ok) throw new Error('Job not found');
+                const jobData = await jobResponse.json();
+                setJob(jobData);
+
+                // Fetch company details if company exists
+                if (jobData.company) {
+                    const companyResponse = await fetch(`http://127.0.0.1:8000/api/companies/${jobData.company}/`);
+                    if (companyResponse.ok) {
+                        const companyData = await companyResponse.json();
+                        setCompany(companyData);
+                    }
+                }
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        // Change slug to id
+        if (id) {
+            fetchJobDetails();
+        }
+    }, [id]); // Change dependency from slug to id
+
+    useEffect(() => {
+        loadScript("js/custom.js");
+    }, []);
+
+    // Helper function to format date
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    };
+
+    // Helper function to calculate days ago
+    const getDaysAgo = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays === 1 ? '1 day ago' : `${diffDays} days ago`;
+    };
+
+    // Helper function to truncate text
+    const truncateText = (text, maxLength = 300) => {
+        if (!text) return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    };
+
+    if (loading) {
+        return (
+            <div className="section-full p-t120 p-b90 text-center">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="sr-only">Loading...</span>
+                </div>
+            </div>
+        );
     }
 
-    useEffect(()=>{
-        loadScript("js/custom.js");
-    })
+    if (error) {
+        return (
+            <div className="section-full p-t120 p-b90 text-center">
+                <h3>Error: {error}</h3>
+                <NavLink to="/" className="site-button mt-3">Back to Home</NavLink>
+            </div>
+        );
+    }
+
+    if (!job) {
+        return (
+            <div className="section-full p-t120 p-b90 text-center">
+                <h3>Job not found</h3>
+                <NavLink to="/" className="site-button mt-3">Back to Home</NavLink>
+            </div>
+        );
+    }
+
+    // Get company description
+    const companyDescription = company?.about || company?.description || '';
+    const shouldShowReadMore = companyDescription.length > 300;
+
+    // Get job description
+    const jobDescription = job.description || '';
+    const shouldShowJobReadMore = jobDescription.length > 400;
 
     return (
         <>
             {/* Job Detail V.2 START */}
-            <div className="section-full  p-t50 p-b90 bg-white">
+            <div className="section-full p-t50 p-b90 bg-white">
                 <div className="container">
-                    {/* BLOG SECTION START */}
                     <div className="section-content">
                         <div className="twm-job-self-wrap twm-job-detail-v2">
                             <div className="twm-job-self-info">
                                 <div className="twm-job-self-top">
                                     <div className="twm-media-bg">
-                                        <JobZImage src="images/job-detail-bg-2.jpg" alt="#" />
-                                        <div className="twm-jobs-category green"><span className="twm-bg-green">New</span></div>
+                                        <JobZImage
+                                            src={company?.banner_image
+                                                ? `http://127.0.0.1:8000${company.banner_image}`
+                                                : "images/job-detail-bg-2.jpg"
+                                            }
+                                            alt={job.title}
+                                        />
+                                        <div className="twm-jobs-category green">
+                                            <span className="twm-bg-green">{job.work_mode}</span>
+                                        </div>
                                         <div className="twm-job-self-bottom">
-                                            <a className="site-button" data-bs-toggle="modal" href="#apply_job_popup" role="button">
+                                            <a
+                                                className="site-button"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#apply_job_popup"
+                                                role="button"
+                                            >
                                                 Apply Now
                                             </a>
+
                                         </div>
                                     </div>
                                     <div className="twm-mid-content">
                                         <div className="twm-media">
-                                            <JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
+                                            <JobZImage
+                                                src={company?.logo
+                                                    ? `http://127.0.0.1:8000${company.logo}`
+                                                    : "images/jobs-company/pic1.jpg"
+                                                }
+                                                alt={job.company_name}
+                                            />
                                         </div>
-                                        <h4 className="twm-job-title">Senior Web Designer , Developer <span className="twm-job-post-duration">/ 1 days ago</span></h4>
-                                        <p className="twm-job-address"><i className="feather-map-pin" />1363-1385 Sunset Blvd Los Angeles, CA 90026, USA</p>
+                                        <h4 className="twm-job-title">
+                                            {job.title}
+                                            <span className="twm-job-post-duration">/ {getDaysAgo(job.created_at)}</span>
+                                        </h4>
+                                        <p className="twm-job-address">
+                                            <i className="feather-map-pin" />
+                                            {job.complete_address || `${job.city}, ${job.country}`}
+                                        </p>
                                         <div className="twm-job-self-mid">
                                             <div className="twm-job-self-mid-left">
-                                                <a href="https://themeforest.net/user/thewebmax/portfolio" className="twm-job-websites site-text-primary">https://thewebmax.com</a>
-                                                <div className="twm-jobs-amount">$2000 - $2500 <span>/ Month</span></div>
+                                                {job.website && (
+                                                    <a href={job.website} className="twm-job-websites site-text-primary" target="_blank" rel="noopener noreferrer">
+                                                        {job.website}
+                                                    </a>
+                                                )}
+                                                {job.salary_range && (
+                                                    <div className="twm-jobs-amount">
+                                                        ${job.salary_range} <span>/ Month</span>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="twm-job-apllication-area">Application ends:
-                                                <span className="twm-job-apllication-date">October 1, 2025</span>
-                                            </div>
+                                            {job.end_date && (
+                                                <div className="twm-job-apllication-area">
+                                                    Application ends:
+                                                    <span className="twm-job-apllication-date">{formatDate(job.end_date)}</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <div className="twm-job-detail-2-wrap">
                             <div className="row d-flex justify-content-center">
                                 <div className="col-lg-4 col-md-12 rightSidebar">
-                                    <SectionJobsSidebar2 _config={sidebarConfig} />
+                                    <SectionJobsSidebar2 _config={sidebarConfig} jobData={job} companyData={company} />
                                 </div>
                                 <div className="col-lg-8 col-md-12">
-                                    {/* Candidate detail START */}
                                     <div className="cabdidate-de-info">
-                                        <h4 className="twm-s-title m-t0">Company Description:</h4>
-                                        <p>
-                                            Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? there are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
-                                        </p>
-                                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi.</p>
-                                        <h4>Job Overview</h4>
-                                        <p>
-                                            Our development team focuses on unit testing, TDD, CI, design patterns and refactoring. Internal and external training is encouraged through mentoring, guided self-learning, conferences, user groups and training courses. We maintain and improve existing codebases, and create new systems, exposing developers to constant variety.
-                                        </p>
-                                        <p>
-                                            Our team understands the performance implications of serving more than 25,000 page requests per-hour, crafting awesome user experiences. While we leverage existing tech, we also research new technologies to overcome technical and business challenges, to maintain our industry-leading status.
-                                        </p>
-                                        <h4 className="twm-s-title">Requirments:</h4>
-                                        <ul className="description-list-2">
-                                            <li>
-                                                <i className="feather-check" />
-                                                Must be able to communicate with others to convey information effectively.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                Personally passionate and up to date with current trends and technologies, committed to quality and comfortable working with adult media.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                Rachelor or Master degree level educational background.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                4 years relevant PHP dev experience.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                Troubleshooting, testing and maintaining the core product software and databases.
-                                            </li>
-                                        </ul>
-                                        <h4 className="twm-s-title">Responsabilities:</h4>
-                                        <ul className="description-list-2">
-                                            <li>
-                                                <i className="feather-check" />
-                                                Establish and promote design guidelines, best practices and standards.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                Accurately estimate design tickets during planning sessions.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                Partnering with product and engineering to translate business and user goals into elegant and practical designs. that can deliver on key business and user metrics.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                Create wireframes, storyboards, user flows, process flows and site maps to communicate interaction and design.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                Present and defend designs and key deliverables to peers and executive level stakeholders.
-                                            </li>
-                                            <li>
-                                                <i className="feather-check" />
-                                                Execute all visual design stages from concept to final hand-off to engineering.
-                                            </li>
-                                        </ul>
+                                        {/* Company Description with Read More */}
+                                        {companyDescription && (
+                                            <>
+                                                <h4 className="twm-s-title m-t0">Company Description:</h4>
+                                                <p style={{ textAlign: 'justify', lineHeight: '1.8' }}>
+                                                    {showFullDescription
+                                                        ? companyDescription
+                                                        : truncateText(companyDescription, 300)
+                                                    }
+                                                </p>
+                                                {shouldShowReadMore && (
+                                                    <button
+                                                        onClick={() => setShowFullDescription(!showFullDescription)}
+                                                        className="site-button-link site-text-primary"
+                                                        style={{
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            cursor: 'pointer',
+                                                            padding: '0',
+                                                            fontSize: '14px',
+                                                            fontWeight: '600',
+                                                            marginTop: '10px',
+                                                            display: 'inline-block'
+                                                        }}
+                                                    >
+                                                        {showFullDescription ? '← Read Less' : 'Read More →'}
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {/* Job Overview with Read More */}
+                                        {jobDescription && (
+                                            <>
+                                                <h4 className="twm-s-title" style={{ marginTop: '30px' }}>Job Overview</h4>
+                                                <p style={{ textAlign: 'justify', lineHeight: '1.8' }}>
+                                                    {showFullJobDescription
+                                                        ? jobDescription
+                                                        : truncateText(jobDescription, 400)
+                                                    }
+                                                </p>
+                                                {shouldShowJobReadMore && (
+                                                    <button
+                                                        onClick={() => setShowFullJobDescription(!showFullJobDescription)}
+                                                        className="site-button-link site-text-primary"
+                                                        style={{
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            cursor: 'pointer',
+                                                            padding: '0',
+                                                            fontSize: '14px',
+                                                            fontWeight: '600',
+                                                            marginTop: '10px',
+                                                            display: 'inline-block'
+                                                        }}
+                                                    >
+                                                        {showFullJobDescription ? '← Read Less' : 'Read More →'}
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {job.requirements && (
+                                            <>
+                                                <h4 className="twm-s-title" style={{ marginTop: '30px' }}>Requirements:</h4>
+                                                <ul className="description-list-2">
+                                                    {job.requirements.split('\n').filter(req => req.trim()).map((req, index) => (
+                                                        <li key={index}>
+                                                            <i className="feather-check" />
+                                                            {req.trim()}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </>
+                                        )}
+
+                                        {job.responsibilities && (
+                                            <>
+                                                <h4 className="twm-s-title" style={{ marginTop: '30px' }}>Responsibilities:</h4>
+                                                <ul className="description-list-2">
+                                                    {job.responsibilities.split('\n').filter(resp => resp.trim()).map((resp, index) => (
+                                                        <li key={index}>
+                                                            <i className="feather-check" />
+                                                            {resp.trim()}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </>
+                                        )}
 
                                         <SectionShareProfile />
-                                        <SectionJobLocation />
-                                        <SectionOfficePhotos2 />
-                                        <SectionOfficeVideo2 />
-
+                                        <SectionJobLocation jobData={job} />
+                                        {company && <SectionOfficePhotos2 companyData={company} />}
+                                        {company && <SectionOfficeVideo2 companyData={company} />}
                                     </div>
                                 </div>
                             </div>
@@ -144,13 +308,13 @@ function JobDetail2Page() {
 
             {/* Related Jobs START */}
             <div className="section-full p-t120 p-b90 site-bg-light-purple twm-related-jobs-carousel-wrap">
-                <SectionRelatedJobs />
+                <SectionRelatedJobs categoryId={job.category} currentJobId={job.id} />
             </div>
             {/* Related Jobs END */}
 
-            <ApplyJobPopup />
+            <ApplyJobPopup jobId={job.id} jobTitle={job.title} />
         </>
-    )
+    );
 }
 
 export default JobDetail2Page;

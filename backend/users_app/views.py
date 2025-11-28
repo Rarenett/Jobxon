@@ -162,6 +162,7 @@ def profile_view(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -204,10 +205,10 @@ class CandidateProfileViewSet(viewsets.ModelViewSet):
         # Get or create profile
         try:
             profile = CandidateProfile.objects.get(user=request.user)
-            print(f"Found existing profile: {profile.id}")
+            print(f"Found existing profile: {profile.id} - {profile.candidate_id}")
         except CandidateProfile.DoesNotExist:
             profile = CandidateProfile.objects.create(user=request.user)
-            print(f"Created new profile: {profile.id}")
+            print(f"Created new profile: {profile.id} - {profile.candidate_id}")
 
         # Serialize and save
         serializer = CandidateBasicInfoSerializer(
@@ -218,13 +219,61 @@ class CandidateProfileViewSet(viewsets.ModelViewSet):
         
         if serializer.is_valid():
             serializer.save()
-            print(f"Profile saved successfully")
+            print(f"Profile saved successfully - ID: {profile.candidate_id}")
             return Response({
                 'message': 'Profile updated successfully',
                 'data': serializer.data
             }, status=status.HTTP_200_OK)
         else:
             print(f"Validation errors: {serializer.errors}")
+            return Response({
+                'message': 'Validation failed',
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], url_path='current-profile')
+    def current_profile(self, request):
+        """Get current authenticated user's complete candidate profile"""
+        try:
+            profile = CandidateProfile.objects.get(user=request.user)
+            serializer = CandidateProfileSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except CandidateProfile.DoesNotExist:
+            return Response(
+                {'error': 'Profile not found. Please create your profile first.'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    @action(detail=False, methods=['post'], url_path='create-profile')
+    def create_profile(self, request):
+        """Create a new candidate profile (if one doesn't exist)"""
+        
+        # Check if profile already exists
+        if CandidateProfile.objects.filter(user=request.user).exists():
+            return Response(
+                {'error': 'Profile already exists. Use update endpoint instead.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create new profile
+        profile = CandidateProfile.objects.create(user=request.user)
+        
+        # Update with provided data
+        serializer = CandidateBasicInfoSerializer(
+            profile, 
+            data=request.data, 
+            partial=True
+        )
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Profile created successfully',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            # Delete the profile if data validation fails
+            profile.delete()
             return Response({
                 'message': 'Validation failed',
                 'errors': serializer.errors

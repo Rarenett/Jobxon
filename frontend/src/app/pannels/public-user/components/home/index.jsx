@@ -10,6 +10,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 
+
 function Home1Page() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -18,7 +19,7 @@ function Home1Page() {
 
     useEffect(() => {
         loadScript("js/custom.js");
-        
+
         // Fetch categories from Django API
         axios.get('http://127.0.0.1:8000/api/categories/')
             .then(response => {
@@ -29,7 +30,7 @@ function Home1Page() {
                 console.error('Error fetching categories:', error);
                 setLoading(false);
             });
-                    // Fetch jobs for job list section
+        // Fetch jobs for job list section
         axios.get("http://127.0.0.1:8000/api/jobs/")
             .then(response => {
                 setJobs(response.data);
@@ -78,7 +79,7 @@ function Home1Page() {
             }
         ]
     };
-        // Format utility for date difference
+    // Format utility for date difference
     function daysAgo(dateString) {
         if (!dateString) return "";
         const posted = new Date(dateString);
@@ -698,33 +699,42 @@ function Home1Page() {
                                             <div className="twm-jobs-list-style1 mb-5">
                                                 <div className="twm-media">
                                                     <JobZImage
-                                                        src="images/jobs-company/pic1.jpg"
-                                                        alt={job.title}
+                                                        src={job.company_logo
+                                                            ? `http://127.0.0.1:8000${job.company_logo}`
+                                                            : "images/jobs-company/pic1.jpg"
+                                                        }
+                                                        alt={job.company_name || job.title}
                                                     />
                                                 </div>
                                                 <div className="twm-mid-content">
-                                                    <NavLink to={`/jobs/${job.slug || job.id}`} className="twm-job-title">
+                                                    {/* Dynamic link - replace :id with actual job.id */}
+                                                    <NavLink
+                                                        to={`/job-detail/2/${job.id}`}
+                                                        className="twm-job-title"
+                                                    >
                                                         <h4>
                                                             {job.title}
                                                             <span className="twm-job-post-duration">
-                                                                {daysAgo(job.created_at)}
+                                                                / {daysAgo(job.created_at)}
                                                             </span>
                                                         </h4>
                                                     </NavLink>
                                                     <p className="twm-job-address">
-                                                        {job.complete_address ||
-                                                            [job.city, job.country].filter(Boolean).join(', ')}
+                                                        {job.complete_address || `${job.city}, ${job.country}`}
                                                     </p>
                                                 </div>
                                                 <div className="twm-right-content">
                                                     <div className="twm-jobs-category green">
-                                                        <span className="twm-bg-green">{job.job_type_name || ''}</span>
+                                                        <span className="twm-bg-green">{job.job_type_name}</span>
                                                     </div>
-                                                    <div className="twm-jobs-amount">
-                                                        {job.offered_salary ? `${job.offered_salary} / month` : ''}
-                                                    </div>
+                                                    {job.salary_range && (
+                                                        <div className="twm-jobs-amount">
+                                                            ${job.salary_range} <span>/ Month</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Dynamic Browse Job button */}
                                                     <NavLink
-                                                        to={`/jobs/${job.slug || job.id}`}
+                                                        to={`/job-detail/2/${job.id}`}
                                                         className="twm-jobs-browse site-text-primary"
                                                     >
                                                         Browse Job
@@ -732,8 +742,9 @@ function Home1Page() {
                                                 </div>
                                             </div>
                                         </li>
-                                    ))
-                                )}
+                                    )))}
+
+
                             </ul>
                             <div className="text-center m-b30">
                                 <NavLink to="/jobs" className="site-button">Browse All Jobs</NavLink>

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import JobCategory, JobType, Job
+from .models import JobApplication, JobCategory, JobType, Job
 
 class JobCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -79,3 +79,29 @@ class EmployerJobSerializer(serializers.ModelSerializer):
                 })
                 
         return super().create(validated_data)
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+    job_title = serializers.CharField(source='job.title', read_only=True)
+    candidate_full_name = serializers.CharField(source='candidate.full_name', read_only=True)
+
+    class Meta:
+        model = JobApplication
+        fields = [
+            'id',
+            'job',
+            'job_title',
+            'candidate',
+            'candidate_id_value',
+            'candidate_full_name',
+            'cover_letter',
+            'resume',
+            'status',
+            'applied_at',
+        ]
+        read_only_fields = [
+            'id',
+            'candidate',
+            'candidate_id_value',
+            'status',
+            'applied_at',
+        ]

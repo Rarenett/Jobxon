@@ -113,7 +113,7 @@ function SectionJobsGrid() {
                                     )}
                                 </div>
                                 <NavLink 
-                                    to={`/jobs/${job.slug || job.id}`} 
+                                    to={`/job-detail/2/${job.id || job.slug }`} 
                                     className="twm-jobs-browse site-text-primary"
                                 >
                                     Browse Job

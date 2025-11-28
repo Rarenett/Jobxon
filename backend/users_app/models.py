@@ -1,8 +1,8 @@
 from django.db import models
 from rest_framework import serializers
-
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.db import models
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -47,78 +47,26 @@ class CustomUser(AbstractUser):
     
     def __str__(self):
         return f"{self.email} ({self.user_type})"
+
+
 from django.db import models
-
-class CandidateProfile(models.Model):
-    """Profile for job seekers"""
-    user = models.OneToOneField(
-        CustomUser, 
-        on_delete=models.CASCADE, 
-        related_name='candidate_profile'
-    )
-    
-    # Basic Information
-    name = models.CharField(max_length=150)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    website = models.URLField(blank=True, null=True)
-    
-    # Professional Details
-    qualification = models.CharField(max_length=200, blank=True, null=True)
-    languages = models.CharField(max_length=200, blank=True, null=True, help_text="Comma-separated")
-    job_category = models.CharField(max_length=150, blank=True, null=True)
-    experience = models.CharField(max_length=100, blank=True, null=True, help_text="e.g. 3 Years")
-    
-    # Salary Expectations
-    current_salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    expected_salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    age = models.PositiveIntegerField(blank=True, null=True)
-    
-    # Profile Media
-    profile_picture = models.ImageField(upload_to="candidates/profile_pics/", blank=True, null=True)
-    resume = models.FileField(upload_to="candidates/resumes/", blank=True, null=True)
-
-    # Address Information
-    country = models.CharField(max_length=100, blank=True, null=True)
-    city = models.CharField(max_length=100, blank=True, null=True)
-    post_code = models.CharField(max_length=20, blank=True, null=True)
-    full_address = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-
-    # Social Links
-    facebook = models.URLField(blank=True, null=True)
-    twitter = models.URLField(blank=True, null=True)
-    linkedin = models.URLField(blank=True, null=True)
-    whatsapp = models.URLField(blank=True, null=True)
-    instagram = models.URLField(blank=True, null=True)
-    pinterest = models.URLField(blank=True, null=True)
-    tumblr = models.URLField(blank=True, null=True)
-    youtube = models.URLField(blank=True, null=True)
-
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        verbose_name = "Candidate Profile"
-        verbose_name_plural = "Candidate Profiles"
-
-
-
 from django.conf import settings
-from django.db import models
-
-from django.conf import settings
-from django.db import models
-
 
 class CandidateProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='candidate_profile'
+    )
+
+    # ✅ Add candidate_id field
+    candidate_id = models.CharField(
+        max_length=20, 
+        unique=True, 
+        editable=False,
+        blank=True,
+        null=True,
+        help_text="Auto-generated unique candidate ID (e.g., JXCAN001)"
     )
 
     # Basic Info
@@ -151,8 +99,33 @@ class CandidateProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def _str_(self):
-        return self.full_name or f"Profile of {self.user.email}"
+    def save(self, *args, **kwargs):
+        """Generate candidate_id automatically on first save"""
+        if not self.candidate_id:
+            self.candidate_id = self.generate_candidate_id()
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def generate_candidate_id():
+        """Generate unique candidate ID in format JXCAN001"""
+        # Get the last candidate ID
+        last_candidate = CandidateProfile.objects.all().order_by('id').last()
+        
+        if last_candidate and last_candidate.candidate_id:
+            # Extract number from last ID (e.g., JXCAN001 -> 1)
+            try:
+                last_number = int(last_candidate.candidate_id.replace('JXCAN', ''))
+                new_number = last_number + 1
+            except (ValueError, AttributeError):
+                new_number = 1
+        else:
+            new_number = 1
+        
+        # Format: JXCAN + 3-digit padded number
+        return f'JXCAN{new_number:03d}'
+
+    def __str__(self):
+        return f"{self.candidate_id} - {self.full_name or self.user.email}"
 
     class Meta:
         verbose_name = "Candidate Profile"
