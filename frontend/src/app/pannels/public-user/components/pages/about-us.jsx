@@ -21,13 +21,7 @@ function AboutUsPage() {
             <SectionHowItWorks />
             {/* HOW IT WORK SECTION END */}
 
-            {/* EXPLORE NEW LIFE START */}
-            <SectionUploadCV />
-            {/* EXPLORE NEW LIFE END */}
-
-            {/* TOP COMPANIES START */}
-            <SectionTopCompanies />
-            {/* TOP COMPANIES END */}
+          
         </>
     )
 }

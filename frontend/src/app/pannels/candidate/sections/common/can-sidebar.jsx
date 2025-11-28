@@ -42,7 +42,7 @@ function CanSidebarSection() {
 
     return (
         <>
-            <div className="twm-candidate-profile-pic">
+            <div className="twm-candidate-profile-pic" >
                 <JobZImage src="images/user-avtar/pic4.jpg" alt="" />
                 <div className="upload-btn-wrapper">
                     <div id="upload-image-grid" />

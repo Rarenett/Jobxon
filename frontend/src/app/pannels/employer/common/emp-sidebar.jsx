@@ -66,9 +66,7 @@ function EmpSidebarSection(props) {
 
 
 
-                        <li className={setMenuActive(currentpath, empRoute(employer.BOOKMARKS))}>
-                            <NavLink to={empRoute(employer.BOOKMARKS)} id="bookId1"><i className="fa fa-bookmark" /><span className="admin-nav-text">Bookmark Jobs</span></NavLink>
-                        </li>
+                       
 
                         <li className={setMenuActive(currentpath, empRoute(employer.PACKAGES))}>
                             <NavLink to={empRoute(employer.PACKAGES)}><i className="fa fa-money-bill-alt" /><span className="admin-nav-text">Packages</span></NavLink>
@@ -78,12 +76,7 @@ function EmpSidebarSection(props) {
                                 <NavLink to={empRoute(employer.MESSAGES1)} > <i className="fa fa-envelope" /><span className="admin-nav-text">Messages</span></NavLink>
                         </li>
                       
-                        <li className={setMenuActive(currentpath, empRoute(employer.RESUME_ALERTS))}>
-                            <NavLink to={empRoute(employer.RESUME_ALERTS)}><i className="fa fa-bell" /><span className="admin-nav-text">Resume Alerts</span></NavLink>
-                        </li>
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#delete-dash-profile"><i className="fa fa-trash-alt" /><span className="admin-nav-text">Delete Profile</span></a>
-                        </li>
+                      
                         <li>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#logout-dash-profile">
                                 <i className="fa fa-share-square" />

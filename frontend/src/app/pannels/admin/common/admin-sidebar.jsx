@@ -103,9 +103,7 @@ function AdminSidebarSection(props) {
                         <li className={setMenuActive(currentpath, adRoute(admin.RESUME_ALERTS))}>
                             <NavLink to={adRoute(admin.RESUME_ALERTS)}><i className="fa fa-bell" /><span className="admin-nav-text">Resume Alerts</span></NavLink>
                         </li>
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#delete-dash-profile"><i className="fa fa-trash-alt" /><span className="admin-nav-text">Delete Profile</span></a>
-                        </li>
+                     
                         <li>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#logout-dash-profile">
                                 <i className="fa fa-share-square" />

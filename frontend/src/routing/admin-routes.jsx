@@ -37,7 +37,7 @@ function AdminRoutes() {
             <Route path={admin.VIEW_APPLIED_CANDIDATES} element={<AdminAPPLIEDCANDIDATES />} />
 
             <Route path={admin.BOOKMARKS} element={<JobBookmarksPage />} />
-                        <Route path={admin.CAND_BOOKMARKS} element={<AdminBookmarksPage />} />
+            <Route path={admin.CAND_BOOKMARKS} element={<AdminBookmarksPage />} />
 
             <Route path={admin.PACKAGES} element={<AdminPackagesPage />} />
             <Route path={admin.MESSAGES1} element={<AdminMessages1Page />} />

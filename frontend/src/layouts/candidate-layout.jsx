@@ -19,13 +19,13 @@ function CandidateLayout() {
 
                 <div className="page-content">
 
-                    <InnerPageBanner _data={setBanner(currentpath)} />
+                    {/* <InnerPageBanner _data={setBanner(currentpath)} /> */}
 
-                    <div className="section-full p-t120  p-b90 site-bg-white">
+                    <div className="section-full p-t120  p-b90 site-bg-white" style={{paddingTop:"100px"}}>
                         <div className="container">
                             <div className="row">
-                                <div className="col-xl-3 col-lg-4 col-md-12 rightSidebar m-b30">
-                                    <div className="side-bar-st-1">
+                                <div className="col-xl-3 col-lg-4 col-md-12 rightSidebar m-b30" style={{paddingTop:"20px"}}>
+                                    <div className="side-bar-st-1 " >
                                         <CanSidebarSection />
                                     </div>
                                 </div>

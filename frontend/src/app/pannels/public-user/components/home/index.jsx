@@ -18,7 +18,7 @@ function Home1Page() {
 
     useEffect(() => {
         loadScript("js/custom.js");
-        
+
         // Fetch categories from Django API
         axios.get('http://127.0.0.1:8000/api/categories/')
             .then(response => {
@@ -29,7 +29,7 @@ function Home1Page() {
                 console.error('Error fetching categories:', error);
                 setLoading(false);
             });
-                    // Fetch jobs for job list section
+        // Fetch jobs for job list section
         axios.get("http://127.0.0.1:8000/api/jobs/")
             .then(response => {
                 setJobs(response.data);
@@ -78,7 +78,7 @@ function Home1Page() {
             }
         ]
     };
-        // Format utility for date difference
+    // Format utility for date difference
     function daysAgo(dateString) {
         if (!dateString) return "";
         const posted = new Date(dateString);
@@ -538,14 +538,19 @@ function Home1Page() {
                                             <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry the standard dummy text ever since the  when an printer took.</p>
                                         </div>
                                         <div className="twm-upload-file">
-                                            <button type="button" className="site-button">Upload Your Resume <i className="feather-upload" /></button>
+                                            <a className="site-button" data-bs-toggle="modal" href="#sign_up_popup2" role="button">
+                                                Upload Your Resume <i className="feather-upload" />
+                                            </a>
                                         </div>
+
                                     </div>
                                     <div className="twm-bold-circle-right" />
                                     <div className="twm-bold-circle-left" />
                                 </div>
                             </div>
                         </div>
+
+                       
                     </div>
                 </div>
             </div>
