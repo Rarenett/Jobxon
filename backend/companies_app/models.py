@@ -112,3 +112,19 @@ class CompanyReview(models.Model):
         verbose_name = "Company Review"
         verbose_name_plural = "Company Reviews"
         ordering = ['-created_at']
+
+
+class TopCompany(models.Model):
+    name = models.CharField(max_length=200)
+    logo = models.ImageField(upload_to='company_logos/')
+    website_url = models.URLField(blank=True, null=True)
+    is_featured = models.BooleanField(default=True)
+    display_order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['display_order', '-created_at']
+        verbose_name_plural = "Top Companies"
+    
+    def __str__(self):
+        return self.name

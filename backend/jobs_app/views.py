@@ -59,9 +59,8 @@ def company_list(request):
     return Response(list(companies))
 
 
-
 class JobApplicationViewSet(viewsets.ModelViewSet):
-    queryset = JobApplication.objects.all().order_by('-applied_at')
+    queryset = JobApplication.objects.select_related('job', 'job__company', 'candidate').all().order_by('-applied_at')
     serializer_class = JobApplicationSerializer
     permission_classes = [IsAuthenticated]
 
@@ -69,11 +68,21 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
         user = self.request.user
         # If candidate: see own applications
         if hasattr(user, 'candidate_profile'):
-            return JobApplication.objects.filter(candidate__user=user).order_by('-applied_at')
+            return JobApplication.objects.select_related(
+                'job', 'job__company', 'candidate'
+            ).filter(candidate__user=user).order_by('-applied_at')
         # If employer: see applications to their jobs
         if user.is_staff or hasattr(user, 'company_profile'):
-            return JobApplication.objects.filter(job__posted_by=user).order_by('-applied_at')
+            return JobApplication.objects.select_related(
+                'job', 'job__company', 'candidate'
+            ).filter(job__posted_by=user).order_by('-applied_at')
         return JobApplication.objects.none()
+
+    def get_serializer_context(self):
+        """Pass request to serializer for building absolute URLs"""
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
     def create(self, request, *args, **kwargs):
         user = request.user
@@ -117,7 +126,7 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
         application = JobApplication.objects.create(
             job=job,
             candidate=candidate_profile,
-            candidate_id_value=candidate_profile.candidate_id,  # store JXCAN001
+            candidate_id_value=candidate_profile.candidate_id,
             cover_letter=cover_letter,
             resume=resume
         )

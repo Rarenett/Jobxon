@@ -16,6 +16,8 @@ function Home1Page() {
     const [loading, setLoading] = useState(true);
     const [jobs, setJobs] = useState([]);
     const [jobsLoading, setJobsLoading] = useState(true);
+    const [companies, setCompanies] = useState([]);
+    const [companiesLoading, setCompaniesLoading] = useState(true);
 
     useEffect(() => {
         loadScript("js/custom.js");
@@ -40,7 +42,18 @@ function Home1Page() {
                 setJobs([]);
                 setJobsLoading(false);
             });
+        axios.get('http://127.0.0.1:8000/top-companies/')
+            .then(response => {
+                setCompanies(response.data);
+                setCompaniesLoading(false);
+            })
+            .catch(error => {
+                console.error('Error fetching companies:', error);
+                setCompanies([]);
+                setCompaniesLoading(false);
+            });
     }, []);
+
 
     // Slick carousel settings for job categories
     const categorySliderSettings = {
@@ -75,6 +88,42 @@ function Home1Page() {
                 breakpoint: 480,
                 settings: {
                     slidesToShow: 1,
+                }
+            }
+        ]
+    };
+    const companySliderSettings = {
+        dots: false,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 6,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 2500,
+        arrows: true,
+        responsive: [
+            {
+                breakpoint: 1200,
+                settings: {
+                    slidesToShow: 5,
+                }
+            },
+            {
+                breakpoint: 992,
+                settings: {
+                    slidesToShow: 4,
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 3,
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 2,
                 }
             }
         ]
@@ -553,7 +602,7 @@ function Home1Page() {
             {/* EXPLORE NEW LIFE END */}
 
             {/* TOP COMPANIES START */}
-            <div className="section-full p-t120  site-bg-white twm-companies-wrap">
+            <div className="section-full p-t120 site-bg-white twm-companies-wrap">
                 {/* title START*/}
                 <div className="section-head center wt-small-separator-outer">
                     <div className="wt-small-separator site-text-primary">
@@ -564,68 +613,127 @@ function Home1Page() {
                 {/* title END*/}
                 <div className="container">
                     <div className="section-content">
-                        <div className="owl-carousel home-client-carousel2 owl-btn-vertical-center">
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w1.png" alt="" /></NavLink></div>
-                                </div>
+                        {companiesLoading ? (
+                            <div className="text-center py-5">
+                                <p>Loading companies...</p>
                             </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w2.png" alt="" /></NavLink></div>
-                                </div>
+                        ) : companies.length > 0 ? (
+                            <Slider {...companySliderSettings} className="home-client-carousel2">
+                                {companies.map((company) => {
+                                    const logoUrl = company.logo?.startsWith('http')
+                                        ? company.logo
+                                        : `http://127.0.0.1:8000${company.logo}`;
+
+                                    return (
+                                        <div key={company.id} className="item">
+                                            <div style={{ padding: '0 10px' }}>
+                                                <NavLink
+                                                    to={company.website_url || publicUser.employer.LIST}
+                                                    target={company.website_url ? "_blank" : "_self"}
+                                                    rel={company.website_url ? "noopener noreferrer" : ""}
+                                                    style={{
+                                                        textDecoration: 'none',
+                                                        display: 'block'
+                                                    }}
+                                                >
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        padding: '25px 15px',
+                                                        minHeight: '220px',
+                                                        background: '#ffffff',
+                                                        borderRadius: '12px',
+                                                        border: '1px solid #e8e8e8',
+                                                        transition: 'all 0.3s ease',
+                                                        cursor: 'pointer',
+                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                                                    }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(-8px)';
+                                                            e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
+                                                            e.currentTarget.style.borderColor = '#1967d2';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)';
+                                                            e.currentTarget.style.borderColor = '#e8e8e8';
+                                                        }}
+                                                    >
+                                                        {/* Logo Container - Rectangle/Square */}
+                                                        <div style={{
+                                                            width: '140px',
+                                                            height: '100px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            marginBottom: '18px',
+                                                            background: '#f8f9fa',
+                                                            borderRadius: '8px',
+                                                            padding: '15px',
+                                                            overflow: 'hidden'
+                                                        }}>
+                                                            {company.logo ? (
+                                                                <img
+                                                                    src={logoUrl}
+                                                                    alt={company.name}
+                                                                    onError={(e) => {
+                                                                        console.error('Image failed to load:', logoUrl);
+                                                                        e.target.style.display = 'none';
+                                                                        e.target.parentElement.innerHTML = '<div style="color: #999; font-size: 14px; text-align: center; width: 100%;">Logo unavailable</div>';
+                                                                    }}
+                                                                    style={{
+                                                                        maxWidth: '100%',
+                                                                        maxHeight: '100%',
+                                                                        width: 'auto',
+                                                                        height: 'auto',
+                                                                        objectFit: 'contain',
+                                                                        display: 'block'
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <div style={{
+                                                                    color: '#999',
+                                                                    fontSize: '14px',
+                                                                    textAlign: 'center',
+                                                                    width: '100%'
+                                                                }}>
+                                                                    Logo unavailable
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Company Name */}
+                                                        <div style={{
+                                                            fontSize: '16px',
+                                                            fontWeight: '300',
+                                                            color: '#1d1d1d',
+                                                            textAlign: 'center',
+                                                            lineHeight: '1.4',
+                                                            marginTop: '8px',
+                                                            padding: '0 10px',
+                                                            wordWrap: 'break-word',
+                                                            width: '100%',
+                                                            minHeight: '44px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center'
+                                                        }}>
+                                                            {company.name}
+                                                        </div>
+                                                    </div>
+                                                </NavLink>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </Slider>
+                        ) : (
+                            <div className="text-center py-5">
+                                <p>No companies available at the moment.</p>
                             </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w3.png" alt="" /></NavLink></div>
-                                </div>
-                            </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w4.png" alt="" /></NavLink></div>
-                                </div>
-                            </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w5.png" alt="" /></NavLink></div>
-                                </div>
-                            </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w6.png" alt="" /></NavLink></div>
-                                </div>
-                            </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w1.png" alt="" /></NavLink></div>
-                                </div>
-                            </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w2.png" alt="" /></NavLink></div>
-                                </div>
-                            </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w3.png" alt="" /></NavLink></div>
-                                </div>
-                            </div>
-                            <div className="item">
-                                <div className="ow-client-logo">
-                                    <div className="client-logo client-logo-media">
-                                        <NavLink to={publicUser.employer.LIST}><JobZImage src="images/client-logo/w5.png" alt="" /></NavLink></div>
-                                </div>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
                 <div className="twm-company-approch-outer">
@@ -638,7 +746,8 @@ function Home1Page() {
                                         <div className="tw-count-number text-clr-sky">
                                             <span className="counter">
                                                 <CountUp end={5} duration={10} />
-                                            </span>M+</div>
+                                            </span>M+
+                                        </div>
                                         <p className="icon-content-info">Million daily active users</p>
                                     </div>
                                 </div>
@@ -650,7 +759,8 @@ function Home1Page() {
                                         <div className="tw-count-number text-clr-pink">
                                             <span className="counter">
                                                 <CountUp end={9} duration={10} />
-                                            </span>K+</div>
+                                            </span>K+
+                                        </div>
                                         <p className="icon-content-info">Open job positions</p>
                                     </div>
                                 </div>
@@ -662,7 +772,8 @@ function Home1Page() {
                                         <div className="tw-count-number text-clr-green">
                                             <span className="counter">
                                                 <CountUp end={2} duration={10} />
-                                            </span>M+</div>
+                                            </span>M+
+                                        </div>
                                         <p className="icon-content-info">Million stories shared</p>
                                     </div>
                                 </div>
@@ -672,6 +783,7 @@ function Home1Page() {
                 </div>
             </div>
             {/* TOP COMPANIES END */}
+
 
             {/* JOB POST LIST START */}
             <div className="section-full p-t120 p-b90 site-bg-light-purple twm-bg-ring-wrap">

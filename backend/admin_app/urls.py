@@ -1,4 +1,3 @@
-# admin_app/urls.py
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -30,13 +29,9 @@ router.register(r'it-skills', CandidateITSkillViewSet, basename='it-skills')
 router.register(r'key-skills', CandidateKeySkillViewSet, basename='keyskill')
 
 
-
-
-
-
 urlpatterns = [
     path('api/', include(router.urls)),
-path('api/resume-headline/', ResumeHeadlineView.as_view(), name='resume-headline'),
+    path('api/resume-headline/', ResumeHeadlineView.as_view(), name='resume-headline'),
 
 ]
 

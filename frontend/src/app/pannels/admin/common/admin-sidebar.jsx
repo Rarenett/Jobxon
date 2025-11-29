@@ -95,6 +95,9 @@ function AdminSidebarSection(props) {
                         <li className={setMenuActive(currentpath, adRoute(admin.PRICING))}>
                             <NavLink to={adRoute(admin.PRICING)}><i className="fa fa-money-bill-alt" /><span className="admin-nav-text">Pricing</span></NavLink>
                         </li>
+                        <li className={setMenuActive(currentpath, adRoute(admin.TOPCOMPANY))}>
+                            <NavLink to={adRoute(admin.TOPCOMPANY)}><i className="fa fa-money-bill-alt" /><span className="admin-nav-text">Top Companies</span></NavLink>
+                        </li>
 
                         <li className={setMenuActive(currentpath, adRoute(admin.MESSAGES1))}>
                             <NavLink to={adRoute(admin.MESSAGES1)} > <i className="fa fa-envelope" /><span className="admin-nav-text">Messages</span></NavLink>

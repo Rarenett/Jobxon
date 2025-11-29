@@ -1,9 +1,9 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from .models import CompanyProfile, CompanyPhoto
+from .models import CompanyProfile, CompanyPhoto, TopCompany
 from .serializers import (
     CompanyProfileSerializer,
     CompanyPhotoSerializer,
@@ -11,7 +11,8 @@ from .serializers import (
     CompanyLogoSerializer,
     CompanyBannerSerializer,
     CompanySocialLinksSerializer,
-    CompanyVideoLinksSerializer
+    CompanyVideoLinksSerializer,
+    TopCompanySerializer
 )
 
 
@@ -137,3 +138,32 @@ class CompanyPhotoViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         profile = CompanyProfile.objects.get(user=self.request.user)
         serializer.save(company=profile)
+
+# views.py - Update your TopCompanyViewSet
+class TopCompanyViewSet(viewsets.ModelViewSet):
+    queryset = TopCompany.objects.all()
+    serializer_class = TopCompanySerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    permission_classes = [AllowAny]  # ADD THIS LINE
+    
+    def get_queryset(self):
+        queryset = TopCompany.objects.all().order_by('display_order', '-created_at')
+        is_featured = self.request.query_params.get('is_featured', None)
+        if is_featured is not None:
+            queryset = queryset.filter(is_featured=is_featured.lower() == 'true')
+        return queryset
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CompanyProfile, CompanyPhoto, CompanyReview
+from .models import CompanyProfile, CompanyPhoto, CompanyReview, TopCompany
 
 
 class CompanyPhotoSerializer(serializers.ModelSerializer):
@@ -80,3 +80,23 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
     def get_review_count(self, obj):
         return obj.reviews.count()
     read_only_fields = ['id', 'email', 'created_at', 'updated_at']
+
+
+class TopCompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TopCompany
+        fields = ['id', 'name', 'logo', 'website_url', 'is_featured', 'display_order', 'created_at']
+        read_only_fields = ['id', 'created_at']
+    
+    def validate_logo(self, value):
+        """Validate logo file size and type"""
+        if value:
+            # Check file size (max 5MB)
+            if value.size > 5 * 1024 * 1024:
+                raise serializers.ValidationError("Logo file size should not exceed 5MB")
+            
+            # Check file type
+            if not value.content_type.startswith('image/'):
+                raise serializers.ValidationError("Only image files are allowed")
+        
+        return value

@@ -21,7 +21,7 @@ import AdminCompaniesPage from "../app/pannels/admin/components/AdminCompaniesPa
 import AdminJobCategory from "../app/pannels/admin/components/admin-JobCategory";
 import AdminManageJobTypesPage from "../app/pannels/admin/components/jobs/AdminManageJobTypesPage";
 import AdminPricingPlan from "../app/pannels/admin/components/AdminPricingPlan";
-
+import AdminTopCompany from "../app/pannels/admin/components/AdminTopCompany";
 import AdminCompanyDetailPage from '../app/pannels/admin/components/AdminCompanyDetailPage';
 
 
@@ -37,7 +37,7 @@ function AdminRoutes() {
             <Route path={admin.VIEW_APPLIED_CANDIDATES} element={<AdminAPPLIEDCANDIDATES />} />
 
             <Route path={admin.BOOKMARKS} element={<JobBookmarksPage />} />
-                        <Route path={admin.CAND_BOOKMARKS} element={<AdminBookmarksPage />} />
+            <Route path={admin.CAND_BOOKMARKS} element={<AdminBookmarksPage />} />
 
             <Route path={admin.PACKAGES} element={<AdminPackagesPage />} />
             <Route path={admin.MESSAGES1} element={<AdminMessages1Page />} />
@@ -47,7 +47,7 @@ function AdminRoutes() {
             <Route path={admin.JOB_CATEGORY} element={<AdminJobCategory />} />
             <Route path={admin.JOB_TYPE} element={<AdminManageJobTypesPage />} />
             <Route path={admin.PRICING} element={<AdminPricingPlan />} />
-
+            <Route path={admin.TOPCOMPANY} element={<AdminTopCompany />} />
 
             <Route path={admin.COMPANY_DETAIL} element={<AdminCompanyDetailPage />} />
 

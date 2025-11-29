@@ -118,7 +118,8 @@ export const admin = {
     COMPANY_DETAIL: "/companies/:id",
     JOB_CATEGORY:   "/job-category",
     JOB_TYPE:       "/job_types",
-    PRICING:        "/pricing"
+    PRICING:        "/pricing",
+    TOPCOMPANY:     "/topcompany"
 }
 
 export function pubRoute(_route) {

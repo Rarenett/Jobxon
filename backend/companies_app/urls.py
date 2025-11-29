@@ -1,11 +1,13 @@
+# urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CompanyProfileViewSet, CompanyPhotoViewSet
+from .views import CompanyProfileViewSet, CompanyPhotoViewSet, TopCompanyViewSet
 
 router = DefaultRouter()
-router.register(r'profiles', CompanyProfileViewSet, basename='company-profile')
-router.register(r'photos', CompanyPhotoViewSet, basename='company-photo')
+router.register(r'companies', CompanyProfileViewSet, basename='company')
+router.register(r'company-photos', CompanyPhotoViewSet, basename='company-photo')
+router.register(r'top-companies', TopCompanyViewSet, basename='top-company')
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]

@@ -79,10 +79,28 @@ class EmployerJobSerializer(serializers.ModelSerializer):
                 })
                 
         return super().create(validated_data)
-
+    
+    
 class JobApplicationSerializer(serializers.ModelSerializer):
+    # Job details
     job_title = serializers.CharField(source='job.title', read_only=True)
+    job_location = serializers.CharField(source='job.location', read_only=True)
+    job_salary = serializers.DecimalField(source='job.salary', max_digits=10, decimal_places=2, read_only=True)
+    job_type = serializers.CharField(source='job.job_type', read_only=True)
+    job_company_name = serializers.CharField(source='job.company.name', read_only=True)
+    job_company_logo = serializers.SerializerMethodField()
+    
+    # Candidate details
     candidate_full_name = serializers.CharField(source='candidate.full_name', read_only=True)
+    
+    def get_job_company_logo(self, obj):
+        """Return full URL for company logo"""
+        if obj.job.company and obj.job.company.logo:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.job.company.logo.url)
+            return obj.job.company.logo.url
+        return None
 
     class Meta:
         model = JobApplication
@@ -90,6 +108,11 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             'id',
             'job',
             'job_title',
+            'job_location',
+            'job_salary',
+            'job_type',
+            'job_company_name',
+            'job_company_logo',
             'candidate',
             'candidate_id_value',
             'candidate_full_name',
