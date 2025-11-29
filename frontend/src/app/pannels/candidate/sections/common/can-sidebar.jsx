@@ -94,12 +94,7 @@ function CanSidebarSection() {
                             Job Alerts
                         </NavLink>
                     </li>
-                    <li className={setMenuActive(currentpath, canRoute(candidate.CHANGE_PASSWORD))}>
-                        <NavLink to={canRoute(candidate.CHANGE_PASSWORD)}>
-                            <i className="fa fa-fingerprint" />
-                            Change Password
-                        </NavLink>
-                    </li>
+                    
                     <li className={setMenuActive(currentpath, canRoute(candidate.CHAT))}>
                         <NavLink to={canRoute(candidate.CHAT)}>
                             <i className="fa fa-comments" />

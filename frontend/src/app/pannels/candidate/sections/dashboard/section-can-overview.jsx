@@ -18,7 +18,7 @@ function SectionCandidateOverview({ profile, loading, userName }) {
                                         <CountUp end={25} duration={10} />
                                     </div>
                                     <div className="wt-card-bottom-2 ">
-                                        <h4 className="m-b0">Posted Jobs</h4>
+                                        <h4 className="m-b0">Applied Jobs</h4>
                                     </div>
                                 </div>
                             </div>
@@ -33,7 +33,7 @@ function SectionCandidateOverview({ profile, loading, userName }) {
                                         <CountUp end={435} duration={10} />
                                     </div>
                                     <div className="wt-card-bottom-2">
-                                        <h4 className="m-b0">Total Applications</h4>
+                                        <h4 className="m-b0">Applications Shortlisted</h4>
                                     </div>
                                 </div>
                             </div>

@@ -52,9 +52,7 @@ const generateAvatar = (name, email, size = 40) => {
 };
 
 const renderProfileImage = (participant, size = 40) => {
-  const imageUrl = getImageUrl(
-    participant?.logo || participant?.profile_image
-  );
+  const imageUrl = getImageUrl(participant?.logo || participant?.profile_image);
 
   if (imageUrl) {
     return (
@@ -69,15 +67,7 @@ const renderProfileImage = (participant, size = 40) => {
           flexShrink: 0,
         }}
         onError={(e) => {
-          const parent = e.target.parentElement;
           e.target.style.display = "none";
-          const avatar = generateAvatar(
-            participant?.name,
-            participant?.email,
-            size
-          );
-          // React element can't be appended directly; in practice keep avatar via state/render,
-          // but if you want same behaviour as EmpMessages2Page just rely on generateAvatar below.
         }}
       />
     );
@@ -107,9 +97,13 @@ function SectionCanChatList() {
         },
       });
       const data = await res.json();
-      setConversations(data);
+      
+      // Handle both array and paginated object responses
+      const items = Array.isArray(data) ? data : (data.results || []);
+      setConversations(items);
     } catch (error) {
       console.error("Failed to load conversations", error);
+      setConversations([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -155,15 +149,18 @@ function SectionCanChatList() {
     setSearchParams({ conversation: convId });
   };
 
-  const filteredConversations = conversations.filter(
-    (conv) =>
-      conv.other_participant?.name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      conv.other_participant?.email
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
+  // Defensive filter - ensure conversations is always an array
+  const filteredConversations = Array.isArray(conversations)
+    ? conversations.filter(
+        (conv) =>
+          conv.other_participant?.name
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          conv.other_participant?.email
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   if (loading) {
     return (
@@ -263,8 +260,7 @@ function SectionCanChatList() {
                       <div
                         className="msg-user-name"
                         style={{
-                          fontWeight:
-                            conv.unread_count > 0 ? 600 : 500,
+                          fontWeight: conv.unread_count > 0 ? 600 : 500,
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
@@ -288,8 +284,7 @@ function SectionCanChatList() {
                         <small
                           style={{
                             fontSize: "11px",
-                            color:
-                              conv.unread_count > 0 ? "#22c55e" : "#999",
+                            color: conv.unread_count > 0 ? "#22c55e" : "#999",
                             whiteSpace: "nowrap",
                           }}
                         >

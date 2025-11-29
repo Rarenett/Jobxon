@@ -170,7 +170,7 @@ function SignUpPopup() {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h2 className="modal-title" id="sign_up_popupLabel">Sign Up</h2>
-                            <p>Sign Up and get access to all the features of Jobzilla</p>
+                            <p>Sign Up and get access to all the features of Jobxon</p>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
                         </div>
                         <div className="modal-body">

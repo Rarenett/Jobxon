@@ -147,7 +147,7 @@ function LoginPage() {
                             <div className="twm-log-reg-form-wrap">
                                 <div className="twm-log-reg-logo-head">
                                     <NavLink to={publicUser.HOME1}>
-                                        <JobZImage src="images/logo-dark.png" alt="" className="logo" />
+                                        <JobZImage src="images/jobxon-logo.png" alt="" className="logo" />
                                     </NavLink>
                                 </div>
                                 <div className="twm-log-reg-inner">
