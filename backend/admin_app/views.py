@@ -7,6 +7,11 @@ from .serializer import CandidateProjectSerializer
 from django.db.models import Q
 from rest_framework.views import APIView
 from .models import ResumeHeadline
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from .models import TermsAndConditions
+from .serializer import TermsAndConditionsSerializer
 from .models import CandidateEducation
 from .models import PersonalDetail
 from .serializer import PersonalDetailSerializer
@@ -549,11 +554,6 @@ def assign_menu_permissions_api(request, user_id):
         return Response({"error": str(e)}, status=500)
 
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from .models import TermsAndConditions
-from .serializer import TermsAndConditionsSerializer
 
 
 @api_view(["GET"])
