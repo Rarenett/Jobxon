@@ -11,6 +11,7 @@ from .views import CandidateEducationViewSet
 from .views import CandidateITSkillViewSet
 from admin_app.views import MenuViewSet, SubMenuViewSet
 from .views import assign_menu_permissions_api
+from .views import get_active_terms
 
 
 
@@ -66,6 +67,8 @@ urlpatterns = [
     path('api/', include(router.urls)),
 path('api/resume-headline/', ResumeHeadlineView.as_view(), name='resume-headline'),
 path("assign-menu-permissions-api/<int:user_id>/", assign_menu_permissions_api),
+path("terms/active/", get_active_terms),
+
 
 
 

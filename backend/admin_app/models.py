@@ -1,6 +1,8 @@
 from django.db import models
 
 from django.conf import settings
+from django.utils import timezone
+
 
 class ResumeHeadline(models.Model):
     user = models.OneToOneField(
@@ -429,3 +431,62 @@ class MenuPermission(models.Model):
 
     def __str__(self):
         return f"{self.user.email} → {self.submenu.name}"
+
+
+
+class TermsAndConditions(models.Model):
+    title = models.CharField(max_length=255, default="Terms & Conditions")
+    version = models.CharField(max_length=10, default="1.0")
+    is_active = models.BooleanField(default=False)
+    published_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-published_at"]
+
+    def save(self, *args, **kwargs):
+        # Only one active
+        if self.is_active:
+            TermsAndConditions.objects.exclude(id=self.id).update(is_active=False)
+            if not self.published_at:
+                self.published_at = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"T&C v{self.version}"
+
+class TermsSection(models.Model):
+    terms = models.ForeignKey(
+        TermsAndConditions,
+        on_delete=models.CASCADE,
+        related_name="sections"
+    )
+    title = models.CharField(max_length=255)
+    order = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.order}. {self.title}"
+
+class TermsContent(models.Model):
+    section = models.ForeignKey(
+        TermsSection,
+        on_delete=models.CASCADE,
+        related_name="contents"
+    )
+    content_type = models.CharField(
+        max_length=20,
+        choices=[
+            ("paragraph", "Paragraph"),
+            ("bullet", "Bullet Point"),
+            ("subheading", "Sub Heading"),
+        ],
+        default="paragraph"
+    )
+    text = models.TextField()
+    order = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.section.title} -> {self.content_type}"

@@ -547,3 +547,22 @@ def assign_menu_permissions_api(request, user_id):
 
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from .models import TermsAndConditions
+from .serializer import TermsAndConditionsSerializer
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def get_active_terms(request):
+    terms = TermsAndConditions.objects.filter(is_active=True).first()
+
+    if not terms:
+        return Response({"error": "No active terms available"}, status=404)
+
+    serializer = TermsAndConditionsSerializer(terms)
+    return Response(serializer.data)

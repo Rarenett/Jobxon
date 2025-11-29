@@ -13,7 +13,8 @@ import AdminPackagesPage from "../app/pannels/admin/components/admin-packages";
 import AdminMessages1Page from "../app/pannels/admin/components/messages/admin-messages1";
 import AdminMessages2Page from "../app/pannels/admin/components/messages/admin-messages2";
 import AdminResumeAlertsPage from "../app/pannels/admin/components/admin-resume-alerts";
-import Error404Page from "../app/pannels/public-user/components/pages/error404";
+import Error404Page from "../app/pannels/public-user/components/pages/error404"
+
 
 import AdminALLCANDIDATES from "../app/pannels/public-user/components/candidates/can-list";
 import AdminAPPLIEDCANDIDATES from "../app/pannels/public-user/components/candidates/can-detail2";

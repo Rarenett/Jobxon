@@ -11,7 +11,8 @@ from .models import DesiredCareerProfile
 from .models import CandidateProject
 from .models import ResumeAttachment
 from .models import ProfileSummary
-
+from rest_framework import serializers
+from .models import TermsAndConditions, TermsSection, TermsContent
 
 
 class CandidateProfileListSerializer(serializers.ModelSerializer):
@@ -201,3 +202,26 @@ class MenuPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuPermission
         fields = ["id", "user_profile", "submenu", "submenu_name", "menu_name", "user_email"]
+
+
+
+class TermsContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TermsContent
+        fields = ["id", "content_type", "text", "order"]
+
+
+class TermsSectionSerializer(serializers.ModelSerializer):
+    contents = TermsContentSerializer(many=True)
+
+    class Meta:
+        model = TermsSection
+        fields = ["id", "title", "order", "contents"]
+
+
+class TermsAndConditionsSerializer(serializers.ModelSerializer):
+    sections = TermsSectionSerializer(many=True)
+
+    class Meta:
+        model = TermsAndConditions
+        fields = ["id", "title", "version", "published_at", "sections"]

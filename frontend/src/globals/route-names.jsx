@@ -3,6 +3,7 @@ import AddSubMenu from "../app/pannels/admin/common/AddSubMenu"
 import AssignMenuPermissionPage from "../app/pannels/admin/common/AssignMenuPermissionPage"
 import MenuList from "../app/pannels/admin/common/MenuList"
 import SubMenuList from "../app/pannels/admin/common/SubMenuList"
+import TermsAndConditions from "../app/pannels/public-user/components/pages/terms"
 
 export const base = {
     PUBLIC_PRE: "",
@@ -57,6 +58,7 @@ export const publicUser = {
         AFTER_LOGIN:    "/after-login",
         ICONS:          "/icons",
         ADMIN_LOGIN:    "/admin_login",
+        TermsAndConditions: "/terms-and-conditions"
     },
     candidate: {
         GRID: "/can-grid",
